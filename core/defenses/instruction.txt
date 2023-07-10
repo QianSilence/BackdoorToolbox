@@ -1,0 +1,15 @@
+# 'AutoEncoderDefense', 'ShrinkPad', 'FineTuning', 'MCR', 'NAD', 'Pruning', 'ABL', 'CutMix',
+
+1.Detection based defenses aim to detect anomalies in input data
+（1）STRIP
+
+2.Model reconstruction based defenses
+
+（1）MCR（Mode Connectivity Repair ）
+（2）NAD（Neural Attention Distillation）
+（3）Pruning
+（4）FineTuning
+
+3.Poison suppression based defenses
+（1）DBD（Decoupling-based backdoor defense）
+（2）ABL (Anti-Backdoor Learning)
