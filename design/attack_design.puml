@@ -1,0 +1,69 @@
+@startuml
+
+class Base {
+  +train_dataset:Dataset 
+  +test_dataset:Dataset 
+  +model:Model 
+  -loss:function
+  -global_schedule:dict 
+  -current_schedule:dict 
+
+  -__init__(self, train_dataset, test_dataset, model, loss, 
+            schedule=None, seed=0, deterministic=False)
+  -_set_seed(self,seed, deterministic)
+  -_seed_worker(self,worker_id)
+  +adjust_learning_rate(self, optimizer, epoch)
+  +get_model(self)
+  +get_poisoned_dataset(self)
+  +trian(self, schedule=None)
+  -_test(self, dataset, device, batch_size=16, num_workers=8, model=None)
+  +test(self, schedule=None, model=None, test_dataset=None, 
+        poisoned_test_dataset=None) 
+}
+
+abstract class Attack{
+    +name:String
+    +poisoned_model:Model
+    +get_attack_name(self)
+    +get_poisoned_model(self)
+    +{abstract} attack(self)
+}
+class "DataPoisoningAttack(Attack,Base)" as DataPoisoningAttack{
+  +attack_config:dict
+  +poisoned_train_dataset:Dataset
+  +poisoned_test_dataset:Dataset 
+  -__init__(self,attack_config,train_dataset,test_dataset,model,loss,
+            schedule=None,seed=0,deterministic=False)
+  +get_poisoned_train_dataset(self)
+  +get_poisoned_test_dataset(self)
+  +attack(self)
+  +{abstract} create_poisoned_dataset(self, attack_config)
+}
+
+class DataPoisoningAttackExample{
+    + __init__(self,attack_config,train_dataset,test_dataset,model,loss,
+               schedule=None,seed=0,deterministic=False)
+    +CreatePoisonedDataset(self,attack_config)  
+}
+
+class ModelPoisoningAttack {
+  -Model poisoned_Model 
+  +__init__(train_dataset,test_dataset, model,loss,
+            attack_config,schedule=None,seed=0,deterministic=False)
+  +CreatePoisonedModel()
+  +train(){attack()}
+  +get_poisoned_Model()
+  +attack(){CreatePoisonedModel()}
+}
+class ModelPoisoningAttackExample{   
+    + __init__(train_dataset,test_dataset,model,loss,
+               attack_config,schedule=None,seed=0,deterministic=False)
+    +CreatePoisonedModel()
+}
+DataPoisoningAttack--|> Attack
+DataPoisoningAttack --|> Base
+DataPoisoningAttackExample --|> DataPoisoningAttack
+ModelPoisoningAttack --|> Attack
+ModelPoisoningAttack --|> Base
+ModelPoisoningAttackExample --|> ModelPoisoningAttack
+@enduml

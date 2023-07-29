@@ -1,17 +1,10 @@
-from ast import Import
+"""
+将package:attacks package下的模块中的类，变量，函数，之后加载package:attacks中任何这些变量
+可以直接加载,例如：在test_Badnets.py中;print(dir())可以看到 "BadNets"已经当前作用域的有效属性列表之中
+"""
 from .BadNets import BadNets
-from .Blended import Blended
-from .LabelConsistent import LabelConsistent
-from .Refool import Refool
-from .WaNet import WaNet
-from .Blind import Blind
-from .IAD import IAD
-from .LIRA import LIRA
-from .PhysicalBA import PhysicalBA
-from .ISSBA import ISSBA
-from .TUAP import TUAP
-from .SleeperAgent import SleeperAgent
+# print(dir())
 
 __all__ = [
-    'BadNets', 'Blended','Refool', 'WaNet', 'LabelConsistent', 'Blind', 'IAD', 'LIRA', 'PhysicalBA', 'ISSBA','TUAP', 'SleeperAgent'
+    'BadNets'
 ]

@@ -1,0 +1,6 @@
+@startuml
+class Model {
+  -__init__(self)
+  +forward(self, x)
+}
+@endtuml

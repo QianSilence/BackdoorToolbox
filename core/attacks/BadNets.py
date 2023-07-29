@@ -1,3 +1,4 @@
+from DataPoisoningAttack import DataPoisoningAttack
 '''
 This is the implement of BadNets [1].
 
@@ -13,9 +14,7 @@ import PIL
 from PIL import Image
 from torchvision.transforms import functional as F
 from torchvision.transforms import Compose
-
-from .base import *
-
+from Base import *
 
 class AddTrigger:
     def __init__(self):
@@ -376,93 +375,40 @@ class PoisonedCIFAR10(CIFAR10):
         return img, target
 
 
-def CreatePoisonedDataset(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index):
-    class_name = type(benign_dataset)
-    if class_name == DatasetFolder:
-        return PoisonedDatasetFolder(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
-    elif class_name == MNIST:
-        return PoisonedMNIST(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
-    elif class_name == CIFAR10:
-        return PoisonedCIFAR10(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
-    else:
-        raise NotImplementedError
+class BadNets(DataPoisoningAttack):
+    '''
+    attack_config:dict 数据投毒攻击方式的参数配置，与具体的攻击形式有关，因此在DataPoisoningAttack这一层除了
+    'name',其余参数不具体指明;在BadNets攻击中该参数形式如下：
+    gattack_config ={
+    'name': 'BadNets',
+    'benign_dataset': None,
+    'y_target': 1,
+    'poisoned_rate': 0.05,
+    'pattern': pattern,
+    'weight': weight,
+    'poisoned_transform_index': 0,
+    'poisoned_transform_test_index': 0,
+    'poisoned_target_transform_index': 0
+    }
+    '''
+    def __init__(self, attack_config, train_dataset, test_dataset, model, loss, schedule=None, seed=0, deterministic=False):
+        super(BadNets,self).__init__(attack_config, train_dataset, test_dataset, model, loss, schedule=schedule,  seed=seed, deterministic=deterministic)
+        self.attack_config = attack_config
+    def create_poisoned_dataset(self,attack_config):
+        benign_dataset = attack_config['benign_dataset']
+        y_target = attack_config['y_target']
+        poisoned_rate = attack_config['poisoned_rate']
+        pattern = attack_config['pattern']
+        weight = attack_config['weight']
+        poisoned_transform_index = attack_config['poisoned_transform_index']
+        poisoned_target_transform_index = attack_config['poisoned_target_transform_index']
+        class_name = type(benign_dataset)
+        if class_name == DatasetFolder:
+            return PoisonedDatasetFolder(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+        elif class_name == MNIST:
+            return PoisonedMNIST(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+        elif class_name == CIFAR10:
+            return PoisonedCIFAR10(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+        else:
+            raise NotImplementedError
 
-
-#所有的攻击算法类均继承于Base类
-class BadNets(Base):
-    """Construct poisoned datasets with BadNets method.
-# 一个攻击算法类所需的所有要素：
-# 数据
-    Args:
-        train_dataset (types in support_list): Benign training dataset.
-        test_dataset (types in support_list): Benign testing dataset.
-        model (torch.nn.Module): Network.
-        loss (torch.nn.Module): Loss.
-        y_target (int): N-to-1 attack target label.
-        poisoned_rate (float): Ratio of poisoned samples.
-        pattern (None | torch.Tensor): Trigger pattern, shape (C, H, W) or (H, W).
-        weight (None | torch.Tensor): Trigger pattern weight, shape (C, H, W) or (H, W).
-        poisoned_transform_train_index (int): The position index that poisoned transform will be inserted in train dataset. Default: 0.
-        poisoned_transform_test_index (int): The position index that poisoned transform will be inserted in test dataset. Default: 0.
-        poisoned_target_transform_index (int): The position that poisoned target transform will be inserted. Default: 0.
-        schedule (dict): Training or testing schedule. Default: None.
-        seed (int): Global seed for random numbers. Default: 0.
-        deterministic (bool): Sets whether PyTorch operations must use "deterministic" algorithms.
-            That is, algorithms which, given the same input, and when run on the same software and hardware,
-            always produce the same output. When enabled, operations will use deterministic algorithms when available,
-            and if only nondeterministic algorithms are available they will throw a RuntimeError when called. Default: False.
-    """
-    """
-    一个攻击算法类所需的所有要素：
-    1.数据
-    2.模型
-    3.策略
-    4.攻击参数设置：目标标签、数据的中毒率，trigger有关，有毒样本索引
-    5.训练设置：训练调度，训练结果的随机性设置
-
-    """
-
-
-    def __init__(self,
-                 train_dataset,
-                 test_dataset,
-                 model,
-                 loss,
-                 y_target,
-                 poisoned_rate,
-                 pattern=None,
-                 weight=None,
-                 poisoned_transform_train_index=0,
-                 poisoned_transform_test_index=0,
-                 poisoned_target_transform_index=0,
-                 schedule=None,
-                 seed=0,
-                 deterministic=False):
-        assert pattern is None or (isinstance(pattern, torch.Tensor) and ((0 < pattern) & (pattern < 1)).sum() == 0), 'pattern should be None or 0-1 torch.Tensor.'
-
-        super(BadNets, self).__init__(
-            train_dataset=train_dataset,
-            test_dataset=test_dataset,
-            model=model,
-            loss=loss,
-            schedule=schedule,
-            seed=seed,
-            deterministic=deterministic)
-        
-        self.poisoned_train_dataset = CreatePoisonedDataset(
-            train_dataset,
-            y_target,
-            poisoned_rate,
-            pattern,
-            weight,
-            poisoned_transform_train_index,
-            poisoned_target_transform_index)
-
-        self.poisoned_test_dataset = CreatePoisonedDataset(
-            test_dataset,
-            y_target,
-            1.0,
-            pattern,
-            weight,
-            poisoned_transform_test_index,
-            poisoned_target_transform_index)

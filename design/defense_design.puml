@@ -1,0 +1,100 @@
+@startuml
+class Dataset {
+  -String id
+  -String name
+  +String name()
+
+}
+class Model {
+  -String id
+  -String name
+  +String name()
+}
+class Base {
+  -Dataset train_dataset
+  -Dataset test_dataset
+  -Model model
+  -float loss
+  -dict global_schedule 
+  -dict current_schedule
+
+  +__init__(train_dataset, test_dataset, model, loss,
+            schedule=None, seed=0, deterministic=False)
+  +Model get_model()
+  +Dataset get_poisoned_dataset()
+  +trian()
+  +_test()
+  +test() 
+}
+
+abstract class Defense {
+  -String name
+  +defense()
+}
+
+class PreTrainDefense {
+  -String name
+  -Model CleanModel = None
+  -Dataset poisoned_dataset
+  -Dataset clean_dataset
+  +__init__(poisoned_train_dataset,poisoned_test_dataset, 
+            model,loss,defense_cinfig,schedule=None,seed=0,deterministic=False)
+  +_data_filter() 
+  +defense()
+  +get_clean_model(){return CleanModel}
+  +get_poisoned_dataset()
+  +get_clean_dataset()
+
+}
+
+class PreTrainDefenseExample{
+    +__init__(poisoned_train_dataset,poisoned_test_dataset, 
+              model,loss,defense_cinfig,schedule=None,seed=0,deterministic=False)
+   +_data_filter()
+}
+class DuringTrainDefense{
+  -String name
+  -Model CleanModel
+  +__init__(train_dataset,test_dataset, model,loss,defense_config,
+                 schedule=None,seed=0,deterministic=False)
+  +PoisonSuppress() 
+  +trin(){PoisonSuppress()}
+  +get_clean_model(){return CleanModel}
+  +defense()
+}
+
+class DuringTrainDefenseExample {
+  +__init__(train_dataset,test_dataset, model,loss,
+            defense_config,schedule=None,seed=0,deterministic=False)
+  +PoisonSuppress() 
+}
+
+class PostTrainDefense {
+  -String name
+  -Model CleanModel
+  +__init__(train_dataset,test_dataset, poisoned_model,
+            loss,schedule=None,seed=0,deterministic=False)
+  +_model_reconstruction() 
+  +get_clean_model(){return CleanModel}
+  +defense()
+}
+
+
+class PostTrainDefenseExample{
+  +__init__(train_dataset,test_dataset, poisoned_model,loss,defense_config
+                 schedule=None,seed=0,deterministic=False)
+  +_model_reconstruction()
+}
+
+Base --> Dataset
+Base --> Model
+PreTrainDefense --|> Base
+PreTrainDefense --|> Defense
+PreTrainDefenseExample --|> PreTrainDefense
+DuringTrainDefense --|> Base
+DuringTrainDefense --|> Defense
+DuringTrainDefenseExample --|>DuringTrainDefense
+PostTrainDefense --|> Defense
+PostTrainDefense --|> Base
+PostTrainDefenseExample --|> PostTrainDefense
+@enduml

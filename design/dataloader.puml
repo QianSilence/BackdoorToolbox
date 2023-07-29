@@ -1,0 +1,15 @@
+@startuml
+class DataLoader {
+  -__init__(
+      self,root: str,train: bool = True,transform: Optional[Callable] = None,
+      target_transform: Optional[Callable] = None, download: bool = False,
+    )
+  +train_labels(self)
+  +test_labels(self)
+  +train_data(self)
+  +test_data(self)
+  -__getitem__(self,index)
+  -__len__(self) -> int:
+  +download(self)
+}
+@enduml

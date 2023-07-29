@@ -1,0 +1,82 @@
+@startuml
+class Dataset {
+  -String id
+  -String name
+  +String name()
+
+}
+class Model {
+  -String id
+  -String name
+  +String name()
+}
+class Base {
+  -Dataset train_dataset
+  -Dataset test_dataset
+  -Model model
+  -float loss
+  -dict global_schedule 
+  -dict current_schedule
+
+  +__init__(train_dataset, test_dataset, model, loss,
+            schedule=None, seed=0, deterministic=False)
+  +Model get_model()
+  +Dataset get_poisoned_dataset()
+  +trian()
+  +_test()
+  +test() 
+}
+abstract class Attack{
+  -String name
+  -Dataset poisoned_train_dataset 
+  -Dataset poisoned_test_dataset
+
+  +__init__(train_dataset,test_dataset,model,loss,
+            attack_config,schedule=None,seed=0,deterministic=False):
+  +CreatePoisonedDataset()
+  +get_poisoned_train_dataset()
+  +get_poisoned_test_dataset()
+  +get_poisoned_Model()
+  +_update_datasets()
+  +train() 
+}
+class Defense {
+  -String name
+  -Model CleanModel = None
+  -Dataset poisoned_dataset
+  -Dataset clean_dataset
+  +__init__(poisoned_train_dataset,poisoned_test_dataset, 
+            model,loss,defense_cinfig,schedule=None,seed=0,deterministic=False)
+  +_data_filter() 
+  +get_clean_model(){return CleanModel}
+  +get_poisoned_dataset()
+  +get_clean_dataset()
+
+}
+
+class test{
+    -attack_method
+    -attack_config
+    -defense_method
+    -defense_config
+    -poisoned_model
+    -clean_model
+    -float ASR = None
+    -float CA = None
+    +__init__(train_dataset,test_dataset,model,loss,attack_method,
+           attack_config,defense_method,defense_config,
+           schedule=None,seed=0,deterministic=False)
+    +_attack_success_rate() 
+    +_clean_ccuracy ()
+    +get_attack_success_rate()
+    +get_clean_ccuracy ()
+}
+Base --> Dataset
+Base --> Model
+Attack --|> Base
+Defense --|> Base
+test -->Dataset
+test -->Model
+test -->Attack
+test -->Defense
+@enduml
