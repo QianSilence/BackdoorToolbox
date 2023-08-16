@@ -37,13 +37,13 @@ class "DataPoisoningAttack(Attack,Base)" as DataPoisoningAttack{
   +get_poisoned_train_dataset(self)
   +get_poisoned_test_dataset(self)
   +attack(self)
-  +{abstract} create_poisoned_dataset(self, attack_config)
+  +{abstract} create_poisoned_dataset(self, dataset,attack_config)
 }
 
 class DataPoisoningAttackExample{
     + __init__(self,attack_config,train_dataset,test_dataset,model,loss,
                schedule=None,seed=0,deterministic=False)
-    +CreatePoisonedDataset(self,attack_config)  
+    +create_poisoned_dataset(self,dataset,attack_config)  
 }
 
 class ModelPoisoningAttack {

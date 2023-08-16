@@ -1,5 +1,8 @@
 '''
 This is the test code of poisoned training under BadNets.
+#（1）数据投毒的架构设计逻辑
+#（2）全周期过程中的数据加载、模型训练和测试逻辑
+#（3）Badnets的后门攻击逻辑
 '''
 import os.path as osp
 '''
@@ -27,7 +30,7 @@ from torchvision.datasets import DatasetFolder
 from torchvision.transforms import Compose, ToTensor, RandomHorizontalFlip, ToPILImage, Resize
 import os
 import sys
-print(__file__)
+# print(__file__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 # print(sys.path)
@@ -38,7 +41,7 @@ print(sys.path)
 
 from attacks import BadNets
 from models import BaselineMNISTNetwork
-
+# torchvision.models.AlexNet()
 
 # ========== Set global settings ==========
 global_seed = 666
@@ -49,6 +52,8 @@ datasets_root_dir = '../datasets'
 
 
 # ========== BaselineMNISTNetwork_MNIST_BadNets ==========
+#tasks: MNIST + BaselineMNISTNetwork
+# 1.  通过torchvision进行数据加载和处理（√）
 
 dataset = torchvision.datasets.MNIST
 
@@ -61,6 +66,7 @@ transform_test = Compose([
     ToTensor()
 ])
 testset = dataset(datasets_root_dir, train=False, transform=transform_test, download=True)
+
 
 pattern = torch.zeros((28, 28), dtype=torch.uint8)
 pattern[-3:, -3:] = 255

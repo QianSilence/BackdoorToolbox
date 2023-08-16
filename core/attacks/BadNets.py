@@ -391,10 +391,13 @@ class BadNets(DataPoisoningAttack):
     'poisoned_target_transform_index': 0
     }
     '''
+    # train_dataset, test_dataset, model, loss, seed=0, deterministic=False
+    # 这里有关训练的配置可以集中到dict:attack_config（√）
+
     def __init__(self, attack_config, train_dataset, test_dataset, model, loss, schedule=None, seed=0, deterministic=False):
         super(BadNets,self).__init__(attack_config, train_dataset, test_dataset, model, loss, schedule=schedule,  seed=seed, deterministic=deterministic)
         self.attack_config = attack_config
-    def create_poisoned_dataset(self,attack_config):
+    def create_poisoned_dataset(self,dataset,attack_config):
         benign_dataset = attack_config['benign_dataset']
         y_target = attack_config['y_target']
         poisoned_rate = attack_config['poisoned_rate']
