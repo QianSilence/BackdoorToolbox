@@ -1,2 +1,0 @@
-__path__ =["./","./Core/","./Models/","./Test/","./Utils/"]
-# print(__path__)

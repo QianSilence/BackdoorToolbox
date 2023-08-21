@@ -1,2 +1,4 @@
-__path__ =["./","./attacks/","./defenses/"]
-# print(__path__)
+from .attacks import *
+from .defenses import *
+
+

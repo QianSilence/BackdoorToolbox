@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 class Attack(ABC):
-    def __init__(self, name):
+    def __init__(self, name = None):
         self.name = name
         
     def get_attack_name(self):
@@ -9,4 +9,4 @@ class Attack(ABC):
     
     @abstractmethod
     def attack():
-        pass
+        raise NotImplementedError
