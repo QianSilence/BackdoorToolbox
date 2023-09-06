@@ -8,7 +8,14 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from .Attack import Attack
-from .Base import *
+from ..base.Base import *
+
+#这里根据策略设计模式，也可以这样设计：
+# （1）令一个个策略直接继承Attack和badnets，然后依据具体的攻击策略实现Attack接口的方法
+# （2）设计一个backdoor类作为策略的context，聚合所有的策略，起到承上启下的封装作用，屏蔽高层模块的对策略、算法的直接访问，
+# 封装可能的存在的变化
+
+
 
 class DataPoisoningAttack(Base, Attack):
     """

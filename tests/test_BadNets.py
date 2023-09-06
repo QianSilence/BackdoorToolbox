@@ -22,9 +22,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from core.attacks import BadNets
+from core.attacks import BackdoorAttack
 from models import BaselineMNISTNetwork
 import time
 from utils import Log
+from ..core.base import Observer
+import os.path as osp
+   
 
 def accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
@@ -117,65 +121,82 @@ attack_config ={
     'poisoned_transform_test_index': 0,
     'poisoned_target_transform_index': 0
 }
+class tester(Observer):
+    def __init__(self):
+        pass
+    def work(self,context):
+        self.test_in_train(context)
 
-def test_in_train(model, epoch, device):
-    
-    import os
-    import os.path as osp
-    import time
-    from utils import Log
-    save_dir = 'experiments'
-    experiment_name = 'BaselineMNISTNetwork_MNIST_package'
-    test_epoch_interval =  10
+    def test_in_train(self,context):
+        assert "model" in context, 'This machine has no cuda devices!'
+        assert "epoch" in context, 'This machine has no cuda devices!'
+        assert "device" in context, 'This machine has no cuda devices!'
+        model = context["model"]
+        epoch = context["epoch"]
+        device = context["device"]
 
-    i = epoch
-    work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
-    os.makedirs(work_dir, exist_ok=True)
-    log = Log(osp.join(work_dir, 'log.txt'))
+        save_dir = 'experiments'
+        experiment_name = 'BaselineMNISTNetwork_MNIST_package'
+        test_epoch_interval =  10
 
-    if (i + 1) % test_epoch_interval == 0:
-        # test result on benign test dataset
-        predict_digits, labels = model.test2(model.test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
-        total_num = labels.size(0)
-        prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-        top1_correct = int(round(prec1.item() / 100.0 * total_num))
-        top5_correct = int(round(prec5.item() / 100.0 * total_num))
-        msg = "==========Test result on benign test dataset==========\n" + \
+        i = epoch
+        work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
+        os.makedirs(work_dir, exist_ok=True)
+        log = Log(osp.join(work_dir, 'log.txt'))
+
+        if (i + 1) % test_epoch_interval == 0:
+            # test result on benign test dataset
+            predict_digits, labels = model.test2(model.test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
+            total_num = labels.size(0)
+            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+            top1_correct = int(round(prec1.item() / 100.0 * total_num))
+            top5_correct = int(round(prec5.item() / 100.0 * total_num))
+            msg = "==========Test result on benign test dataset==========\n" + \
+                time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
+                f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
+            log(msg)
+
+            # test result on poisoned test dataset
+            # if self.current_schedule['benign_training'] is False:
+            predict_digits, labels = model.test2(model.poisoned_test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
+            total_num = labels.size(0)
+            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+            top1_correct = int(round(prec1.item() / 100.0 * total_num))
+            top5_correct = int(round(prec5.item() / 100.0 * total_num))
+            msg = "==========Test result on poisoned test dataset==========\n" + \
             time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
             f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-        log(msg)
+                
+            log(msg)
+            model.model = model.model.to(device)
+            model.model.train()
 
-        # test result on poisoned test dataset
-        # if self.current_schedule['benign_training'] is False:
-        predict_digits, labels = model.test2(model.poisoned_test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
-        total_num = labels.size(0)
-        prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-        top1_correct = int(round(prec1.item() / 100.0 * total_num))
-        top5_correct = int(round(prec5.item() / 100.0 * total_num))
-        msg = "==========Test result on poisoned test dataset==========\n" + \
-        time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-        f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            
-        log(msg)
-        model.model = model.model.to(device)
-        model.model.train()
+class saver(Observer):
+    def __init__(self):
+        pass
+    def work(self,context):
+        self.ave_model_in_train(context)
 
-def save_model_in_train(model, epoch, device):
-    import os.path as osp
-    import torch
-    save_dir = 'experiments'
-    experiment_name = 'BaselineMNISTNetwork_MNIST_package'
-    save_epoch_interval =  10
-    i = epoch
-    work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
-    if (i + 1) % save_epoch_interval == 0:
-        model.model.eval()
-        model.model = model.model.cpu()
-        ckpt_model_filename = "ckpt_epoch_" + str(i+1) + ".pth"
-        ckpt_model_path = os.path.join(work_dir, ckpt_model_filename)
-        torch.save(model.model.state_dict(), ckpt_model_path)
-        model.model = model.model.to(device)
-        model.model.train()
+    def save_model_in_train(self,context):
+        assert "model" in context, 'This machine has no cuda devices!'
+        assert "epoch" in context, 'This machine has no cuda devices!'
+        assert "device" in context, 'This machine has no cuda devices!'
+        model = context["model"]
+        epoch = context["epoch"]
+        device = context["device"]
+        save_dir = 'experiments'
+        experiment_name = 'BaselineMNISTNetwork_MNIST_package'
+        save_epoch_interval =  10
+        i = epoch
+        work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
+        if (i + 1) % save_epoch_interval == 0:
+            model.model.eval()
+            model.model = model.model.cpu()
+            ckpt_model_filename = "ckpt_epoch_" + str(i+1) + ".pth"
+            ckpt_model_path = os.path.join(work_dir, ckpt_model_filename)
+            torch.save(model.model.state_dict(), ckpt_model_path)
+            model.model = model.model.to(device)
+            model.model.train()
 
 # 1.Attack training example and Interaction example:
 badnets = BadNets(
@@ -183,14 +204,14 @@ badnets = BadNets(
     attack_config,
     schedule=schedule,  
 )
-badnets.interactions.append(test_in_train)
-badnets.interactions.append(save_model_in_train)
-badnets.attack()
+backdoor = BackdoorAttack(badnets)
+backdoor.addObserver(tester())
+backdoor.addObserver(saver())
+backdoor.attack()
 
 # 2.Normal training example:
-# badnets = BadNets(
-#     task,
-#     attack_config,
-#     schedule=schedule,  
-# )
-# badnets.train()
+# backdoor.train()
+
+# 3.Normal training example:
+# backdoor.test()
+

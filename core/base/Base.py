@@ -6,6 +6,8 @@
 # @File        : tmp.py
 # @Description  : xxxx
 from abc import abstractmethod
+from .Observable import Observable
+from .Observer import Observer
 import os
 import os.path as osp
 import time
@@ -47,7 +49,7 @@ def accuracy(output, target, topk=(1,)):
     return res
 
 
-class Base(object):
+class Base(Observable):
     """
     Base class for backdoor training and testing.
     Args:
@@ -67,6 +69,7 @@ class Base(object):
             That is, algorithms which, given the same input, and when run on the same software and hardware,
             always produce the same output. When enabled, operations will use deterministic algorithms when available,
             and if only nondeterministic algorithms are available they will throw a RuntimeError when called. Default: False.
+        observers(list[observer]): Contains observer object that interfere with the model training process
     """
     def __init__(self, task, schedule=None):
         assert 'train_dataset' in task, "task must contain 'train_dataset' configuration! "
@@ -89,7 +92,9 @@ class Base(object):
         assert 'seed' in schedule, "task must contain 'seed' configuration! "
         assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
         self._set_seed(schedule['seed'], schedule['deterministic'])
-        self.interactions = []
+        
+        self.observers = []
+
 
     #根据seed设置训练结果的随机性
     """
@@ -125,12 +130,19 @@ class Base(object):
         worker_seed = torch.initial_seed() % 2**32
         np.random.seed(worker_seed)
         random.seed(worker_seed)
-
+    
     def get_model(self):
-        return self.model
+        return deepcopy(self.model)
+    def set_train_dataset(self, dataset):
+        self.train_dataset = dataset
+    def set_test_dataset(self,dataset):
+        self.test_dataset = dataset
 
-    def get_poisoned_dataset(self):
-        return self.poisoned_train_dataset, self.poisoned_test_dataset
+        
+    def get_dataset(self):
+        return self.train_dataset, self.test_dataset
+    # def get_poisoned_dataset(self):
+        # return self.poisoned_train_dataset, self.poisoned_test_dataset
 
     def adjust_learning_rate(self, optimizer, epoch):
         if epoch in self.current_schedule['schedule']:
@@ -138,7 +150,7 @@ class Base(object):
             for param_group in optimizer.param_groups:
                 param_group['lr'] = self.current_schedule['lr']
     
-    def train(self, schedule=None):
+    def train(self, schedule=None, dataset=None):
         if schedule is None and self.global_schedule is None:
             raise AttributeError("Training schedule is None, please check your schedule setting.")
         elif schedule is not None and self.global_schedule is None:
@@ -212,17 +224,19 @@ class Base(object):
 
                 iteration += 1
 
-                if iteration % self.current_schedule['log_iteration_interval'] == 0:
-                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + f"Epoch:{i+1}/{self.current_schedule['epochs']}, iteration:{batch_id + 1}/{len(self.poisoned_train_dataset)//self.current_schedule['batch_size']}, lr: {self.current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
-                    last_time = time.time()
-                    log(msg)
+                # if iteration % self.current_schedule['log_iteration_interval'] == 0:
+                #     msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + f"Epoch:{i+1}/{self.current_schedule['epochs']}, iteration:{batch_id + 1}/{len(self.poisoned_train_dataset)//self.current_schedule['batch_size']}, lr: {self.current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                #     last_time = time.time()
+                #     log(msg)
 
-            if 'interact_in_training' in self.current_schedule and self.current_schedule['interact_in_training']:
-                for func in  self.interactions:
-                    assert callable(func),"function {0} is not callable!".format(func)
-                    func(self, i, device)
-                    # print(self)
-                    # print(type(self))
+            if len(self.observers) > 0:
+                train_text = {}
+                train_text["model"] = self.model
+                train_text["epoch"] = i
+                train_text["device"] = device
+                self._notifyObservers(train_text)
+                   
+
         
             # if (i + 1) % self.current_schedule['test_epoch_interval'] == 0:
             #     # test result on benign test dataset
@@ -259,6 +273,11 @@ class Base(object):
             #     torch.save(self.model.state_dict(), ckpt_model_path)
             #     self.model = self.model.to(device)
             #     self.model.train()
+    # Template Method Pattern：
+    # In order to realize that the subclass can interrupt or intervene in the execution process 
+    # of the parent class function, use the template method pattern to define the skeleton of 
+    # an algorithm in the parent class, but leave the implementation of some specific steps to the subclass, 
+    # so that subclasses can customize and extend parts of the algorithm
     @abstractmethod
     def interact_in_training():
         raise NotImplementedError
@@ -370,3 +389,18 @@ class Base(object):
                   time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
                   f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
             log(msg)
+
+    def addObserver(self, observer):
+        self.observers.append(observer)
+
+    def deleteObserver(self,observer):
+        for item in self.observers:
+            if item is observer:
+                self.observers.remove(observer)
+    def _notifyObservers(self, train_context):
+        for observer in self.observers:
+            assert callable(observer.work),"function {0} is not callable!".format(observer.work)
+            observer.work(train_context)
+
+        
+    

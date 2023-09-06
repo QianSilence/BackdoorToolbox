@@ -6,6 +6,7 @@
 # @File        : tmp.py
 # @Description :This is the implement of BadNets [1].
 #               Reference:[1] Badnets: Evaluating Backdooring Attacks on Deep Neural Networks. IEEE Access 2019.
+from .DataPoisoningAttack import DataPoisoningAttack
 import copy
 import random
 import numpy as np
@@ -17,8 +18,6 @@ from torchvision.transforms import functional as F
 from torchvision.transforms import Compose
 from ..base.Base import *
 from torchvision.datasets import DatasetFolder, MNIST, CIFAR10
-from .Attack import Attack
-from ..base.Base import *
 support_list = (
     DatasetFolder,
     MNIST,
@@ -541,7 +540,7 @@ class PoisonedCIFAR10(CIFAR10):
 
         return img, target
 
-class BadNets(Base, Attack):
+class BadNets(DataPoisoningAttack):
     """
     According to the specific attack strategy, override the create_poisoned_dataset() function of the parent class 
         to realize the algorithmic logic of generating the poisoned dataset
@@ -557,15 +556,13 @@ class BadNets(Base, Attack):
         self.attack_strategy(string): The name of attack_strategy.
     """
     def __init__(self, task, attack_config, schedule=None):
-        Base.__init__(self, task, schedule = schedule)   
-        Attack.__init__(self)
+        super(BadNets,self).__init__(task, schedule)
         self.attack_config = attack_config
         assert 'attack_strategy' in self.attack_config, "Attack_config must contain 'attack_strategy' configuration! "
         self.attack_strategy = attack_config['attack_strategy']
-    
-    def get_attack_strategy(self):
-        return self.attack_strategy
+        
     def create_poisoned_dataset(self,dataset):
+
         benign_dataset = dataset
         assert 'y_target' in self.attack_config, "Attack_config must contain 'y_target' configuration! "
         y_target = self.attack_config['y_target']
