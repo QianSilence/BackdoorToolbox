@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10, MNIST, DatasetFolder
 
-from .accuracy import accuracy
+from .compute_accuracy import accuracy
 from .log import Log
 
 

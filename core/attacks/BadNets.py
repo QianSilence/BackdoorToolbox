@@ -165,6 +165,7 @@ class AddVisionDatasetTrigger():
         img = self.add_trigger(img)
         img = img.squeeze()
         img = Image.fromarray(img.numpy(), mode='L')
+        
         return img
     
 class AddMNISTTrigger(AddTrigger):
@@ -331,7 +332,9 @@ class PoisonedDatasetFolder(DatasetFolder):
             if self.target_transform is not None:
                 target = self.target_transform(target)
 
-        return sample, target
+        return torch.tensor(sample), torch.tensor(target)
+    def get_poisoned_set(self):
+        return self.poisoned_set
     
 class PoisonedVisionDataset(VisionDataset):
     """
@@ -395,18 +398,17 @@ class PoisonedVisionDataset(VisionDataset):
         # doing this so that it is consistent with all other datasets
         # to return a PIL Image
         img = Image.fromarray(img.numpy(), mode='L')
-
-        if index in self.poisoned_set:
+        if index in self.poisoned_set: 
             img = self.poisoned_transform(img)
             target = self.poisoned_target_transform(target)
         else:
             if self.transform is not None:
                 img = self.transform(img)
-
             if self.target_transform is not None:
                 target = self.target_transform(target)
-
         return img, target
+    def get_poisoned_set(self):
+        return self.poisoned_set
     
 
 class PoisonedMNIST(MNIST):
@@ -481,11 +483,13 @@ class PoisonedMNIST(MNIST):
             if self.target_transform is not None:
                 target = self.target_transform(target)
 
-        return img, target
+        return torch.tensor(img), torch.tensor(target)
+
+    def get_poisoned_set(self):
+        return self.poisoned_set
 
 #这与PoisonedMNIST(MNIST)逻辑上没有区别
 #这里有毒数据集的定义可以通过继承torchvision.datasets.vision.VisionDataset来实现
-
 class PoisonedCIFAR10(CIFAR10):
     def __init__(self,
                  benign_dataset,
@@ -538,8 +542,10 @@ class PoisonedCIFAR10(CIFAR10):
 
             if self.target_transform is not None:
                 target = self.target_transform(target)
-
-        return img, target
+        return torch.tensor(img), torch.tensor(target)
+    
+    def get_poisoned_set(self):
+        return self.poisoned_set
 
 class BadNets(Base, Attack):
     """
@@ -549,40 +555,51 @@ class BadNets(Base, Attack):
     Args:
         task(dict):The attack strategy is used for the task, including datasets, model, Optimizer algorithm 
             and loss function.
-        attack_config(dict): Parameters are needed according to attack strategy
+        attack_schedule(dict): Parameters are needed according to attack strategy
         schedule=None(dict): Config related to model training
  
     Attributes:
-        self.attack_config(dict): Initialized by the incoming  parameter "attack_config".
+        self.attack_schedule(dict): Initialized by the incoming  parameter "attack_schedule".
         self.attack_strategy(string): The name of attack_strategy.
     """
-    def __init__(self, task, attack_config, schedule=None):
+    def __init__(self, task, attack_schedule):
+        schedule = None
+        if 'train_schedule' in attack_schedule:
+            schedule = attack_schedule['train_schedule']
         Base.__init__(self, task, schedule = schedule)   
         Attack.__init__(self)
-        self.attack_config = attack_config
-        assert 'attack_strategy' in self.attack_config, "Attack_config must contain 'attack_strategy' configuration! "
-        self.attack_strategy = attack_config['attack_strategy']
+        self.attack_schedule = attack_schedule
+        assert 'attack_strategy' in self.attack_schedule, "Attack_config must contain 'attack_strategy' configuration! "
+        self.attack_strategy = attack_schedule['attack_strategy']
     
     def get_attack_strategy(self):
         return self.attack_strategy
     def create_poisoned_dataset(self,dataset):
         benign_dataset = dataset
-        assert 'y_target' in self.attack_config, "Attack_config must contain 'y_target' configuration! "
-        y_target = self.attack_config['y_target']
-        assert 'poisoned_rate' in self.attack_config, "Attack_config must contain 'poisoned_rate' configuration! "
-        poisoned_rate = self.attack_config['poisoned_rate']
-        assert 'pattern' in self.attack_config, "Attack_config must contain 'pattern' configuration! "
-        pattern = self.attack_config['pattern']
-        assert 'weight' in self.attack_config, "Attack_config must contain 'weight' configuration! "
-        weight = self.attack_config['weight']
-        assert 'poisoned_transform_index' in self.attack_config, "Attack_config must contain 'poisoned_transform_index' configuration! "
-        poisoned_transform_index = self.attack_config['poisoned_transform_index']
-        assert 'poisoned_target_transform_index' in self.attack_config, "Attack_config must contain 'poisoned_target_transform_index' configuration! "
-        poisoned_target_transform_index = self.attack_config['poisoned_target_transform_index']
+        assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
+        y_target = self.attack_schedule['y_target']
+        assert 'poisoned_rate' in self.attack_schedule, "Attack_config must contain 'poisoned_rate' configuration! "
+        poisoned_rate = self.attack_schedule['poisoned_rate']
+        assert 'pattern' in self.attack_schedule, "Attack_config must contain 'pattern' configuration! "
+        pattern = self.attack_schedule['pattern']
+        assert 'weight' in self.attack_schedule, "Attack_config must contain 'weight' configuration! "
+        weight = self.attack_schedule['weight']
+        assert 'poisoned_transform_index' in self.attack_schedule, "Attack_config must contain 'poisoned_transform_index' configuration! "
+        poisoned_transform_index = self.attack_schedule['poisoned_transform_index']
+        assert 'poisoned_target_transform_index' in self.attack_schedule, "Attack_config must contain 'poisoned_target_transform_index' configuration! "
+        poisoned_target_transform_index = self.attack_schedule['poisoned_target_transform_index']
         
         dataset_type = type(benign_dataset)
         assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
-    
+        work_dir = osp.join(self.attack_schedule['save_dir'], self.attack_schedule['experiment'])
+        
+        os.makedirs(work_dir, exist_ok=True)
+        log = Log(osp.join(work_dir, 'log.txt'))
+
+        msg = "\n\n\n==========Start creating poisoned_dataset==========\n"
+        log(msg)
+        msg = f"Total samples: {len(benign_dataset)},Among the poisoned samples:{int(len(benign_dataset) * poisoned_rate)}\n"
+        log(msg)
         if dataset_type == DatasetFolder:
             return PoisonedDatasetFolder(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         elif dataset_type == MNIST:
@@ -592,4 +609,8 @@ class BadNets(Base, Attack):
             return PoisonedCIFAR10(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         else:
             raise NotImplementedError
+        
+    def interact_in_training():
+        pass
+
 

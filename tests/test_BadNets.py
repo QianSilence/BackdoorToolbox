@@ -25,29 +25,16 @@ from core.attacks import BadNets
 from core.attacks import BackdoorAttack
 from models import BaselineMNISTNetwork
 import time
-from utils import Log
-from ..core.base import Observer
+from utils import show_image
+from utils import accuracy
 import os.path as osp
-   
-
-def accuracy(output, target, topk=(1,)):
-    """Computes the precision@k for the specified values of k"""
-    maxk = max(topk)
-    batch_size = target.size(0)
-
-    _, pred = output.topk(maxk, 1, True, True)
-    pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-    res = []
-    for k in topk:
-        correct_k = correct[:k].contiguous().view(-1).float().sum(0)
-        res.append(correct_k.mul_(100.0 / batch_size))
-
+import random
+from core.base import Observer
+from core.base import Base
 
 # ========== Set global settings ==========
-global_seed = 666
-deterministic = True
+global_seed = 333
+deterministic = False
 torch.manual_seed(global_seed)
 CUDA_VISIBLE_DEVICES = '1'
 datasets_root_dir = BASE_DIR + '/datasets/'
@@ -67,36 +54,26 @@ transform_test = Compose([
 ])
 testset = dataset(datasets_root_dir, train=False, transform=transform_test, download=True)
 optimizer = torch.optim.SGD
-
-
 pattern = torch.zeros((28, 28), dtype=torch.uint8)
 pattern[-3:, -3:] = 255
 weight = torch.zeros((28, 28), dtype=torch.float32)
 weight[-3:, -3:] = 1.0
-
-# task: including datasets,model, Optimizer algorithm and loss function.
-task = {
-    'train_dataset': trainset,
-    'test_dataset' : testset,
-    'model' : BaselineMNISTNetwork(),
-    'optimizer': optimizer,
-    'loss' : nn.CrossEntropyLoss()
-}
-# Config related to model training
 schedule = {
-    # experiment
-    'experiment_name': 'BaselineMNISTNetwork_MNIST_package',
-    # 'benign_training': False,
+    'experiment': 'BaselineMNISTNetwork_MNIST_package',
+
+    # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,
     
-    # related to device
+
+    # Settings related to device
     'device': 'GPU',
     'CUDA_VISIBLE_DEVICES': CUDA_VISIBLE_DEVICES,
     'GPU_num': 1,
 
-    # related to tarining 
-    'epochs': 200,
+    # Settings related to tarining 
+    'pretrain': None,
+    'epochs': 10,
     'batch_size': 128,
     'num_workers': 2,
     'lr': 0.1,
@@ -104,114 +81,101 @@ schedule = {
     'weight_decay': 5e-4,
     'gamma': 0.1,
     'schedule': [150, 180],
+    # When this parameter is given,the model is saved after trianed
+    'model_path':'/Poisoned_model.pth',
 
-    # related to interaction
-    'interact_in_training': True,
+    # Settings aving model,data and logs
     'save_dir': 'experiments',
-    'log_iteration_interval': 100
+    'log_iteration_interval': 100,
+    # 日志的保存路径 save_dir+experiment+当前时间
 }
-# Parameters are needed according to attack strategy
-attack_config ={
+
+task = {
+    'train_dataset': trainset,
+    'test_dataset' : testset,
+    'model' : BaselineMNISTNetwork(),
+    'optimizer': optimizer,
+    'loss' : nn.CrossEntropyLoss()
+}
+
+# # Parameters are needed according to attack strategy
+attack_schedule ={ 
+    'experiment': 'BaselineMNISTNetwork_MNIST_package',
     'attack_strategy': 'BadNets',
+    # attack config
     'y_target': 1,
     'poisoned_rate': 0.05,
     'pattern': pattern,
     'weight': weight,
     'poisoned_transform_index': 0,
-    'poisoned_transform_test_index': 0,
-    'poisoned_target_transform_index': 0
+    'poisoned_target_transform_index': 0,
+    # device config
+    'device': None,
+    'CUDA_VISIBLE_DEVICES': None,
+    'GPU_num': None,
+    'batch_size': None,
+    'num_workers': None,
+    # Settings related to saving model,data and logs
+    'save_dir': 'experiments',
+    'train_schedule':schedule,
 }
-class tester(Observer):
-    def __init__(self):
-        pass
-    def work(self,context):
-        self.test_in_train(context)
+work_dir = attack_schedule['save_dir'] + '/' + attack_schedule['experiment']
 
-    def test_in_train(self,context):
-        assert "model" in context, 'This machine has no cuda devices!'
-        assert "epoch" in context, 'This machine has no cuda devices!'
-        assert "device" in context, 'This machine has no cuda devices!'
-        model = context["model"]
-        epoch = context["epoch"]
-        device = context["device"]
+if __name__ == "__main__":
+    badnets = BadNets(
+        task,
+        attack_schedule
+    )
+    backdoor = BackdoorAttack(badnets)
 
-        save_dir = 'experiments'
-        experiment_name = 'BaselineMNISTNetwork_MNIST_package'
-        test_epoch_interval =  10
+    # 1. show backdoor sample
+    # Alreadly exsiting dataset and trained model.
+    # poisoned_train_dataset = torch.load("/home/zzq/CreatingSpace/BackdoorToolbox/datasets/PoisonedMNIST/training.pt") 
+    # poisoned_test_dataset = torch.load("/home/zzq/CreatingSpace/BackdoorToolbox/datasets/PoisonedMNIST/test.pt")
 
-        i = epoch
-        work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
-        os.makedirs(work_dir, exist_ok=True)
-        log = Log(osp.join(work_dir, 'log.txt'))
+    poisoned_train_dataset = backdoor.get_poisoned_train_dataset()
+    poisoned_test_dataset = backdoor.get_poisoned_test_dataset()
+    torch.save(poisoned_train_dataset, datasets_root_dir + '/PoisonedMNIST/training.pt')
+    torch.save(poisoned_test_dataset, datasets_root_dir + '/PoisonedMNIST/test.pt')
+    # poisoned_set = poisoned_train_dataset.get_poisoned_set()
+    # index = poisoned_set[random.sample(range(len(poisoned_set)))]
+    # # print(index)
+    # image, label = poisoned_train_dataset[index]
+    # image = image.squeeze().numpy()
+    # # print(image.shape)
+    # show_image(image, "label: " + str(label))
 
-        if (i + 1) % test_epoch_interval == 0:
-            # test result on benign test dataset
-            predict_digits, labels = model.test2(model.test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
-            total_num = labels.size(0)
-            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            msg = "==========Test result on benign test dataset==========\n" + \
-                time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-                f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            log(msg)
+    #2. test backdoor model
+    poisoned_model = backdoor.get_backdoor_model()
+    torch.save(poisoned_model.state_dict(), work_dir + '/Poisoned_model.pth')
 
-            # test result on poisoned test dataset
-            # if self.current_schedule['benign_training'] is False:
-            predict_digits, labels = model.test2(model.poisoned_test_dataset, device, model.current_schedule['batch_size'], model.current_schedule['num_workers'])
-            total_num = labels.size(0)
-            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            msg = "==========Test result on poisoned test dataset==========\n" + \
-            time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-            f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-                
-            log(msg)
-            model.model = model.model.to(device)
-            model.model.train()
 
-class saver(Observer):
-    def __init__(self):
-        pass
-    def work(self,context):
-        self.ave_model_in_train(context)
+    #3.test benign_accuracy and poisoning_rate
+    testset = poisoned_test_dataset
+    poisoned_test_indexs = list(testset.get_poisoned_set())
+    benign_test_indexs = list(set(range(len(testset))) - set(poisoned_test_indexs))
+    predict_digits, labels = backdoor.test()
+    benign_accuracy = accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs])
+    poisoning_rate = accuracy(predict_digits[poisoned_test_indexs],labels[poisoned_test_indexs])
+    print(benign_accuracy)
+    print(poisoning_rate)
 
-    def save_model_in_train(self,context):
-        assert "model" in context, 'This machine has no cuda devices!'
-        assert "epoch" in context, 'This machine has no cuda devices!'
-        assert "device" in context, 'This machine has no cuda devices!'
-        model = context["model"]
-        epoch = context["epoch"]
-        device = context["device"]
-        save_dir = 'experiments'
-        experiment_name = 'BaselineMNISTNetwork_MNIST_package'
-        save_epoch_interval =  10
-        i = epoch
-        work_dir = osp.join(save_dir, experiment_name + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
-        if (i + 1) % save_epoch_interval == 0:
-            model.model.eval()
-            model.model = model.model.cpu()
-            ckpt_model_filename = "ckpt_epoch_" + str(i+1) + ".pth"
-            ckpt_model_path = os.path.join(work_dir, ckpt_model_filename)
-            torch.save(model.model.state_dict(), ckpt_model_path)
-            model.model = model.model.to(device)
-            model.model.train()
+    #4.Alreadly exsiting trained model
+    # model = BaselineMNISTNetwork()
+    # model = nn.DataParallel(model)
+    # path = "/home/zzq/CreatingSpace/BackdoorToolbox/experiments/BaselineMNISTNetwork_MNIST_package_2023-09-08_17:10:29/Poisoned_model.pth"
+    # parameter=torch.load(path)
+    # # # print(parameter)
+    # model.load_state_dict(parameter)
+    # trainset = torch.load("/home/zzq/CreatingSpace/BackdoorToolbox/datasets/PoisonedMNIST/training.pt") 
+    # testset = torch.load("/home/zzq/CreatingSpace/BackdoorToolbox/datasets/PoisonedMNIST/test.pt")
+    # predict_digits, labels = backdoor.test(schedule, model, testset)
+    # poisoned_train_indexs = list(trainset.get_poisoned_set())
+    # poisoned_test_indexs = list(testset.get_poisoned_set())
+    # benign_test_indexs = list(set(range(len(testset))) - set(poisoned_test_indexs))
+    # benign_accuracy = accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs])
+    # poisoning_rate = accuracy(predict_digits[poisoned_test_indexs],labels[poisoned_test_indexs])
+    # print(benign_accuracy)
+    # print(poisoning_rate)
 
-# 1.Attack training example and Interaction example:
-badnets = BadNets(
-    task,
-    attack_config,
-    schedule=schedule,  
-)
-backdoor = BackdoorAttack(badnets)
-backdoor.addObserver(tester())
-backdoor.addObserver(saver())
-backdoor.attack()
-
-# 2.Normal training example:
-# backdoor.train()
-
-# 3.Normal training example:
-# backdoor.test()
 

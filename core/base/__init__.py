@@ -1,2 +1,5 @@
 from .Base import Base
-__all__ = ['Base']
+from .TrainingObservable import TrainingObservable
+from .Observer import Observer
+
+__all__ = ['Base','TrainingObservable','Observer']

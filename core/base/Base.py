@@ -3,11 +3,10 @@
 # @Time        : 2023/08/21 10:26:03
 # @Author      : Zhenqian Zhu
 # @Affiliation : Harbin Institute of Technology, Shenzhen
-# @File        : tmp.py
-# @Description  : xxxx
+# @File        : Base.py
+# @Description  : Logical implementation of model training and testing
 from abc import abstractmethod
-from .Observable import Observable
-from .Observer import Observer
+from .TrainingObservable import TrainingObservable
 import os
 import os.path as osp
 import time
@@ -20,40 +19,30 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import DatasetFolder, MNIST, CIFAR10
 import os 
 import sys
+from torchvision.datasets.vision import VisionDataset
+from utils import accuracy
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from utils import Log
+# ignore warnings
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 support_list = (
     DatasetFolder,
     MNIST,
-    CIFAR10
+    CIFAR10,
+    VisionDataset
 )
 def check(dataset):
     return isinstance(dataset, support_list)
 
-
-def accuracy(output, target, topk=(1,)):
-    """Computes the precision@k for the specified values of k"""
-    maxk = max(topk)
-    batch_size = target.size(0)
-
-    _, pred = output.topk(maxk, 1, True, True)
-    pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-    res = []
-    for k in topk:
-        correct_k = correct[:k].contiguous().view(-1).float().sum(0)
-        res.append(correct_k.mul_(100.0 / batch_size))
-    return res
-
-
-class Base(Observable):
+class Base(TrainingObservable):
     """
-    Base class for backdoor training and testing.
+    Base class for training and testing.According to the principle of single function, this class is only responsible for model training 
+    and can not perceive the attack and defense strategies of high-level modules.
     Args:
-        task(dict):The attack strategy is used for the task, including datasets, model, Optimizer algorithm 
+        task(dict): The training task, including datasets, model, Optimizer algorithm 
             and loss function.
         schedule=None(dict): Config related to model training 
 
@@ -87,13 +76,14 @@ class Base(Observable):
         self.optimizer = task['optimizer']
 
         self.global_schedule = deepcopy(schedule)
-        self.current_schedule = None
+        current_schedule = None
 
         assert 'seed' in schedule, "task must contain 'seed' configuration! "
         assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
         self._set_seed(schedule['seed'], schedule['deterministic'])
         
-        self.observers = []
+        self.training_observers = []
+        self.post_training_observers = []
 
 
     #根据seed设置训练结果的随机性
@@ -130,9 +120,12 @@ class Base(Observable):
         worker_seed = torch.initial_seed() % 2**32
         np.random.seed(worker_seed)
         random.seed(worker_seed)
-    
+    #Here ensure that the type of the output model is nn.module 
     def get_model(self):
-        return deepcopy(self.model)
+        if isinstance(self.model,nn.DataParallel):
+            return deepcopy(self.model.module)
+        else:
+            return deepcopy(self.model)
     def set_train_dataset(self, dataset):
         self.train_dataset = dataset
     def set_test_dataset(self,dataset):
@@ -141,51 +134,49 @@ class Base(Observable):
         
     def get_dataset(self):
         return self.train_dataset, self.test_dataset
-    # def get_poisoned_dataset(self):
-        # return self.poisoned_train_dataset, self.poisoned_test_dataset
 
-    def adjust_learning_rate(self, optimizer, epoch):
-        if epoch in self.current_schedule['schedule']:
-            self.current_schedule['lr'] *= self.current_schedule['gamma']
+    def adjust_learning_rate(self, optimizer, epoch, current_schedule):
+        if epoch in current_schedule['schedule']:
+            current_schedule['lr'] *= current_schedule['gamma']
             for param_group in optimizer.param_groups:
-                param_group['lr'] = self.current_schedule['lr']
+                param_group['lr'] = current_schedule['lr']
     
-    def train(self, schedule=None, dataset=None):
-        if schedule is None and self.global_schedule is None:
+    def train(self, dataset=None, schedule=None,):
+        if schedule is not None:
+            current_schedule = deepcopy(schedule)
+        elif self.global_schedule is not None:
+            current_schedule = deepcopy(self.global_schedule)
+        else: 
             raise AttributeError("Training schedule is None, please check your schedule setting.")
-        elif schedule is not None and self.global_schedule is None:
-            self.current_schedule = deepcopy(schedule)
-        elif schedule is None and self.global_schedule is not None:
-            self.current_schedule = deepcopy(self.global_schedule)
-        elif schedule is not None and self.global_schedule is not None:
-            self.current_schedule = deepcopy(schedule)
+     
+        if dataset is not None:
+            self.train_dataset = dataset
 
-        if 'pretrain' in self.current_schedule:
-            self.model.load_state_dict(torch.load(self.current_schedule['pretrain']), strict=False)
+        if 'pretrain' in current_schedule and current_schedule['pretrain'] is not None:
+            self.model.load_state_dict(torch.load(current_schedule['pretrain']), strict=False)
 
         #os.environ(mapping)：A variable that records information about the current code execution environment;
-        
         # Use GPU
-        if 'device' in self.current_schedule and self.current_schedule['device'] == 'GPU':
-            if 'CUDA_VISIBLE_DEVICES' in self.current_schedule:
-                os.environ['CUDA_VISIBLE_DEVICES'] = self.current_schedule['CUDA_VISIBLE_DEVICES']
+        if 'device' in current_schedule and current_schedule['device'] == 'GPU':
+            if 'CUDA_VISIBLE_DEVICES' in current_schedule:
+                os.environ['CUDA_VISIBLE_DEVICES'] = current_schedule['CUDA_VISIBLE_DEVICES']
 
             assert torch.cuda.device_count() > 0, 'This machine has no cuda devices!'
-            assert self.current_schedule['GPU_num'] > 0, 'GPU_num should be a positive integer'
-            assert torch.cuda.device_count() >= self.current_schedule['GPU_num'] , 'This machine has {0} cuda devices, and use {1} of them to train'.format(torch.cuda.device_count(), self.current_schedule['GPU_num'])
+            assert current_schedule['GPU_num'] > 0, 'GPU_num should be a positive integer'
+            assert torch.cuda.device_count() >= current_schedule['GPU_num'] , 'This machine has {0} cuda devices, and use {1} of them to train'.format(torch.cuda.device_count(), current_schedule['GPU_num'])
             device = torch.device("cuda:0")
-            gpus = list(range(self.current_schedule['GPU_num']))
+            gpus = list(range(current_schedule['GPU_num']))
             self.model = nn.DataParallel(self.model, device_ids=gpus, output_device=device)
-            print(f"This machine has {torch.cuda.device_count()} cuda devices, and use {self.current_schedule['GPU_num']} of them to train.")
+            print(f"This machine has {torch.cuda.device_count()} cuda devices, and use {current_schedule['GPU_num']} of them to train.")
         # Use CPU
         else:
             device = torch.device("cpu")
 
         train_loader = DataLoader(
                 self.train_dataset,
-                batch_size=self.current_schedule['batch_size'],
+                batch_size=current_schedule['batch_size'],
                 shuffle=True,
-                num_workers=self.current_schedule['num_workers'],
+                num_workers=current_schedule['num_workers'],
                 drop_last=False,
                 pin_memory=True,
                 worker_init_fn=self._seed_worker
@@ -193,24 +184,30 @@ class Base(Observable):
 
         self.model = self.model.to(device)
         self.model.train()
-        optimizer = self.optimizer(self.model.parameters(), lr=self.current_schedule['lr'], momentum=self.current_schedule['momentum'], weight_decay=self.current_schedule['weight_decay'])
+        optimizer = self.optimizer(self.model.parameters(), lr=current_schedule['lr'], momentum=current_schedule['momentum'], weight_decay=current_schedule['weight_decay'])
         
-        work_dir = osp.join(self.current_schedule['save_dir'], self.current_schedule['experiment_name'] + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
-        os.makedirs(work_dir, exist_ok=True)
-        log = Log(osp.join(work_dir, 'log.txt'))
-
         # log and output:
         # 1. ouput loss and time
         # 2. test and output statistics
         # 3. save checkpoint
-        iteration = 0
-        last_time = time.time()
-
-        msg = f"Total train samples: {len(self.train_dataset)}\nTotal test samples: {len(self.test_dataset)}\nBatch size: {self.current_schedule['batch_size']}\niteration every epoch: {len(self.train_dataset) // self.current_schedule['batch_size']}\nInitial learning rate: {self.current_schedule['lr']}\n"
+        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'] )
+        os.makedirs(work_dir, exist_ok=True)
+        
+        log_path = osp.join(work_dir, 'log.txt')
+        log = Log(log_path)
+        experiment = current_schedule['experiment']
+        t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
+        msg = "\n==========Execute model train in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
         log(msg)
 
-        for i in range(self.current_schedule['epochs']):
-            self.adjust_learning_rate(optimizer, i)
+        iteration = 0
+        last_time = time.time()
+        
+        msg = f"Total train samples: {len(self.train_dataset)}\nTotal test samples: {len(self.test_dataset)}\nBatch size: {current_schedule['batch_size']}\niteration every epoch: {len(self.train_dataset) // current_schedule['batch_size']}\nInitial learning rate: {current_schedule['lr']}\n"
+        log(msg)
+
+        for i in range(current_schedule['epochs']):
+            self.adjust_learning_rate(optimizer, i, current_schedule)
             for batch_id, batch in enumerate(train_loader):
                 batch_img = batch[0]
                 batch_label = batch[1]
@@ -224,63 +221,49 @@ class Base(Observable):
 
                 iteration += 1
 
-                # if iteration % self.current_schedule['log_iteration_interval'] == 0:
-                #     msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + f"Epoch:{i+1}/{self.current_schedule['epochs']}, iteration:{batch_id + 1}/{len(self.poisoned_train_dataset)//self.current_schedule['batch_size']}, lr: {self.current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
-                #     last_time = time.time()
-                #     log(msg)
+                if iteration % current_schedule['log_iteration_interval'] == 0:
+                    last_time = time.time()
+                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}/{len(self.train_dataset)//current_schedule['batch_size']}, lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                    log(msg)
 
-            if len(self.observers) > 0:
-                train_text = {}
-                train_text["model"] = self.model
-                train_text["epoch"] = i
-                train_text["device"] = device
-                self._notifyObservers(train_text)
-                   
+            if len(self.training_observers) > 0:
+                self.model = self.model.to(device)
+                self.model.eval()
+                context = {}
+                context["model"] = deepcopy(self.model)
+                context["epoch"] = i
+                context["device"] = device
+                context["work_dir"] = work_dir
+                context["log_path"] = log_path
+                context["last_time"] = last_time
+                self._notify_training_observer(context)
+                self.model = self.model.to(device)
+                self.model.train()
 
+        if 'model_path' in current_schedule and current_schedule['model_path'] is not None:
+            torch.save(self.model.state_dict(), work_dir + current_schedule['model_path'])
+
+        # if len(self.post_training_observers) > 0:
+        #         self.model = self.model.to(device)
+        #         self.model.eval()
+        #         context = {}
+        #         context["model"] = deepcopy(self.model)
+        #         context["epoch"] = i
+        #         context["device"] = device
+        #         context["work_dir"] = work_dir
+        #         context["log_path"] = log_path
+        #         context["last_time"] = last_time
+        #         self._notify_training_observer(context)
+        #         self.model = self.model.to(device)
+        #         self.model.train()
         
-            # if (i + 1) % self.current_schedule['test_epoch_interval'] == 0:
-            #     # test result on benign test dataset
-            #     predict_digits, labels = self._test(self.test_dataset, device, self.current_schedule['batch_size'], self.current_schedule['num_workers'])
-            #     total_num = labels.size(0)
-            #     prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            #     top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            #     top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            #     msg = "==========Test result on benign test dataset==========\n" + \
-            #           time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-            #           f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            #     log(msg)
-
-            #     # test result on poisoned test dataset
-            #     # if self.current_schedule['benign_training'] is False:
-            #     predict_digits, labels = self._test(self.poisoned_test_dataset, device, self.current_schedule['batch_size'], self.current_schedule['num_workers'])
-            #     total_num = labels.size(0)
-            #     prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            #     top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            #     top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            #     msg = "==========Test result on poisoned test dataset==========\n" + \
-            #           time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-            #           f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            #     log(msg)
-
-            #     self.model = self.model.to(device)
-            #     self.model.train()
-            # #保存模型
-            # if (i + 1) % self.current_schedule['save_epoch_interval'] == 0:
-            #     self.model.eval()
-            #     self.model = self.model.cpu()
-            #     ckpt_model_filename = "ckpt_epoch_" + str(i+1) + ".pth"
-            #     ckpt_model_path = os.path.join(work_dir, ckpt_model_filename)
-            #     torch.save(self.model.state_dict(), ckpt_model_path)
-            #     self.model = self.model.to(device)
-            #     self.model.train()
     # Template Method Pattern：
-    # In order to realize that the subclass can interrupt or intervene in the execution process 
-    # of the parent class function, use the template method pattern to define the skeleton of 
-    # an algorithm in the parent class, but leave the implementation of some specific steps to the subclass, 
-    # so that subclasses can customize and extend parts of the algorithm
-    @abstractmethod
+    # In order to realize that the subclass can interrupt or intervene in the train process of the parent class function,
+    # use the template method pattern to define the skeleton of an algorithm in the parent class, but leave the implementation 
+    # of some specific steps to the subclass, so that subclasses can customize and extend parts of the algorithm
+   
     def interact_in_training():
-        raise NotImplementedError
+        pass
 
     def _test(self, dataset, device, batch_size=16, num_workers=8, model=None):
         if model is None:
@@ -316,91 +299,90 @@ class Base(Observable):
             labels = torch.cat(labels, dim=0)
             return predict_digits, labels
         
-    def test2(self, dataset, device, batch_size=16, num_workers=8, model=None):
-        return self._test(dataset, device, batch_size=batch_size, num_workers=num_workers, model=model)
-        
+    def test_in_training(self):
+        self._test()
 
-    def test(self, schedule=None, model=None, test_dataset=None, poisoned_test_dataset=None):
-        if schedule is None and self.global_schedule is None:
+    # Here, new test models, datasets and schedules are allowed to be passed in, and by default,
+    #  the models, datasets and schedules defined in this class are used.
+    def test(self, schedule=None, model=None, test_dataset=None):
+        if schedule is not None:
+            current_schedule = schedule
+        elif self.global_schedule is not None:
+            current_schedule = self.global_schedule
+        else:
             raise AttributeError("Test schedule is None, please check your schedule setting.")
-        elif schedule is not None and self.global_schedule is None:
-            self.current_schedule = deepcopy(schedule)
-        elif schedule is None and self.global_schedule is not None:
-            self.current_schedule = deepcopy(self.global_schedule)
-        elif schedule is not None and self.global_schedule is not None:
-            self.current_schedule = deepcopy(schedule)
 
         if model is None:
             model = self.model
 
-        if 'test_model' in self.current_schedule:
-            model.load_state_dict(torch.load(self.current_schedule['test_model']), strict=False)
-
-        if test_dataset is None and poisoned_test_dataset is None:
+        if test_dataset is None:
             test_dataset = self.test_dataset
-            poisoned_test_dataset = self.poisoned_test_dataset
 
-        # Use GPU
-        if 'device' in self.current_schedule and self.current_schedule['device'] == 'GPU':
-            if 'CUDA_VISIBLE_DEVICES' in self.current_schedule:
-                os.environ['CUDA_VISIBLE_DEVICES'] = self.current_schedule['CUDA_VISIBLE_DEVICES']
+        
+        if 'device' in current_schedule and current_schedule['device'] == 'GPU':
+            if 'CUDA_VISIBLE_DEVICES' in current_schedule:
+                os.environ['CUDA_VISIBLE_DEVICES'] = current_schedule['CUDA_VISIBLE_DEVICES']
 
             assert torch.cuda.device_count() > 0, 'This machine has no cuda devices!'
-            assert self.current_schedule['GPU_num'] >0, 'GPU_num should be a positive integer'
-            print(f"This machine has {torch.cuda.device_count()} cuda devices, and use {self.current_schedule['GPU_num']} of them to train.")
-
-            if self.current_schedule['GPU_num'] == 1:
-                device = torch.device("cuda:0")
-            else:
-                gpus = list(range(self.current_schedule['GPU_num']))
-                model = nn.DataParallel(model.cuda(), device_ids=gpus, output_device=gpus[0])
-                # TODO: DDP training
-                pass
+            assert current_schedule['GPU_num'] > 0, 'GPU_num should be a positive integer'
+            assert torch.cuda.device_count() >= current_schedule['GPU_num'] , 'This machine has {0} cuda devices, and use {1} of them to test'.format(torch.cuda.device_count(), current_schedule['GPU_num'])
+            device = torch.device("cuda:0")
+            gpus = list(range(current_schedule['GPU_num']))
+            self.model = nn.DataParallel(self.model, device_ids=gpus, output_device=device)
+            print(f"This machine has {torch.cuda.device_count()} cuda devices, and use {current_schedule['GPU_num']} of them to test.")
         # Use CPU
         else:
             device = torch.device("cpu")
+            print(f"Use cpu to test.")
 
-        work_dir = osp.join(self.current_schedule['save_dir'], self.current_schedule['experiment_name'] + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
+
+        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'] )
         os.makedirs(work_dir, exist_ok=True)
+       
         log = Log(osp.join(work_dir, 'log.txt'))
+        experiment = current_schedule['experiment']
+        t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
+        msg = "\n==========Execute model test in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
+        log(msg)
+        
+        last_time = time.time()
+        # test result on benign test dataset
+        predict_digits, labels = self._test(test_dataset, device, current_schedule['batch_size'], current_schedule['num_workers'], model)
+        
+        total_num = labels.size(0)
+        prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+        top1_correct = int(round(prec1.item() / 100.0 * total_num))
+        top5_correct = int(round(prec5.item() / 100.0 * total_num)) 
+        
+        msg = "\n==========Test result on benign test dataset==========\n"
+        log(msg)
+        msg = f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
+        log(msg)
+        return predict_digits, labels
 
-        if test_dataset is not None:
-            last_time = time.time()
-            # test result on benign test dataset
-            predict_digits, labels = self._test(test_dataset, device, self.current_schedule['batch_size'], self.current_schedule['num_workers'], model)
-            total_num = labels.size(0)
-            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            msg = "==========Test result on benign test dataset==========\n" + \
-                  time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-                  f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            log(msg)
+    def add_training_observer(self, observer):
+        self.training_observers.append(observer)
 
-        if poisoned_test_dataset is not None:
-            last_time = time.time()
-            # test result on poisoned test dataset
-            predict_digits, labels = self._test(poisoned_test_dataset, device, self.current_schedule['batch_size'], self.current_schedule['num_workers'], model)
-            total_num = labels.size(0)
-            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
-            top1_correct = int(round(prec1.item() / 100.0 * total_num))
-            top5_correct = int(round(prec5.item() / 100.0 * total_num))
-            msg = "==========Test result on poisoned test dataset==========\n" + \
-                  time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + \
-                  f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
-            log(msg)
-
-    def addObserver(self, observer):
-        self.observers.append(observer)
-
-    def deleteObserver(self,observer):
-        for item in self.observers:
+    def delete_training_observer(self,observer):
+        for item in self.training_observers:
             if item is observer:
-                self.observers.remove(observer)
-    def _notifyObservers(self, train_context):
+                self.training_observers.remove(observer)
+    def _notify_training_observer(self, train_context):
+        for observer in self.training_observers:
+            assert callable(observer.work),"function {0} is not callable!".format(observer.work)
+            observer.work(train_context)
+    def add_post_training_observer(self, observer):
+        self.post_training_observers.append(observer)
+
+    def delete_post_training_observer(self,observer):
+        for item in self.post_training_observers:
+            if item is observer:
+                self.post_training_observers.remove(observer)
+    def _notify_post_training_observer(self, train_context):
         for observer in self.observers:
             assert callable(observer.work),"function {0} is not callable!".format(observer.work)
             observer.work(train_context)
+
 
         
     

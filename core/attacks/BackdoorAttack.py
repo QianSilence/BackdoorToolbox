@@ -20,6 +20,10 @@ class BackdoorAttack(object):
     As the context class of the strategy mode, this class aggregates all specific attack strategies, 
     acts as a link between the preceding and the following, and shields high-level modules
     from direct access to strategies and algorithms.
+    It could have several methods:
+        1. Return poisoning datasets and poisoned model
+        2. Return attack results: such as accuracy rate, poisoning rate etc.
+    According to actual needs, other methods can be defined.
 
     Args:
         attack_method(Attack):a specific attack strategy object.
@@ -31,57 +35,55 @@ class BackdoorAttack(object):
     """
     def __init__(self, attack_method):
         self.attack_method = attack_method
-        self.attack_strategy = self.attack_method.get_attack_strategy()
-        self.train_dataset, self.test_dataset = self.attack_method.get_dataset()
-        self.model = self.attack_method.get_model()
-        self.poisoned_train_dataset = None
-        self.poisoned_test_dataset = None
-        self.poisoned_model = None
-        
-        # print(type(train_dataset))
-        # print(type(test_dataset))
+        self.clean_train_dataset,self.clean_test_dataset = self.attack_method.get_dataset()
+        self.poisoned_train_dataset = self.poisoned_test_dataset = None
+        self.backdoor_model = None
+
     def get_attack_strategy(self):
-        return self.attack_strategy
-    
-    def get_train_dataset(self):
-        return self.train_dataset
-    def get_test_dataset(self):
-        return self.test_dataset
+        return self.attack_method.get_attack_strategy()
+
+    def get_backdoor_model(self):
+        if self.backdoor_model is None:
+             self.attack()
+        return self.backdoor_model
 
     def get_poisoned_train_dataset(self):
         if self.poisoned_train_dataset is None:
-            self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.train_dataset) 
+            self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset) 
         return self.poisoned_train_dataset
+
     def get_poisoned_test_dataset(self):
         if self.poisoned_test_dataset is None:
-            self.poisoned_test_dataset = self.attack_method.create_poisoned_dataset(self.test_dataset)
+            self.poisoned_test_dataset = self.attack_method.create_poisoned_dataset(self.clean_test_dataset)
         return self.poisoned_test_dataset
     
-    def get_model(self):
-        return self.model
-
-    def get_poisoned_model(self):
-        if self.poisoned_model is None:
-            self.attack()
-        return self.poisoned_model
-     
-    # 可以指定寻览数据集，默认为原有的干净数据集训练
-    def train(self,schedule=None,dataset=None):
-        self.attack_method.train(schedule,dataset)
-        self.model = self.attack_method.get_model()
-        
-    def test(self, schedule=None, model=None, test_dataset=None): 
-        self.attack_method.test(schedule, model, test_dataset)
-
-    def attack(self,schedule=None):
+    # 这里预留一个接口，对于定义好的对象，可以针对不同的数据集产生不同的有毒数据集
+    # def get_poisoned_dataset(self, dataset=None, schedule=None):
+    #     return self.train_dataset
+    
+    #根据具体的攻击策略发动攻击，攻击训练允许自定义schedule。如果schedule=None，则默认使用定义attack_method对象时指定的调度
+    def attack(self, schedule=None):
         if  self.poisoned_train_dataset is None:
-            self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.train_dataset) 
-        self.attack_method.train(self.poisoned_train_dataset)
-        self.poisoned_model = self.attack_method.get_model()
-    def addObserver(self,observer):
-        self.attack_method.addObserver(observer)
-    def deleteObserver(self,observer):
-        self.attack_method.deleteObserver(observer)
+            self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset) 
+        self.attack_method.train(self.poisoned_train_dataset,schedule)
+        self.backdoor_model = self.attack_method.get_model()
+
+    # 这里测试逻辑允许指定调度和测试数据集
+    def test(self, schedule=None, model=None, test_dataset=None): 
+        return self.attack_method.test(schedule, model, test_dataset)
+    
+  
+    def add_training_observer(self,observer):
+        self.attack_method.add_training_observer(observer)
+    def delete_training_observer(self,observer):
+        self.attack_method.delete_training_observer(observer)
+
+    def add_post_training_observer(self, observer):
+        print("add_post_training_observer")
+        self.attack_method.add_post_training_observer(observer)
+    def delete_post_training_observer(self,observer):
+        self.attack_method.delete_post_training_observer(observer)
+    
 
 
 

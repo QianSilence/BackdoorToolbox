@@ -1,7 +1,0 @@
-Total train samples: 60000
-Total test samples: 10000
-Batch size: 128
-iteration every epoch: 468
-Initial learning rate: 0.1
-[2023-08-19_15:35:45] Epoch:1/200, iteration:100/468, lr: 0.1, loss: 0.43051648139953613, time: 1.1229279041290283
-[2023-08-19_15:35:46] Epoch:1/200, iteration:200/468, lr: 0.1, loss: 0.31081900000572205, time: 0.5366733074188232

@@ -5,4 +5,4 @@
 from .Attack import Attack
 from .BackdoorAttack import BackdoorAttack
 from .BadNets import BadNets
-__all__ = ['Base', 'Attack', 'BackdoorAttack', 'BadNets']
+__all__ = ['Attack', 'BackdoorAttack', 'BadNets']

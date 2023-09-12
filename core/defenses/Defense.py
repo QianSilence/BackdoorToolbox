@@ -13,10 +13,15 @@
 # @Affiliation : Harbin Institute of Technology, Shenzhen
 # @File        : Attack.py
 # @Description  : 这里使用策略模式抽象出所有策略的共有方式attack()
+
 from abc import ABC, abstractmethod
 class Defense(ABC):
     @abstractmethod
     def repair(self):
         raise NotImplementedError
+    # if the defense strategy is based data filter,then it must shíxiàn gāi method
+    @abstractmethod
+    def filter(self, dataset, schedule=None):
+        pass
 
 
