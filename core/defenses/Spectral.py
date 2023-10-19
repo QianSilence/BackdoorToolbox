@@ -19,9 +19,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from core.base import Base
 from torch.utils.data import DataLoader, Subset
-
-from utils.log import Log
-from utils.compute_metric import compute_confusion_matrix, compute_indexes
+from utils.interact.log import Log
+from utils import compute_confusion_matrix, compute_indexes
 from .Defense import Defense
 from multiprocessing.sharedctypes import Value
 from tqdm import trange    
@@ -42,7 +41,7 @@ class Spectral(Base,Defense):
             device (str): 'GPU',
             CUDA_VISIBLE_DEVICES: CUDA_VISIBLE_DEVICES,
             GPU_num (int): 1,
-            save_dir (str): 'experiments',
+            work_dir (str): 'experiments',
             log_iteration_interval(int): 100
     """
 
@@ -82,7 +81,7 @@ class Spectral(Base,Defense):
             raise AttributeError("Training schedule is None, please check your schedule setting.")
         
         # get logger
-        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'])
+        work_dir = osp.join(current_schedule['work_dir'], current_schedule['experiment'])
        
         os.makedirs(work_dir, exist_ok=True)
         log = Log(osp.join(work_dir, 'log.txt'))
@@ -137,13 +136,14 @@ class Spectral(Base,Defense):
         self.train(left_dataset, current_schedule['train_schedule'])
         return self.get_model()
         
+
     def filter(self, dataset=None, schedule=None):
 
         """filter out poisoned samples from poisoned dataset. 
         
         Args:
             dataset (torch.utils.data.Dataset): The dataset to filter.
-            schedule (dict): schedule for spliting the dataset.            
+            schedule (dict): defense schedule filteringing the dataset.           
         """
         if dataset is None:
             if self.poisoned_trainset is not None:
@@ -158,7 +158,7 @@ class Spectral(Base,Defense):
         else: 
             raise AttributeError("Training schedule is None, please check your schedule setting.")
         
-        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'])
+        work_dir = osp.join(current_schedule['work_dir'], current_schedule['experiment'])
         os.makedirs(work_dir, exist_ok=True)
         log = Log(osp.join(work_dir, 'log.txt'))
         experiment = current_schedule['experiment']
@@ -227,7 +227,11 @@ class Spectral(Base,Defense):
             inps,outs = [],[]
             def layer_hook(module, inp, out):
                 outs.append(out.data)
-            #(√)这里选择model.layer4的模型参数
+            """
+            这里需要明确的是hook函数是什么？怎么使用？
+            中间层输出的所在设备，数据类型，形状是什么？
+            中间层表示结果的保存
+            """
             # hook = model.module.layer4.register_forward_hook(layer_hook)
             if isinstance(model, nn.DataParallel):
                 hook = model.module.fc2.register_forward_hook(layer_hook)

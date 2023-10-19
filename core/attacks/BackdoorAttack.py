@@ -17,12 +17,12 @@ from .BadNets import BadNets
 
 class BackdoorAttack(object):
     """
-    As the context class of the strategy mode, this class aggregates all specific attack strategies, 
-    acts as a link between the preceding and the following, and shields high-level modules
-    from direct access to strategies and algorithms.
+    As the context class of the strategy mode, this class aggregates all specific attack strategies, acts as a link between 
+    the preceding and the following, and shields high-level modules from direct access to strategies and algorithms.
     It could have several methods:
-        1. Return poisoning datasets and poisoned model
-        2. Return attack results: such as accuracy rate, poisoning rate etc.
+        1. return poisoning datasets 
+        2. return backdoor Model
+
     According to actual needs, other methods can be defined.
 
     Args:
@@ -31,7 +31,7 @@ class BackdoorAttack(object):
     Attributes:
         poisoned_train_dataset(torch.utils.data.Dataset) : poisoning training dataset
         poisoned_test_dataset(torch.utils.data.Dataset) : poisoning test dataset
-        poisoned_model(torch.nn.Module): The resulting poisoned model after training on the poisoning training dataset
+        backdoor_model(torch.nn.Module): The resulting backdoor model after training on the poisoning training dataset.
     """
     def __init__(self, attack_method):
         self.attack_method = attack_method

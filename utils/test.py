@@ -8,9 +8,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10, MNIST, DatasetFolder
-
-from .compute_accuracy import accuracy
-from .log import Log
+from .compute import compute_accuracy
+from .interact.log import Log
 
 
 def _seed_worker(worker_id):
@@ -111,14 +110,14 @@ def test(model, dataset, schedule):
         else:
             raise NotImplementedError
 
-    work_dir = osp.join(schedule['save_dir'], schedule['experiment_name'] + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
+    work_dir = osp.join(schedule['work_dir'], schedule['experiment_name'] + '_' + time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()))
     os.makedirs(work_dir, exist_ok=True)
     log = Log(osp.join(work_dir, 'log.txt'))
 
     last_time = time.time()
     predict_digits, labels = _test(model, dataset, device, schedule['batch_size'], schedule['num_workers'])
     total_num = labels.size(0)
-    prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+    prec1, prec5 = compute_accuracy(predict_digits, labels, topk=(1, 5))
     top1_correct = int(round(prec1.item() / 100.0 * total_num))
     top5_correct = int(round(prec5.item() / 100.0 * total_num))
     msg = f"==========Test result on {schedule['metric']}==========\n" + \

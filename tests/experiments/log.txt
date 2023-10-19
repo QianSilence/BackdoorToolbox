@@ -1,0 +1,75 @@
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-17_14:23:02==========
+Total train samples: 60000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-17_14:29:51==========
+Total train samples: 60000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-17_14:31:25==========
+Total train samples: 60000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+[2023-10-17_14:31:33] Epoch:1/100, iteration:100\468,lr: 0.1, loss: 0.47281572222709656, time: 0.00016188621520996094
+batch_size:128,correct_num:116
+[2023-10-17_14:31:36] Epoch:1/100, iteration:200\468,lr: 0.1, loss: 0.28127187490463257, time: 7.557868957519531e-05
+batch_size:128,correct_num:117
+[2023-10-17_14:31:39] Epoch:1/100, iteration:300\468,lr: 0.1, loss: 0.15159755945205688, time: 8.440017700195312e-05
+batch_size:128,correct_num:123
+[2023-10-17_14:31:42] Epoch:1/100, iteration:400\468,lr: 0.1, loss: 0.07932537794113159, time: 6.890296936035156e-05
+batch_size:128,correct_num:125
+[2023-10-17_14:31:45] Epoch:2/100, iteration:31\468,lr: 0.1, loss: 0.02320457249879837, time: 0.00011563301086425781
+batch_size:128,correct_num:128
+[2023-10-17_14:31:48] Epoch:2/100, iteration:131\468,lr: 0.1, loss: 0.01932193525135517, time: 9.751319885253906e-05
+batch_size:128,correct_num:127
+[2023-10-17_14:31:51] Epoch:2/100, iteration:231\468,lr: 0.1, loss: 0.03672202676534653, time: 9.036064147949219e-05
+batch_size:128,correct_num:126
+[2023-10-17_14:31:54] Epoch:2/100, iteration:331\468,lr: 0.1, loss: 0.02591860666871071, time: 9.441375732421875e-05
+batch_size:128,correct_num:127
+[2023-10-17_14:31:57] Epoch:2/100, iteration:431\468,lr: 0.1, loss: 0.07495079189538956, time: 9.369850158691406e-05
+batch_size:128,correct_num:124
+[2023-10-17_14:32:00] Epoch:3/100, iteration:62\468,lr: 0.1, loss: 0.06723173707723618, time: 0.00010228157043457031
+batch_size:128,correct_num:126
+[2023-10-17_14:32:03] Epoch:3/100, iteration:162\468,lr: 0.1, loss: 0.014696463011205196, time: 7.2479248046875e-05
+batch_size:128,correct_num:128
+[2023-10-17_14:32:06] Epoch:3/100, iteration:262\468,lr: 0.1, loss: 0.06631337851285934, time: 8.654594421386719e-05
+batch_size:128,correct_num:126
+[2023-10-17_14:32:09] Epoch:3/100, iteration:362\468,lr: 0.1, loss: 0.036110587418079376, time: 6.890296936035156e-05
+batch_size:128,correct_num:127
+[2023-10-17_14:32:12] Epoch:3/100, iteration:462\468,lr: 0.1, loss: 0.033341243863105774, time: 9.274482727050781e-05
+batch_size:128,correct_num:126
+[2023-10-17_14:32:15] Epoch:4/100, iteration:93\468,lr: 0.1, loss: 0.06298201531171799, time: 9.822845458984375e-05
+batch_size:128,correct_num:127
+[2023-10-17_14:32:18] Epoch:4/100, iteration:193\468,lr: 0.1, loss: 0.023699607700109482, time: 9.369850158691406e-05
+batch_size:128,correct_num:127
+[2023-10-17_14:32:21] Epoch:4/100, iteration:293\468,lr: 0.1, loss: 0.14731881022453308, time: 6.842613220214844e-05
+batch_size:128,correct_num:124
+
+==========Execute model test in BaselineMNISTNetwork_MNIST at 2023-10-17_16:49:26==========
+
+==========Test result on test dataset==========
+Top-1 correct / Total: 9932/10000, Top-1 accuracy: 0.9932, Top-5 correct / Total: 10000/10000, Top-5 accuracy: 1.0, time: 15.872908592224121

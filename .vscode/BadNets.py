@@ -277,7 +277,7 @@ class PoisonedDatasetFolder(DatasetFolder):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -290,11 +290,11 @@ class PoisonedDatasetFolder(DatasetFolder):
             benign_dataset.target_transform,
             None)
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poisoned_set = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -355,7 +355,7 @@ class PoisonedVisionDataset(VisionDataset):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -367,11 +367,11 @@ class PoisonedVisionDataset(VisionDataset):
         self.data = benign_dataset.data
         self.targets = benign_dataset.targets
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poisoned_set = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -431,7 +431,7 @@ class PoisonedMNIST(MNIST):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -443,11 +443,11 @@ class PoisonedMNIST(MNIST):
             benign_dataset.target_transform,
             download=True)
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poisoned_set = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -489,7 +489,7 @@ class PoisonedCIFAR10(CIFAR10):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -501,11 +501,11 @@ class PoisonedCIFAR10(CIFAR10):
             benign_dataset.target_transform,
             download=True)    
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poisoned_set = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -566,8 +566,8 @@ class BadNets(DataPoisoningAttack):
         benign_dataset = dataset
         assert 'y_target' in self.attack_config, "Attack_config must contain 'y_target' configuration! "
         y_target = self.attack_config['y_target']
-        assert 'poisoned_rate' in self.attack_config, "Attack_config must contain 'poisoned_rate' configuration! "
-        poisoned_rate = self.attack_config['poisoned_rate']
+        assert 'poisoning_rate' in self.attack_config, "Attack_config must contain 'poisoning_rate' configuration! "
+        poisoning_rate = self.attack_config['poisoning_rate']
         assert 'pattern' in self.attack_config, "Attack_config must contain 'pattern' configuration! "
         pattern = self.attack_config['pattern']
         assert 'weight' in self.attack_config, "Attack_config must contain 'weight' configuration! "
@@ -581,12 +581,12 @@ class BadNets(DataPoisoningAttack):
         assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
     
         if dataset_type == DatasetFolder:
-            return PoisonedDatasetFolder(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedDatasetFolder(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         elif dataset_type == MNIST:
-            return PoisonedVisionDataset(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
-            # return PoisonedMNIST(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedVisionDataset(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            # return PoisonedMNIST(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         elif dataset_type == CIFAR10:
-            return PoisonedCIFAR10(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedCIFAR10(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         else:
             raise NotImplementedError
 

@@ -1,8 +1,8 @@
 import torch
 import os
 import time
-from . import accuracy 
-from . import Log
+from .compute import compute_accuracy
+from .interact.log import Log
 from core.base.Observer import Observer
 class SaveModelInTraining(Observer):
     def __init__(self,save_epoch_interval):
@@ -56,7 +56,7 @@ class TestInTraining(Observer):
             # test result on benign test dataset
             predict_digits, labels = model.test_in_training()
             total_num = labels.size(0)
-            prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+            prec1, prec5 = compute_accuracy(predict_digits, labels, topk=(1, 5))
             top1_correct = int(round(prec1.item() / 100.0 * total_num))
             top5_correct = int(round(prec5.item() / 100.0 * total_num))
             msg = "==========Test in training process==========\n" + \

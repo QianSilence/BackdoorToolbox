@@ -1,0 +1,160 @@
+Traceback (most recent call last):
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/tests/test_AdaptiveBlend.py", line 24, in <module>
+    from core.attacks import AdaptiveBlend
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/__init__.py", line 1, in <module>
+    from .attacks import *
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/attacks/__init__.py", line 6, in <module>
+    from .BackdoorAttack import BackdoorAttack
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/attacks/BackdoorAttack.py", line 11, in <module>
+    from ..base.Base import *
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/base/__init__.py", line 1, in <module>
+    from .Base import Base
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/base/Base.py", line 23, in <module>
+    from utils import compute_accuracy
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/utils/__init__.py", line 6, in <module>
+    from .process_image import show_image, save_image
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/utils/process_image.py", line 1, in <module>
+    import matplotlib.pyplot as plt
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/matplotlib/pyplot.py", line 2479, in <module>
+    and cbook._get_running_interactive_framework()):  # type: ignore
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/matplotlib/cbook.py", line 80, in _get_running_interactive_framework
+    if not _c_internal_utils.display_is_valid():
+KeyboardInterrupt
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:15:31==========
+
+
+==========Generate backdoor samples==========
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 50000,Among the poisoned samples:2500
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 10000,Among the poisoned samples:500
+
+Total samples:50000, poisoning samples:2500,  benign samples:47500
+
+==========Train on poisoned_train_dataset and get backdoor model==========
+
+This machine has 1 cuda devices, and use 1 of them to train.
+
+==========Execute model train in ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:15:39==========
+
+Total train samples: 50000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 390
+Initial learning rate: 0.1
+
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:18:52==========
+
+
+==========Generate backdoor samples==========
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 50000,Among the poisoned samples:2500
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 10000,Among the poisoned samples:500
+
+Total samples:50000, poisoning samples:2500,  benign samples:47500
+
+==========Train on poisoned_train_dataset and get backdoor model==========
+
+This machine has 1 cuda devices, and use 1 of them to train.
+
+==========Execute model train in ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:19:01==========
+
+Total train samples: 50000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 390
+Initial learning rate: 0.1
+
+[2023-10-08_16:19:25] Epoch:1/100, iteration:100/390, lr: 0.1, loss: 2.03456974029541, time: 0.20558977127075195
+
+[2023-10-08_16:19:48] Epoch:1/100, iteration:200/390, lr: 0.1, loss: 1.938805103302002, time: 0.20532679557800293
+
+[2023-10-08_16:20:11] Epoch:1/100, iteration:300/390, lr: 0.1, loss: 1.7885740995407104, time: 0.20402312278747559
+
+[2023-10-08_16:20:34] Epoch:2/100, iteration:9/390, lr: 0.1, loss: 1.6651217937469482, time: 0.20526337623596191
+
+[2023-10-08_16:20:57] Epoch:2/100, iteration:109/390, lr: 0.1, loss: 1.46512770652771, time: 0.20259428024291992
+
+[2023-10-08_16:21:20] Epoch:2/100, iteration:209/390, lr: 0.1, loss: 1.592187762260437, time: 0.20517730712890625
+
+[2023-10-08_16:21:44] Epoch:2/100, iteration:309/390, lr: 0.1, loss: 1.4651039838790894, time: 0.20016121864318848
+
+[2023-10-08_16:22:07] Epoch:3/100, iteration:18/390, lr: 0.1, loss: 1.320937991142273, time: 0.20398783683776855
+
+[2023-10-08_16:22:30] Epoch:3/100, iteration:118/390, lr: 0.1, loss: 1.1674383878707886, time: 0.20442843437194824
+
+[2023-10-08_16:22:52] Epoch:3/100, iteration:218/390, lr: 0.1, loss: 1.2669380903244019, time: 0.2009115219116211
+
+[2023-10-08_16:23:15] Epoch:3/100, iteration:318/390, lr: 0.1, loss: 0.8562616109848022, time: 0.20241594314575195
+
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:33:27==========
+
+
+==========Generate backdoor samples==========
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 50000,Among the poisoned samples:2500
+
+
+
+
+==========Start creating poisoned_dataset==========
+
+Total samples: 10000,Among the poisoned samples:500
+
+Total samples:50000, poisoning samples:2500,  benign samples:47500
+
+==========Train on poisoned_train_dataset and get backdoor model==========
+
+This machine has 1 cuda devices, and use 1 of them to train.
+
+==========Execute model train in ResNet-18_CIFAR-10_Adaptive-Blend at 2023-10-08_16:33:36==========
+
+Total train samples: 50000
+Total test samples: 10000
+Batch size: 128
+iteration every epoch: 390
+Initial learning rate: 0.1
+
+[2023-10-08_16:34:00] Epoch:1/100, iteration:100/390, lr: 0.1, loss: 1.8308254480361938, time: 0.2084367275238037
+

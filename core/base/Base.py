@@ -20,11 +20,11 @@ from torchvision.datasets import DatasetFolder, MNIST, CIFAR10
 import os 
 import sys
 from torchvision.datasets.vision import VisionDataset
-from utils import accuracy
+from utils import compute_accuracy
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
 # print(sys.path)
-from utils import Log
+from utils import Log, get_latent_rep_without_detach
 # ignore warnings
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -36,7 +36,9 @@ support_list = (
 )
 def check(dataset):
     return isinstance(dataset, support_list)
-
+"""
+这里看可以依据训练策略自定义训练函数
+"""
 class Base(TrainingObservable):
     """
     Base class for training and testing.According to the principle of single function, this class is only responsible for model training 
@@ -80,8 +82,8 @@ class Base(TrainingObservable):
 
         assert 'seed' in schedule, "task must contain 'seed' configuration! "
         assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
-        self._set_seed(schedule['seed'], schedule['deterministic'])
-        
+        if 'seed' in schedule and schedule['seed'] is not None and 'deterministic' in schedule and schedule['deterministic']: 
+            self._set_seed(schedule['seed'], schedule['deterministic'])
         self.training_observers = []
         self.post_training_observers = []
 
@@ -160,7 +162,8 @@ class Base(TrainingObservable):
         if 'device' in current_schedule and current_schedule['device'] == 'GPU':
             if 'CUDA_VISIBLE_DEVICES' in current_schedule:
                 os.environ['CUDA_VISIBLE_DEVICES'] = current_schedule['CUDA_VISIBLE_DEVICES']
-
+            # print(current_schedule['CUDA_VISIBLE_DEVICES'])
+            # print(f"This machine has {torch.cuda.device_count()} cuda devices")
             assert torch.cuda.device_count() > 0, 'This machine has no cuda devices!'
             assert current_schedule['GPU_num'] > 0, 'GPU_num should be a positive integer'
             assert torch.cuda.device_count() >= current_schedule['GPU_num'] , 'This machine has {0} cuda devices, and use {1} of them to train'.format(torch.cuda.device_count(), current_schedule['GPU_num'])
@@ -190,9 +193,7 @@ class Base(TrainingObservable):
         # 1. ouput loss and time
         # 2. test and output statistics
         # 3. save checkpoint
-        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'] )
-        os.makedirs(work_dir, exist_ok=True)
-        
+        work_dir = current_schedule['work_dir']  
         log_path = osp.join(work_dir, 'log.txt')
         log = Log(log_path)
         experiment = current_schedule['experiment']
@@ -214,16 +215,33 @@ class Base(TrainingObservable):
                 batch_img = batch_img.to(device)
                 batch_label = batch_label.to(device)
                 optimizer.zero_grad()
-                predict_digits = self.model(batch_img)
-                loss = self.loss(predict_digits, batch_label)
+                if hasattr(self.loss, 'regularize') and self.loss.regularize:
+                    layer = self.loss.regularize_layer
+                    # print(layer)
+                    latents, predict_digits = get_latent_rep_without_detach(self.model, layer, batch_img)
+                    # print("latents:{0}".format(latents))
+                    # loss,loss1,loss2 = self.loss(latents, predict_digits, batch_label)
+                    loss,loss1,loss2,loss3,loss4,entropy_vector = self.loss(latents, predict_digits, batch_label)
+                else:
+                    predict_digits = self.model(batch_img)
+                    loss = self.loss(predict_digits, batch_label)
+                # print("predict_digits:{0},batch_label:{1}".format(predict_digits.shape,batch_label.shape))
+                
                 loss.backward()
                 optimizer.step()
-
                 iteration += 1
 
                 if iteration % current_schedule['log_iteration_interval'] == 0:
                     last_time = time.time()
-                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) + f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}/{len(self.train_dataset)//current_schedule['batch_size']}, lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                    if hasattr(self.loss, 'regularize') and self.loss.regularize:
+                        msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, loss1:{float(loss1)},loss2:{float(loss2)},loss3:{float(loss3)},loss4:{float(loss4)},entropy_vector:{entropy_vector}time: {time.time()-last_time}\n"
+                    else:
+                        msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                    log(msg)
+                    max_num , index = torch.max(predict_digits, dim=1)
+                    equal_matrix = torch.eq(index,batch_label)
+                    correct_num =torch.sum(equal_matrix)
+                    msg ="batch_size:{0},correct_num:{1}\n".format(current_schedule["batch_size"],correct_num)
                     log(msg)
 
             if len(self.training_observers) > 0:
@@ -240,8 +258,8 @@ class Base(TrainingObservable):
                 self.model = self.model.to(device)
                 self.model.train()
 
-        if 'model_path' in current_schedule and current_schedule['model_path'] is not None:
-            torch.save(self.model.state_dict(), work_dir + current_schedule['model_path'])
+        # if 'model_path' in current_schedule and current_schedule['model_path'] is not None:
+        #     torch.save(self.model.state_dict(), work_dir + current_schedule['model_path'])
 
         # if len(self.post_training_observers) > 0:
         #         self.model = self.model.to(device)
@@ -265,7 +283,7 @@ class Base(TrainingObservable):
     def interact_in_training():
         pass
 
-    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None):
+    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None,work_dir = None):
         if model is None:
             model = self.model
         else:
@@ -294,6 +312,16 @@ class Base(TrainingObservable):
                 batch_img = batch_img.cpu()
                 predict_digits.append(batch_img)
                 labels.append(batch_label)
+                # if work_dir is not None:
+                #     log_path = osp.join(work_dir, 'log.txt')
+                #     log = Log(log_path)
+                #     # print(torch.tensor(batch_img).shape)
+                #     max_num , index = torch.max(batch_img, dim=1)
+                #     equal_matrix = torch.eq(index,batch_label)
+                #     correct_num =torch.sum(equal_matrix)
+                #     msg ="batch_size:{0},correct_num:{1}\n".format(batch_label.size()[0],correct_num)
+                #     log(msg)
+
             predict_digits = torch.cat(predict_digits, dim=0)
             
             labels = torch.cat(labels, dim=0)
@@ -328,17 +356,14 @@ class Base(TrainingObservable):
             assert torch.cuda.device_count() >= current_schedule['GPU_num'] , 'This machine has {0} cuda devices, and use {1} of them to test'.format(torch.cuda.device_count(), current_schedule['GPU_num'])
             device = torch.device("cuda:0")
             gpus = list(range(current_schedule['GPU_num']))
-            self.model = nn.DataParallel(self.model, device_ids=gpus, output_device=device)
+            model = nn.DataParallel(model, device_ids=gpus, output_device=device)
             print(f"This machine has {torch.cuda.device_count()} cuda devices, and use {current_schedule['GPU_num']} of them to test.")
         # Use CPU
         else:
             device = torch.device("cpu")
             print(f"Use cpu to test.")
 
-
-        work_dir = osp.join(current_schedule['save_dir'], current_schedule['experiment'] )
-        os.makedirs(work_dir, exist_ok=True)
-       
+        work_dir = current_schedule['work_dir']
         log = Log(osp.join(work_dir, 'log.txt'))
         experiment = current_schedule['experiment']
         t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
@@ -346,15 +371,15 @@ class Base(TrainingObservable):
         log(msg)
         
         last_time = time.time()
-        # test result on benign test dataset
-        predict_digits, labels = self._test(test_dataset, device, current_schedule['batch_size'], current_schedule['num_workers'], model)
+        # test result on test dataset
+        predict_digits, labels = self._test(test_dataset, device, current_schedule['batch_size'], current_schedule['num_workers'], model=model,work_dir=work_dir)
         
         total_num = labels.size(0)
-        prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
+        prec1, prec5 = compute_accuracy(predict_digits, labels, topk=(1, 5))
         top1_correct = int(round(prec1.item() / 100.0 * total_num))
         top5_correct = int(round(prec5.item() / 100.0 * total_num)) 
         
-        msg = "\n==========Test result on benign test dataset==========\n"
+        msg = "\n==========Test result on test dataset==========\n"
         log(msg)
         msg = f"Top-1 correct / Total: {top1_correct}/{total_num}, Top-1 accuracy: {top1_correct/total_num}, Top-5 correct / Total: {top5_correct}/{total_num}, Top-5 accuracy: {top5_correct/total_num}, time: {time.time()-last_time}\n"
         log(msg)

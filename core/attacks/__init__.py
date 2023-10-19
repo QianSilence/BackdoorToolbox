@@ -5,4 +5,6 @@
 from .Attack import Attack
 from .BackdoorAttack import BackdoorAttack
 from .BadNets import BadNets
-__all__ = ['Attack', 'BackdoorAttack', 'BadNets']
+from .AdaptiveBlend import AdaptiveBlend
+from .AdaptivePatch import AdaptivePatch
+__all__ = ['Attack', 'BackdoorAttack', 'BadNets', 'AdaptiveBlend', 'AdaptivePatch']

@@ -269,7 +269,7 @@ class PoisonedDatasetFolder(DatasetFolder):
         target_transform (callable, optional): A function/transform that takes
             in the target and transforms it.
     Attributes:
-        poisoned_set(frozenset):Save the index of the poisoning sample in the dataset.
+        poison_indices(frozenset):Save the index of the poisoning sample in the dataset.
         poisoned_transform(Optional[Callable])：Compose which contains operation which can transform 
         samples into poisoning samples. 
         poisoned_target_transform(Optional[Callable]):Compose which contains operation which can transform 
@@ -279,7 +279,7 @@ class PoisonedDatasetFolder(DatasetFolder):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -292,11 +292,11 @@ class PoisonedDatasetFolder(DatasetFolder):
             benign_dataset.target_transform,
             None)
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -323,7 +323,7 @@ class PoisonedDatasetFolder(DatasetFolder):
         path, target = self.samples[index]
         sample = self.loader(path)
 
-        if index in self.poisoned_set:
+        if index in self.poison_indices:
             sample = self.poisoned_transform(sample)
             target = self.poisoned_target_transform(target)
         else:
@@ -333,8 +333,8 @@ class PoisonedDatasetFolder(DatasetFolder):
                 target = self.target_transform(target)
 
         return torch.tensor(sample), torch.tensor(target)
-    def get_poisoned_set(self):
-        return self.poisoned_set
+    def get_poison_indices(self):
+        return self.poison_indices
     
 class PoisonedVisionDataset(VisionDataset):
     """
@@ -349,7 +349,7 @@ class PoisonedVisionDataset(VisionDataset):
         self.poisoned_target_transform(list) 
 
     Attributes:
-    self.poisoned_set(frozenset):Save the index of the poisoning sample in the dataset.
+    self.poison_indices(frozenset):Save the index of the poisoning sample in the dataset.
     self.poisoned_transform(Optional[Callable])：Compose which contains operation which can transform 
     samples into poisoning samples. 
     self.poisoned_target_transform(Optional[Callable]):Compose which contains operation which can transform 
@@ -359,7 +359,7 @@ class PoisonedVisionDataset(VisionDataset):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -371,11 +371,11 @@ class PoisonedVisionDataset(VisionDataset):
         self.data = benign_dataset.data
         self.targets = benign_dataset.targets
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -398,7 +398,7 @@ class PoisonedVisionDataset(VisionDataset):
         # doing this so that it is consistent with all other datasets
         # to return a PIL Image
         img = Image.fromarray(img.numpy(), mode='L')
-        if index in self.poisoned_set: 
+        if index in self.poison_indices: 
             img = self.poisoned_transform(img)
             target = self.poisoned_target_transform(target)
         else:
@@ -407,8 +407,8 @@ class PoisonedVisionDataset(VisionDataset):
             if self.target_transform is not None:
                 target = self.target_transform(target)
         return img, target
-    def get_poisoned_set(self):
-        return self.poisoned_set
+    def get_poison_indices(self):
+        return self.poison_indices
     
 
 class PoisonedMNIST(MNIST):
@@ -424,7 +424,7 @@ class PoisonedMNIST(MNIST):
         self.poisoned_target_transform(list) 
 
     Attributes:
-    self.poisoned_set(frozenset):Save the index of the poisoning sample in the dataset.
+    self.poison_indices(frozenset):Save the index of the poisoning sample in the dataset.
     self.poisoned_transform(Optional[Callable])：Compose which contains operation which can transform 
     samples into poisoning samples. 
     self.poisoned_target_transform(Optional[Callable]):Compose which contains operation which can transform 
@@ -434,7 +434,7 @@ class PoisonedMNIST(MNIST):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -446,11 +446,11 @@ class PoisonedMNIST(MNIST):
             benign_dataset.target_transform,
             download=True)
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -473,7 +473,7 @@ class PoisonedMNIST(MNIST):
         # to return a PIL Image
         img = Image.fromarray(img.numpy(), mode='L')
 
-        if index in self.poisoned_set:
+        if index in self.poison_indices:
             img = self.poisoned_transform(img)
             target = self.poisoned_target_transform(target)
         else:
@@ -485,8 +485,8 @@ class PoisonedMNIST(MNIST):
 
         return torch.tensor(img), torch.tensor(target)
 
-    def get_poisoned_set(self):
-        return self.poisoned_set
+    def get_poison_indices(self):
+        return self.poison_indices
 
 #这与PoisonedMNIST(MNIST)逻辑上没有区别
 #这里有毒数据集的定义可以通过继承torchvision.datasets.vision.VisionDataset来实现
@@ -494,7 +494,7 @@ class PoisonedCIFAR10(CIFAR10):
     def __init__(self,
                  benign_dataset,
                  y_target,
-                 poisoned_rate,
+                 poisoning_rate,
                  pattern,
                  weight,
                  poisoned_transform_index,
@@ -506,11 +506,11 @@ class PoisonedCIFAR10(CIFAR10):
             benign_dataset.target_transform,
             download=True)    
         total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoned_rate)
+        poisoned_num = int(total_num * poisoning_rate)
         assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
         tmp_list = list(range(total_num))
         random.shuffle(tmp_list)
-        self.poisoned_set = frozenset(tmp_list[:poisoned_num])
+        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
 
         # Add trigger to images
         if self.transform is None:
@@ -533,7 +533,7 @@ class PoisonedCIFAR10(CIFAR10):
         # to return a PIL Image
         img = Image.fromarray(img)
 
-        if index in self.poisoned_set:
+        if index in self.poison_indices:
             img = self.poisoned_transform(img)
             target = self.poisoned_target_transform(target)
         else:
@@ -544,8 +544,8 @@ class PoisonedCIFAR10(CIFAR10):
                 target = self.target_transform(target)
         return torch.tensor(img), torch.tensor(target)
     
-    def get_poisoned_set(self):
-        return self.poisoned_set
+    def get_poison_indices(self):
+        return self.poison_indices
 
 class BadNets(Base, Attack):
     """
@@ -578,8 +578,8 @@ class BadNets(Base, Attack):
         benign_dataset = dataset
         assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
         y_target = self.attack_schedule['y_target']
-        assert 'poisoned_rate' in self.attack_schedule, "Attack_config must contain 'poisoned_rate' configuration! "
-        poisoned_rate = self.attack_schedule['poisoned_rate']
+        assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
+        poisoning_rate = self.attack_schedule['poisoning_rate']
         assert 'pattern' in self.attack_schedule, "Attack_config must contain 'pattern' configuration! "
         pattern = self.attack_schedule['pattern']
         assert 'weight' in self.attack_schedule, "Attack_config must contain 'weight' configuration! "
@@ -591,22 +591,21 @@ class BadNets(Base, Attack):
         
         dataset_type = type(benign_dataset)
         assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
-        work_dir = osp.join(self.attack_schedule['save_dir'], self.attack_schedule['experiment'])
-        
+        work_dir = self.attack_schedule['work_dir']
         os.makedirs(work_dir, exist_ok=True)
         log = Log(osp.join(work_dir, 'log.txt'))
 
         msg = "\n\n\n==========Start creating poisoned_dataset==========\n"
         log(msg)
-        msg = f"Total samples: {len(benign_dataset)},Among the poisoned samples:{int(len(benign_dataset) * poisoned_rate)}\n"
+        msg = f"Total samples: {len(benign_dataset)},Among the poisoned samples:{int(len(benign_dataset) * poisoning_rate)}\n"
         log(msg)
         if dataset_type == DatasetFolder:
-            return PoisonedDatasetFolder(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedDatasetFolder(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         elif dataset_type == MNIST:
-            return PoisonedVisionDataset(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
-            # return PoisonedMNIST(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedVisionDataset(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            # return PoisonedMNIST(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         elif dataset_type == CIFAR10:
-            return PoisonedCIFAR10(benign_dataset, y_target, poisoned_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
+            return PoisonedCIFAR10(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         else:
             raise NotImplementedError
         
