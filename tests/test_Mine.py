@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from core.attacks import BadNets,BackdoorAttack
-from core.base import Observer, Base
+from core.base import Observer, Base, MineTrainer
 from models import BaselineMNISTNetwork
 import random
 import time
@@ -87,7 +87,7 @@ weight = torch.zeros((28, 28), dtype=torch.float32)
 weight[-3:, -3:] = 1.0
 schedule = {
     'experiment': 'BaselineMNISTNetwork_MNIST_BadNets_MINE',
-
+    "train_strategy":MineTrainer,
     # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,

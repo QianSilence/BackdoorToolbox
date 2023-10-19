@@ -7,6 +7,7 @@
 # @Description  : Logical implementation of model training and testing
 from abc import abstractmethod
 from .TrainingObservable import TrainingObservable
+from .BaseTrainer import BaseTrainer
 import os
 import os.path as osp
 import time
@@ -188,93 +189,11 @@ class Base(TrainingObservable):
         self.model = self.model.to(device)
         self.model.train()
         optimizer = self.optimizer(self.model.parameters(), lr=current_schedule['lr'], momentum=current_schedule['momentum'], weight_decay=current_schedule['weight_decay'])
-        
-        # log and output:
-        # 1. ouput loss and time
-        # 2. test and output statistics
-        # 3. save checkpoint
-        work_dir = current_schedule['work_dir']  
-        log_path = osp.join(work_dir, 'log.txt')
-        log = Log(log_path)
-        experiment = current_schedule['experiment']
-        t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
-        msg = "\n==========Execute model train in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
-        log(msg)
-
-        iteration = 0
-        last_time = time.time()
-        
-        msg = f"Total train samples: {len(self.train_dataset)}\nTotal test samples: {len(self.test_dataset)}\nBatch size: {current_schedule['batch_size']}\niteration every epoch: {len(self.train_dataset) // current_schedule['batch_size']}\nInitial learning rate: {current_schedule['lr']}\n"
-        log(msg)
-
-        for i in range(current_schedule['epochs']):
-            self.adjust_learning_rate(optimizer, i, current_schedule)
-            for batch_id, batch in enumerate(train_loader):
-                batch_img = batch[0]
-                batch_label = batch[1]
-                batch_img = batch_img.to(device)
-                batch_label = batch_label.to(device)
-                optimizer.zero_grad()
-                if hasattr(self.loss, 'regularize') and self.loss.regularize:
-                    layer = self.loss.regularize_layer
-                    # print(layer)
-                    latents, predict_digits = get_latent_rep_without_detach(self.model, layer, batch_img)
-                    # print("latents:{0}".format(latents))
-                    # loss,loss1,loss2 = self.loss(latents, predict_digits, batch_label)
-                    loss,loss1,loss2,loss3,loss4,entropy_vector = self.loss(latents, predict_digits, batch_label)
-                else:
-                    predict_digits = self.model(batch_img)
-                    loss = self.loss(predict_digits, batch_label)
-                # print("predict_digits:{0},batch_label:{1}".format(predict_digits.shape,batch_label.shape))
-                
-                loss.backward()
-                optimizer.step()
-                iteration += 1
-
-                if iteration % current_schedule['log_iteration_interval'] == 0:
-                    last_time = time.time()
-                    if hasattr(self.loss, 'regularize') and self.loss.regularize:
-                        msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, loss1:{float(loss1)},loss2:{float(loss2)},loss3:{float(loss3)},loss4:{float(loss4)},entropy_vector:{entropy_vector}time: {time.time()-last_time}\n"
-                    else:
-                        msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
-                    log(msg)
-                    max_num , index = torch.max(predict_digits, dim=1)
-                    equal_matrix = torch.eq(index,batch_label)
-                    correct_num =torch.sum(equal_matrix)
-                    msg ="batch_size:{0},correct_num:{1}\n".format(current_schedule["batch_size"],correct_num)
-                    log(msg)
-
-            if len(self.training_observers) > 0:
-                self.model = self.model.to(device)
-                self.model.eval()
-                context = {}
-                context["model"] = deepcopy(self.model)
-                context["epoch"] = i
-                context["device"] = device
-                context["work_dir"] = work_dir
-                context["log_path"] = log_path
-                context["last_time"] = last_time
-                self._notify_training_observer(context)
-                self.model = self.model.to(device)
-                self.model.train()
-
-        # if 'model_path' in current_schedule and current_schedule['model_path'] is not None:
-        #     torch.save(self.model.state_dict(), work_dir + current_schedule['model_path'])
-
-        # if len(self.post_training_observers) > 0:
-        #         self.model = self.model.to(device)
-        #         self.model.eval()
-        #         context = {}
-        #         context["model"] = deepcopy(self.model)
-        #         context["epoch"] = i
-        #         context["device"] = device
-        #         context["work_dir"] = work_dir
-        #         context["log_path"] = log_path
-        #         context["last_time"] = last_time
-        #         self._notify_training_observer(context)
-        #         self.model = self.model.to(device)
-        #         self.model.train()
-        
+        assert "train_strategy" in current_schedule and current_schedule["train_strategy"]  is not None, 'Please specify specific training strategy!'
+        Trainer = current_schedule["train_strategy"]
+        trainer = Trainer(self.model, self.train_dataset ,train_loader, self.loss, optimizer, device)
+        trainer.train(current_schedule)
+    
     # Template Method Pattern：
     # In order to realize that the subclass can interrupt or intervene in the train process of the parent class function,
     # use the template method pattern to define the skeleton of an algorithm in the parent class, but leave the implementation 

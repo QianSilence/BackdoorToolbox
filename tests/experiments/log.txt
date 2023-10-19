@@ -73,3 +73,86 @@ batch_size:128,correct_num:124
 
 ==========Test result on test dataset==========
 Top-1 correct / Total: 9932/10000, Top-1 accuracy: 0.9932, Top-5 correct / Total: 10000/10000, Top-5 accuracy: 1.0, time: 15.872908592224121
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-19_21:45:21==========
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-19_21:54:37==========
+Total train samples: 60000
+Total test samples: 60000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-19_21:57:04==========
+Total train samples: 60000
+Total test samples: 60000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+[2023-10-19_21:57:11] Epoch:1/100, iteration:100\468,lr: 0.1, loss: 0.47281572222709656, time: 9.441375732421875e-05
+batch_size:128,correct_num:116
+[2023-10-19_21:57:14] Epoch:1/100, iteration:200\468,lr: 0.1, loss: 0.28127187490463257, time: 5.221366882324219e-05
+batch_size:128,correct_num:117
+[2023-10-19_21:57:17] Epoch:1/100, iteration:300\468,lr: 0.1, loss: 0.15159755945205688, time: 8.726119995117188e-05
+batch_size:128,correct_num:123
+[2023-10-19_21:57:20] Epoch:1/100, iteration:400\468,lr: 0.1, loss: 0.07932537794113159, time: 6.794929504394531e-05
+batch_size:128,correct_num:125
+[2023-10-19_21:57:23] Epoch:2/100, iteration:31\468,lr: 0.1, loss: 0.02320457249879837, time: 9.083747863769531e-05
+batch_size:128,correct_num:128
+[2023-10-19_21:57:26] Epoch:2/100, iteration:131\468,lr: 0.1, loss: 0.01932193525135517, time: 7.510185241699219e-05
+batch_size:128,correct_num:127
+[2023-10-19_21:57:29] Epoch:2/100, iteration:231\468,lr: 0.1, loss: 0.03672202676534653, time: 8.225440979003906e-05
+batch_size:128,correct_num:126
+[2023-10-19_21:57:32] Epoch:2/100, iteration:331\468,lr: 0.1, loss: 0.02591860666871071, time: 5.8650970458984375e-05
+batch_size:128,correct_num:127
+[2023-10-19_21:57:35] Epoch:2/100, iteration:431\468,lr: 0.1, loss: 0.07495079189538956, time: 0.00010371208190917969
+batch_size:128,correct_num:124
+[2023-10-19_21:57:39] Epoch:3/100, iteration:62\468,lr: 0.1, loss: 0.06723173707723618, time: 9.465217590332031e-05
+batch_size:128,correct_num:126
+[2023-10-19_21:57:42] Epoch:3/100, iteration:162\468,lr: 0.1, loss: 0.014696463011205196, time: 6.151199340820312e-05
+batch_size:128,correct_num:128

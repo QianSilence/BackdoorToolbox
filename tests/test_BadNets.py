@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from core.attacks import BadNets,BackdoorAttack
-from core.base import Observer, Base
+from core.base import Observer, Base, BaseTrainer
 from models import BaselineMNISTNetwork
 import random
 import time
@@ -28,6 +28,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn import manifold
+
 from utils import show_img,save_img,accuracy,compute_accuracy,get_latent_rep, plot_2d,Log,parser,count_model_predict_digits
 # ========== Set global settings ==========
 global_seed = 333
@@ -70,7 +71,7 @@ weight = torch.zeros((28, 28), dtype=torch.float32)
 weight[-3:, -3:] = 1.0
 schedule = {
     'experiment': 'BaselineMNISTNetwork_MNIST',
-
+    "train_strategy": BaseTrainer,
     # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,

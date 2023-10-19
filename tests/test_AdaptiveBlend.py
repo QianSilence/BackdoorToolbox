@@ -83,7 +83,7 @@ trigger_path = os.path.join(datasets_root_dir, "triggers/hellokitty_32.png")
 
 schedule = {
     'experiment': 'ResNet-18_CIFAR-10_Adaptive-Blend',
-
+    "train_strategy": BaseTrainer,
     # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,
