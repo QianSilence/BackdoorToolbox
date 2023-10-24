@@ -7,6 +7,7 @@
 # @Description : Some calculation-related algorithmic tools are implemented
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 #prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
 def compute_accuracy(output, target, topk=(1,)):
@@ -77,6 +78,8 @@ FN:    0       1
 def compute_confusion_matrix(precited,expected):
     predicted = np.array(precited,dtype = int)
     expected = np.array(expected,dtype = int)
+    precited = precited.astype(bool)
+    expected = expected.astype(bool)
 
     tp_list = list(precited & expected)    # 将TP的计算结果转换为list
     fp_list = list(precited & ~expected)   # 将FP的计算结果转换为list
@@ -87,6 +90,7 @@ def compute_confusion_matrix(precited,expected):
     fp = fp_list.count(1)                  # 统计FP的个数
     tn = tn_list.count(1)                  # 统计TN的个数
     fn = fn_list.count(1)                  # 统计FN的个数
+
     return tp, fp, tn, fn
 
 # 计算常用指标
@@ -181,3 +185,80 @@ def count_model_predict_digits(predict_digits,y_labels,poison_indices,y_target,s
         res[str(label)] = {"predicts":predicts,"y_post_prob_matrix":y_post_prob_matrix,"entropy_matrix":entropy_matrix,"entropy_vector":entropy_vector}
     np.savez(save_path,**res)
     return res
+
+
+class SCELoss(nn.Module):
+    """Symmetric Cross Entropy."""
+    def __init__(self, alpha=0.1, beta=1, num_classes=10, reduction=None):
+        super(SCELoss, self).__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.num_classes = num_classes
+        self.reduction = reduction
+
+    def forward(self, x, target):
+        """
+        x(torch.tensor):input : 包含每个类的得分，2-D tensor,shape为 batch*n
+        target(torch.tensor),shape: 大小为 n 的 1—D tensor，包含类别的索引(0到 n-1)。
+        """
+        ce = torch.nn.CrossEntropyLoss(reduction=self.reduction)
+        rce = RCELoss(num_classes=self.num_classes, reduction=self.reduction)
+        ce_loss = ce(x, target)
+        rce_loss = rce(x, target)
+        # print(f"ce_loss:{ce_loss},shape:{ce_loss.shape},rce_loss:{rce_loss},shape:{rce_loss.shape}\n")
+        loss = self.alpha * ce_loss + self.beta * rce_loss
+        return loss
+    
+class RCELoss(nn.Module):
+    """Reverse Cross Entropy Loss."""
+
+    def __init__(self, num_classes=10, reduction=None):
+        super(RCELoss, self).__init__()
+        self.num_classes = num_classes
+        self.reduction = reduction
+
+    def forward(self, x, target):
+        prob = F.softmax(x, dim=-1)
+        prob = torch.clamp(prob, min=1e-7, max=1.0)
+        one_hot = F.one_hot(target, self.num_classes).float()
+        one_hot = torch.clamp(one_hot, min=1e-4, max=1.0)
+        loss = -1 * torch.sum(prob * torch.log(one_hot), dim=-1)
+        if self.reduction == "mean":
+            loss = loss.mean()
+        return loss
+
+# def is_singular_matrix(matrices):
+#     with torch.no_grad():
+#         determinantes = torch.det(matrices)
+#         print("Determinant:{}\n".format(determinantes))
+#         indexs = torch.le(determinantes, 0)
+#         if torch.any(indexs).item():
+#             index = np.where(np.array(indexs) == True)
+#             matrix = matrices[index]
+#             # Determine whether it is symmetrical
+#             symmetry = (torch.transpose(matrix,0,1) - matrix) < 0.1
+#             print(f"Is matrix symmetry:{symmetry}\n")
+#             # Determine whether it is positive or not
+#             eigenvalues, _ = torch.eig(matrix)
+#             is_positive_definite = all(eigenvalues[:, 0] > 0)
+#             if not is_positive_definite:
+#                 print("index:{index},deter:{determinantes[index]},eigenvalues:{eigenvalues},\n")
+#             exit(-1)
+
+def is_singular_matrix(matrices):
+    determinantes = torch.prod(matrices, dim=1)
+    with torch.no_grad():
+        indexs = torch.le(determinantes, 0)
+        if torch.any(indexs).item():
+            index = np.where(np.array(indexs) == True)
+            matrix = matrices[index]
+            is_positive_definite = all(matrix[0:-1] > 0)
+            if not is_positive_definite:
+                print(f"index:{index},deter:{determinantes[index]},eigenvalues:{matrix},\n")
+                print(matrices)
+            exit(-1)
+
+
+         
+         
+

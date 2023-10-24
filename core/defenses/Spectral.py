@@ -134,7 +134,6 @@ class Spectral(Base,Defense):
         msg = "==========Training with selected clean data==========\n"
         log(msg)
         self.train(left_dataset, current_schedule['train_schedule'])
-        return self.get_model()
         
 
     def filter(self, dataset=None, schedule=None):

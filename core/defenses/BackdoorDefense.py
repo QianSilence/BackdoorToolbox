@@ -10,10 +10,36 @@ from copy import deepcopy
 from .Defense import Defense
 from ..base.Base import *
 from .Spectral import Spectral
-#对外的功能：
-#1.返回干净模型
-#2.返回防御结果：比如准确率，中毒率
-#3.如果是数据过滤的算法：则有有毒数据集，过滤后的数据集，以及准确率，假阳率，漏报率等
+
+
+"""
+从防御的角度来看，测试时仅有两个任务
+
+防御过程：
+
+1.返回干净模型
+
+防御效果：
+
+1.模型的效果，如：准确率，中毒率
+
+因此需要提供测试接口函数
+
+具体的指标由tester根据接口函数来计算：
+
+
+2.2 如果是数据过滤的算法，还要有数据过滤的效果：
+更细节一点：
+返回目标标签
+返回目标标签在数据集中对应的索引
+返回过滤的有毒数据索引和干净数据索引
+
+
+综上计算：
+具体的过滤指标由tester根据上述接口函数来计算
+
+准确率，假阳率，漏报率等
+"""
 
 class BackdoorDefense(object):
     """
@@ -38,23 +64,45 @@ class BackdoorDefense(object):
         self.defense_method = defense_method
         self.defense_strategy = self.defense_method.get_defense_strategy()
         self.defense_model = None
-        self.removed_inds =  None
-        self.left_inds = None
+        self.poisoned_indices =  None
+        self.clean_indices = None
         self.target_label_inds = None
-    
+        self.repaired_model =  None
     def get_defense_strategy(self):
-        return self.attack_strategy
+        return self.defense_strategy
     
-    def repair(self, transform=None, schedule=None):
-        self.defense_model = self.defense_method.repair(transform, schedule)
-        return self.defense_model
- 
-    def filter(self, dataset = None, schedule=None):
-        self.removed_inds, self.left_inds, self.target_label_inds =  self.defense_method.filter(dataset, schedule)
-        return self.removed_inds, self.left_inds, self.target_label_inds
+    def get_repaired_model(self, dataset=None, schedule=None):
+        if self.repaired_model is None:
+            self.defense_method.repair(dataset, schedule)
+        self.repaired_model = self.defense_method.get_model()
+        return self.repaired_model
     
+    def get_target_label(self):
+        return self.defense_method.get_target_label()
+
+    def get_pred_poisoned_sample_dist(self):
+        return  self.defense_method.get_poison_data_pool()
+    
+    def get_real_poisoned_sample_dist(self):
+        """
+        In the form of a bool array  of all samples in the dataset, 1 is a poisoning sample and 0 is a non-poisoning sample.
+        """
+        train_dataset, _= self.defense_method.get_dataset()
+        poison_indices = train_dataset.get_poison_indices()
+        expected = np.zeros(len(train_dataset))
+        expected[poison_indices] = 1
+        return expected
+
+    def filter(self, dataset=None, schedule=None):
+        """
+        Return the results of dataset filtering
+        """
+        self.poisoned_indices, self.clean_indices =  self.defense_method.filter(dataset, schedule)
+        return self.poisoned_indices, self.clean_indices
+   
     def test(self, schedule=None, model=None, test_dataset=None): 
         return self.defense_method.test(schedule, model, test_dataset)
+    
 
     def add_training_observer(self,observer):
         self.attack_method.add_training_observer(observer)

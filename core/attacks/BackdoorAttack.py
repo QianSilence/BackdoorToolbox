@@ -42,9 +42,10 @@ class BackdoorAttack(object):
     def get_attack_strategy(self):
         return self.attack_method.get_attack_strategy()
 
-    def get_backdoor_model(self):
+    def get_backdoor_model(self,dataset = None, schedule=None):
         if self.backdoor_model is None:
-             self.attack()
+             self.attack(dataset = dataset, schedule=schedule)
+        self.backdoor_model = self.attack_method.get_model()
         return self.backdoor_model
 
     def get_poisoned_train_dataset(self):
@@ -62,12 +63,16 @@ class BackdoorAttack(object):
     #     return self.train_dataset
     
     #根据具体的攻击策略发动攻击，攻击训练允许自定义schedule。如果schedule=None，则默认使用定义attack_method对象时指定的调度
-    def attack(self, schedule=None):
-        if  self.poisoned_train_dataset is None:
-            self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset) 
-        self.attack_method.train(self.poisoned_train_dataset,schedule)
-        self.backdoor_model = self.attack_method.get_model()
+    def attack(self, dataset = None, schedule=None):
+        train_dataset = dataset 
+        if train_dataset is None:
+            if  self.poisoned_train_dataset is not None:
+                train_dataset = self.poisoned_train_dataset 
+            else:
+                train_dataset = self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset) 
 
+        self.attack_method.train(train_dataset,schedule)
+        
     # 这里测试逻辑允许指定调度和测试数据集
     def test(self, schedule=None, model=None, test_dataset=None): 
         return self.attack_method.test(schedule, model, test_dataset)

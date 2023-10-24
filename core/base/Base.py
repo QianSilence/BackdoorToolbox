@@ -7,7 +7,6 @@
 # @Description  : Logical implementation of model training and testing
 from abc import abstractmethod
 from .TrainingObservable import TrainingObservable
-from .BaseTrainer import BaseTrainer
 import os
 import os.path as osp
 import time
@@ -144,16 +143,17 @@ class Base(TrainingObservable):
             for param_group in optimizer.param_groups:
                 param_group['lr'] = current_schedule['lr']
     
-    def train(self, dataset=None, schedule=None,):
+    def train(self, dataset=None, schedule=None):
         if schedule is not None:
             current_schedule = deepcopy(schedule)
         elif self.global_schedule is not None:
             current_schedule = deepcopy(self.global_schedule)
         else: 
             raise AttributeError("Training schedule is None, please check your schedule setting.")
-     
+
         if dataset is not None:
             self.train_dataset = dataset
+     
 
         if 'pretrain' in current_schedule and current_schedule['pretrain'] is not None:
             self.model.load_state_dict(torch.load(current_schedule['pretrain']), strict=False)
@@ -189,11 +189,60 @@ class Base(TrainingObservable):
         self.model = self.model.to(device)
         self.model.train()
         optimizer = self.optimizer(self.model.parameters(), lr=current_schedule['lr'], momentum=current_schedule['momentum'], weight_decay=current_schedule['weight_decay'])
-        assert "train_strategy" in current_schedule and current_schedule["train_strategy"]  is not None, 'Please specify specific training strategy!'
-        Trainer = current_schedule["train_strategy"]
-        trainer = Trainer(self.model, self.train_dataset ,train_loader, self.loss, optimizer, device)
-        trainer.train(current_schedule)
-    
+        
+        work_dir = current_schedule['work_dir']  
+        log_path = osp.join(work_dir, 'log.txt')
+        log = Log(log_path)
+        experiment = current_schedule['experiment']
+        t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
+        msg = "\n==========Execute model train in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
+        log(msg)
+
+        iteration = 0
+        last_time = time.time()
+        
+        msg = f"Total train samples: {len(self.train_dataset)}\nTotal test samples: {len(self.train_dataset)}\nBatch size: {current_schedule['batch_size']}\niteration every epoch: {len(self.train_dataset) // current_schedule['batch_size']}\nInitial learning rate: {current_schedule['lr']}\n"
+        log(msg)
+
+        for i in range(current_schedule['epochs']):
+            # self.adjust_learning_rate(optimizer, i, schedule)
+            for batch_id, batch in enumerate(train_loader):
+                batch_img = batch[0]
+                batch_label = batch[1]
+                batch_img = batch_img.to(device)
+                batch_label = batch_label.to(device)
+                optimizer.zero_grad()
+                predict_digits = self.model(batch_img)
+                loss = self.loss(predict_digits, batch_label)
+                # print("predict_digits:{0},batch_label:{1}".format(predict_digits.shape,batch_label.shape))
+                loss.backward()
+                optimizer.step()
+                iteration += 1
+
+                if iteration % current_schedule['log_iteration_interval'] == 0:
+                    last_time = time.time()
+                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                    log(msg)
+                    max_num , index = torch.max(predict_digits, dim=1)
+                    equal_matrix = torch.eq(index,batch_label)
+                    correct_num =torch.sum(equal_matrix)
+                    msg ="batch_size:{0},correct_num:{1}\n".format(current_schedule["batch_size"],correct_num)
+                    log(msg)
+     
+            # if len(training_observers) > 0:
+            #     model = self.model.to(device)
+            #     model.eval()
+            #     context = {}
+            #     context["model"] = deepcopy(self.model)
+            #     context["epoch"] = i
+            #     context["device"] = device
+            #     context["work_dir"] = work_dir
+            #     context["log_path"] = log_path
+            #     context["last_time"] = last_time
+            #     self._notify_training_observer(context)
+            #     model = self.model.to(device)
+            #     model.train()
+ 
     # Template Method Pattern：
     # In order to realize that the subclass can interrupt or intervene in the train process of the parent class function,
     # use the template method pattern to define the skeleton of an algorithm in the parent class, but leave the implementation 
@@ -202,7 +251,7 @@ class Base(TrainingObservable):
     def interact_in_training():
         pass
 
-    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None,work_dir = None):
+    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None, work_dir = None):
         if model is None:
             model = self.model
         else:
@@ -225,7 +274,7 @@ class Base(TrainingObservable):
             predict_digits = []
             labels = []
             for batch in test_loader:
-                batch_img, batch_label = batch
+                batch_img, batch_label = batch[0],batch[1]
                 batch_img = batch_img.to(device)
                 batch_img = model(batch_img)
                 batch_img = batch_img.cpu()
@@ -244,11 +293,9 @@ class Base(TrainingObservable):
             predict_digits = torch.cat(predict_digits, dim=0)
             
             labels = torch.cat(labels, dim=0)
+            # print(labels)
             return predict_digits, labels
         
-    def test_in_training(self):
-        self._test()
-
     # Here, new test models, datasets and schedules are allowed to be passed in, and by default,
     #  the models, datasets and schedules defined in this class are used.
     def test(self, schedule=None, model=None, test_dataset=None):
@@ -291,8 +338,8 @@ class Base(TrainingObservable):
         
         last_time = time.time()
         # test result on test dataset
-        predict_digits, labels = self._test(test_dataset, device, current_schedule['batch_size'], current_schedule['num_workers'], model=model,work_dir=work_dir)
-        
+        predict_digits, labels = self._test(test_dataset, device, batch_size=current_schedule['batch_size'], num_workers=current_schedule['num_workers'], model=model,work_dir=work_dir)
+
         total_num = labels.size(0)
         prec1, prec5 = compute_accuracy(predict_digits, labels, topk=(1, 5))
         top1_correct = int(round(prec1.item() / 100.0 * total_num))

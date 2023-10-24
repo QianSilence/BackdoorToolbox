@@ -156,3 +156,1121 @@ batch_size:128,correct_num:124
 batch_size:128,correct_num:126
 [2023-10-19_21:57:42] Epoch:3/100, iteration:162\468,lr: 0.1, loss: 0.014696463011205196, time: 6.151199340820312e-05
 batch_size:128,correct_num:128
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 10000,Among the poisoned samples:500
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 10000,Among the poisoned samples:500
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 10000,Among the poisoned samples:500
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 10000,Among the poisoned samples:500
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 10000,Among the poisoned samples:500
+
+
+
+==========Start creating poisoned_dataset==========
+Total samples: 60000,Among the poisoned samples:3000
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-24_10:55:27==========
+Total train samples: 60000
+Total test samples: 60000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+[2023-10-24_10:55:33] Epoch:1/100, iteration:100\468,lr: 0.1, loss: 0.37480902671813965, time: 0.000316619873046875
+batch_size:128,correct_num:115
+[2023-10-24_10:55:35] Epoch:1/100, iteration:200\468,lr: 0.1, loss: 0.3057618737220764, time: 8.153915405273438e-05
+batch_size:128,correct_num:119
+[2023-10-24_10:55:36] Epoch:1/100, iteration:300\468,lr: 0.1, loss: 0.3036610186100006, time: 4.9591064453125e-05
+batch_size:128,correct_num:118
+[2023-10-24_10:55:38] Epoch:1/100, iteration:400\468,lr: 0.1, loss: 0.12071710079908371, time: 0.000110626220703125
+batch_size:128,correct_num:122
+[2023-10-24_10:55:40] Epoch:2/100, iteration:31\468,lr: 0.1, loss: 0.027471663430333138, time: 0.0001385211944580078
+batch_size:128,correct_num:128
+[2023-10-24_10:55:41] Epoch:2/100, iteration:131\468,lr: 0.1, loss: 0.019674304872751236, time: 6.699562072753906e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:55:43] Epoch:2/100, iteration:231\468,lr: 0.1, loss: 0.04199526086449623, time: 5.626678466796875e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:55:44] Epoch:2/100, iteration:331\468,lr: 0.1, loss: 0.032229162752628326, time: 8.869171142578125e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:55:46] Epoch:2/100, iteration:431\468,lr: 0.1, loss: 0.05126506835222244, time: 5.602836608886719e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:55:47] Epoch:3/100, iteration:62\468,lr: 0.1, loss: 0.08922947943210602, time: 0.00011134147644042969
+batch_size:128,correct_num:126
+[2023-10-24_10:55:49] Epoch:3/100, iteration:162\468,lr: 0.1, loss: 0.0137875871732831, time: 6.628036499023438e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:55:50] Epoch:3/100, iteration:262\468,lr: 0.1, loss: 0.06953901797533035, time: 7.677078247070312e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:55:52] Epoch:3/100, iteration:362\468,lr: 0.1, loss: 0.03425382450222969, time: 7.843971252441406e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:55:53] Epoch:3/100, iteration:462\468,lr: 0.1, loss: 0.036239221692085266, time: 7.867813110351562e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:55:55] Epoch:4/100, iteration:93\468,lr: 0.1, loss: 0.09191294014453888, time: 0.00012159347534179688
+batch_size:128,correct_num:126
+[2023-10-24_10:55:57] Epoch:4/100, iteration:193\468,lr: 0.1, loss: 0.04320074990391731, time: 8.916854858398438e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:55:58] Epoch:4/100, iteration:293\468,lr: 0.1, loss: 0.09528464823961258, time: 7.081031799316406e-05
+batch_size:128,correct_num:124
+[2023-10-24_10:56:00] Epoch:4/100, iteration:393\468,lr: 0.1, loss: 0.06145881116390228, time: 6.985664367675781e-05
+batch_size:128,correct_num:126
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-24_10:56:25==========
+Total train samples: 60000
+Total test samples: 60000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+[2023-10-24_10:56:31] Epoch:1/5, iteration:100\468,lr: 0.1, loss: 0.37480902671813965, time: 0.0001289844512939453
+batch_size:128,correct_num:115
+[2023-10-24_10:56:32] Epoch:1/5, iteration:200\468,lr: 0.1, loss: 0.3057618737220764, time: 5.984306335449219e-05
+batch_size:128,correct_num:119
+[2023-10-24_10:56:34] Epoch:1/5, iteration:300\468,lr: 0.1, loss: 0.3036610186100006, time: 6.246566772460938e-05
+batch_size:128,correct_num:118
+[2023-10-24_10:56:35] Epoch:1/5, iteration:400\468,lr: 0.1, loss: 0.12071710079908371, time: 5.459785461425781e-05
+batch_size:128,correct_num:122
+[2023-10-24_10:56:37] Epoch:2/5, iteration:31\468,lr: 0.1, loss: 0.027471663430333138, time: 0.00011205673217773438
+batch_size:128,correct_num:128
+[2023-10-24_10:56:39] Epoch:2/5, iteration:131\468,lr: 0.1, loss: 0.019674304872751236, time: 7.295608520507812e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:56:40] Epoch:2/5, iteration:231\468,lr: 0.1, loss: 0.04199526086449623, time: 4.982948303222656e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:56:42] Epoch:2/5, iteration:331\468,lr: 0.1, loss: 0.032229162752628326, time: 8.320808410644531e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:56:43] Epoch:2/5, iteration:431\468,lr: 0.1, loss: 0.05126506835222244, time: 9.870529174804688e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:56:46] Epoch:3/5, iteration:62\468,lr: 0.1, loss: 0.08922947943210602, time: 0.00014090538024902344
+batch_size:128,correct_num:126
+[2023-10-24_10:56:47] Epoch:3/5, iteration:162\468,lr: 0.1, loss: 0.0137875871732831, time: 7.05718994140625e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:56:49] Epoch:3/5, iteration:262\468,lr: 0.1, loss: 0.06953901797533035, time: 6.318092346191406e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:56:50] Epoch:3/5, iteration:362\468,lr: 0.1, loss: 0.03425382450222969, time: 8.130073547363281e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:56:52] Epoch:3/5, iteration:462\468,lr: 0.1, loss: 0.036239221692085266, time: 7.724761962890625e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:56:54] Epoch:4/5, iteration:93\468,lr: 0.1, loss: 0.09191294014453888, time: 0.00020051002502441406
+batch_size:128,correct_num:126
+[2023-10-24_10:56:55] Epoch:4/5, iteration:193\468,lr: 0.1, loss: 0.04320074990391731, time: 7.748603820800781e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:56:57] Epoch:4/5, iteration:293\468,lr: 0.1, loss: 0.09528464823961258, time: 5.507469177246094e-05
+batch_size:128,correct_num:124
+[2023-10-24_10:56:58] Epoch:4/5, iteration:393\468,lr: 0.1, loss: 0.06145881116390228, time: 6.747245788574219e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:57:00] Epoch:5/5, iteration:24\468,lr: 0.1, loss: 0.02114957943558693, time: 0.00011920928955078125
+batch_size:128,correct_num:127
+[2023-10-24_10:57:02] Epoch:5/5, iteration:124\468,lr: 0.1, loss: 0.060607459396123886, time: 5.269050598144531e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:57:03] Epoch:5/5, iteration:224\468,lr: 0.1, loss: 0.022593805566430092, time: 6.604194641113281e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:57:05] Epoch:5/5, iteration:324\468,lr: 0.1, loss: 0.03214854374527931, time: 5.1021575927734375e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:57:06] Epoch:5/5, iteration:424\468,lr: 0.1, loss: 0.03105301409959793, time: 5.1021575927734375e-05
+batch_size:128,correct_num:125
+
+==========Execute model train in BaselineMNISTNetwork_MNIST at 2023-10-24_10:57:45==========
+Total train samples: 60000
+Total test samples: 60000
+Batch size: 128
+iteration every epoch: 468
+Initial learning rate: 0.1
+[2023-10-24_10:57:51] Epoch:1/100, iteration:100\468,lr: 0.1, loss: 0.37480902671813965, time: 0.0001628398895263672
+batch_size:128,correct_num:115
+[2023-10-24_10:57:52] Epoch:1/100, iteration:200\468,lr: 0.1, loss: 0.3057618737220764, time: 0.0001232624053955078
+batch_size:128,correct_num:119
+[2023-10-24_10:57:54] Epoch:1/100, iteration:300\468,lr: 0.1, loss: 0.3036610186100006, time: 5.936622619628906e-05
+batch_size:128,correct_num:118
+[2023-10-24_10:57:55] Epoch:1/100, iteration:400\468,lr: 0.1, loss: 0.12071710079908371, time: 8.606910705566406e-05
+batch_size:128,correct_num:122
+[2023-10-24_10:57:57] Epoch:2/100, iteration:31\468,lr: 0.1, loss: 0.027471663430333138, time: 0.0001323223114013672
+batch_size:128,correct_num:128
+[2023-10-24_10:57:58] Epoch:2/100, iteration:131\468,lr: 0.1, loss: 0.019674304872751236, time: 6.890296936035156e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:00] Epoch:2/100, iteration:231\468,lr: 0.1, loss: 0.04199526086449623, time: 6.556510925292969e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:01] Epoch:2/100, iteration:331\468,lr: 0.1, loss: 0.032229162752628326, time: 7.867813110351562e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:03] Epoch:2/100, iteration:431\468,lr: 0.1, loss: 0.05126506835222244, time: 5.054473876953125e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:58:05] Epoch:3/100, iteration:62\468,lr: 0.1, loss: 0.08922947943210602, time: 0.0001811981201171875
+batch_size:128,correct_num:126
+[2023-10-24_10:58:06] Epoch:3/100, iteration:162\468,lr: 0.1, loss: 0.0137875871732831, time: 8.463859558105469e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:58:08] Epoch:3/100, iteration:262\468,lr: 0.1, loss: 0.06953901797533035, time: 8.082389831542969e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:09] Epoch:3/100, iteration:362\468,lr: 0.1, loss: 0.03425382450222969, time: 8.511543273925781e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:11] Epoch:3/100, iteration:462\468,lr: 0.1, loss: 0.036239221692085266, time: 6.222724914550781e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:13] Epoch:4/100, iteration:93\468,lr: 0.1, loss: 0.09191294014453888, time: 0.00014090538024902344
+batch_size:128,correct_num:126
+[2023-10-24_10:58:14] Epoch:4/100, iteration:193\468,lr: 0.1, loss: 0.04320074990391731, time: 6.985664367675781e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:58:15] Epoch:4/100, iteration:293\468,lr: 0.1, loss: 0.09528464823961258, time: 5.030632019042969e-05
+batch_size:128,correct_num:124
+[2023-10-24_10:58:17] Epoch:4/100, iteration:393\468,lr: 0.1, loss: 0.06145881116390228, time: 6.651878356933594e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:19] Epoch:5/100, iteration:24\468,lr: 0.1, loss: 0.02114957943558693, time: 0.00011563301086425781
+batch_size:128,correct_num:127
+[2023-10-24_10:58:20] Epoch:5/100, iteration:124\468,lr: 0.1, loss: 0.060607459396123886, time: 5.53131103515625e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:58:22] Epoch:5/100, iteration:224\468,lr: 0.1, loss: 0.022593805566430092, time: 7.82012939453125e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:23] Epoch:5/100, iteration:324\468,lr: 0.1, loss: 0.03214854374527931, time: 8.726119995117188e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:25] Epoch:5/100, iteration:424\468,lr: 0.1, loss: 0.03105301409959793, time: 5.698204040527344e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:58:27] Epoch:6/100, iteration:55\468,lr: 0.1, loss: 0.035075679421424866, time: 0.00011444091796875
+batch_size:128,correct_num:127
+[2023-10-24_10:58:28] Epoch:6/100, iteration:155\468,lr: 0.1, loss: 0.02441319450736046, time: 5.698204040527344e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:30] Epoch:6/100, iteration:255\468,lr: 0.1, loss: 0.036001648753881454, time: 6.508827209472656e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:31] Epoch:6/100, iteration:355\468,lr: 0.1, loss: 0.039009612053632736, time: 5.364418029785156e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:33] Epoch:6/100, iteration:455\468,lr: 0.1, loss: 0.060656946152448654, time: 6.341934204101562e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:34] Epoch:7/100, iteration:86\468,lr: 0.1, loss: 0.014385499060153961, time: 0.00011444091796875
+batch_size:128,correct_num:128
+[2023-10-24_10:58:36] Epoch:7/100, iteration:186\468,lr: 0.1, loss: 0.018473632633686066, time: 6.389617919921875e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:37] Epoch:7/100, iteration:286\468,lr: 0.1, loss: 0.009438971988856792, time: 5.412101745605469e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:58:39] Epoch:7/100, iteration:386\468,lr: 0.1, loss: 0.05986851453781128, time: 4.38690185546875e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:41] Epoch:8/100, iteration:17\468,lr: 0.1, loss: 0.020742865279316902, time: 0.0001251697540283203
+batch_size:128,correct_num:127
+[2023-10-24_10:58:42] Epoch:8/100, iteration:117\468,lr: 0.1, loss: 0.03984833136200905, time: 4.696846008300781e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:44] Epoch:8/100, iteration:217\468,lr: 0.1, loss: 0.011457673273980618, time: 5.793571472167969e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:58:45] Epoch:8/100, iteration:317\468,lr: 0.1, loss: 0.057118650525808334, time: 6.4849853515625e-05
+batch_size:128,correct_num:124
+[2023-10-24_10:58:47] Epoch:8/100, iteration:417\468,lr: 0.1, loss: 0.010176831856369972, time: 6.866455078125e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:58:48] Epoch:9/100, iteration:48\468,lr: 0.1, loss: 0.006033454090356827, time: 0.000171661376953125
+batch_size:128,correct_num:128
+[2023-10-24_10:58:50] Epoch:9/100, iteration:148\468,lr: 0.1, loss: 0.0190806332975626, time: 6.151199340820312e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:51] Epoch:9/100, iteration:248\468,lr: 0.1, loss: 0.024634331464767456, time: 0.00010752677917480469
+batch_size:128,correct_num:127
+[2023-10-24_10:58:53] Epoch:9/100, iteration:348\468,lr: 0.1, loss: 0.10064054280519485, time: 5.555152893066406e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:54] Epoch:9/100, iteration:448\468,lr: 0.1, loss: 0.026088817045092583, time: 5.1975250244140625e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:58:56] Epoch:10/100, iteration:79\468,lr: 0.1, loss: 0.03851363807916641, time: 0.00013494491577148438
+batch_size:128,correct_num:126
+[2023-10-24_10:58:58] Epoch:10/100, iteration:179\468,lr: 0.1, loss: 0.023619789630174637, time: 5.1975250244140625e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:58:59] Epoch:10/100, iteration:279\468,lr: 0.1, loss: 0.023000387474894524, time: 8.344650268554688e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:01] Epoch:10/100, iteration:379\468,lr: 0.1, loss: 0.04391048848628998, time: 0.00011944770812988281
+batch_size:128,correct_num:126
+[2023-10-24_10:59:03] Epoch:11/100, iteration:10\468,lr: 0.1, loss: 0.03439847007393837, time: 0.00011539459228515625
+batch_size:128,correct_num:127
+[2023-10-24_10:59:04] Epoch:11/100, iteration:110\468,lr: 0.1, loss: 0.008133151568472385, time: 5.555152893066406e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:06] Epoch:11/100, iteration:210\468,lr: 0.1, loss: 0.030175890773534775, time: 5.626678466796875e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:07] Epoch:11/100, iteration:310\468,lr: 0.1, loss: 0.021777598187327385, time: 7.009506225585938e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:09] Epoch:11/100, iteration:410\468,lr: 0.1, loss: 0.04968830570578575, time: 6.151199340820312e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:59:11] Epoch:12/100, iteration:41\468,lr: 0.1, loss: 0.010476361960172653, time: 0.00013446807861328125
+batch_size:128,correct_num:128
+[2023-10-24_10:59:12] Epoch:12/100, iteration:141\468,lr: 0.1, loss: 0.014598246663808823, time: 5.3882598876953125e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:14] Epoch:12/100, iteration:241\468,lr: 0.1, loss: 0.016796709969639778, time: 6.818771362304688e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:15] Epoch:12/100, iteration:341\468,lr: 0.1, loss: 0.07540883123874664, time: 7.462501525878906e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:16] Epoch:12/100, iteration:441\468,lr: 0.1, loss: 0.01789494976401329, time: 7.581710815429688e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:18] Epoch:13/100, iteration:72\468,lr: 0.1, loss: 0.016659928485751152, time: 0.0001418590545654297
+batch_size:128,correct_num:127
+[2023-10-24_10:59:20] Epoch:13/100, iteration:172\468,lr: 0.1, loss: 0.005591650493443012, time: 6.0558319091796875e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:21] Epoch:13/100, iteration:272\468,lr: 0.1, loss: 0.04838471859693527, time: 7.271766662597656e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:23] Epoch:13/100, iteration:372\468,lr: 0.1, loss: 0.08742550760507584, time: 5.9604644775390625e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:59:25] Epoch:14/100, iteration:3\468,lr: 0.1, loss: 0.009448477998375893, time: 0.00016927719116210938
+batch_size:128,correct_num:128
+[2023-10-24_10:59:26] Epoch:14/100, iteration:103\468,lr: 0.1, loss: 0.005284072831273079, time: 6.270408630371094e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:28] Epoch:14/100, iteration:203\468,lr: 0.1, loss: 0.0770297572016716, time: 6.818771362304688e-05
+batch_size:128,correct_num:125
+[2023-10-24_10:59:29] Epoch:14/100, iteration:303\468,lr: 0.1, loss: 0.03394484147429466, time: 6.723403930664062e-05
+batch_size:128,correct_num:126
+[2023-10-24_10:59:31] Epoch:14/100, iteration:403\468,lr: 0.1, loss: 0.016496922820806503, time: 6.270408630371094e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:32] Epoch:15/100, iteration:34\468,lr: 0.1, loss: 0.049904003739356995, time: 0.00010251998901367188
+batch_size:128,correct_num:126
+[2023-10-24_10:59:34] Epoch:15/100, iteration:134\468,lr: 0.1, loss: 0.006073379889130592, time: 8.440017700195312e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:35] Epoch:15/100, iteration:234\468,lr: 0.1, loss: 0.014150228351354599, time: 5.7220458984375e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:37] Epoch:15/100, iteration:334\468,lr: 0.1, loss: 0.040357474237680435, time: 6.246566772460938e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:38] Epoch:15/100, iteration:434\468,lr: 0.1, loss: 0.0453948937356472, time: 6.461143493652344e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:40] Epoch:16/100, iteration:65\468,lr: 0.1, loss: 0.028755653649568558, time: 0.00016808509826660156
+batch_size:128,correct_num:126
+[2023-10-24_10:59:41] Epoch:16/100, iteration:165\468,lr: 0.1, loss: 0.016865314915776253, time: 6.628036499023438e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:43] Epoch:16/100, iteration:265\468,lr: 0.1, loss: 0.015556556172668934, time: 5.221366882324219e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:44] Epoch:16/100, iteration:365\468,lr: 0.1, loss: 0.031025409698486328, time: 7.796287536621094e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:46] Epoch:16/100, iteration:465\468,lr: 0.1, loss: 0.022616909816861153, time: 5.7697296142578125e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:48] Epoch:17/100, iteration:96\468,lr: 0.1, loss: 0.010668071918189526, time: 0.0001347064971923828
+batch_size:128,correct_num:128
+[2023-10-24_10:59:49] Epoch:17/100, iteration:196\468,lr: 0.1, loss: 0.013267332687973976, time: 7.390975952148438e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:51] Epoch:17/100, iteration:296\468,lr: 0.1, loss: 0.010722870007157326, time: 6.866455078125e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:52] Epoch:17/100, iteration:396\468,lr: 0.1, loss: 0.004911924246698618, time: 6.175041198730469e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:54] Epoch:18/100, iteration:27\468,lr: 0.1, loss: 0.014308681711554527, time: 0.00012803077697753906
+batch_size:128,correct_num:127
+[2023-10-24_10:59:55] Epoch:18/100, iteration:127\468,lr: 0.1, loss: 0.004154243506491184, time: 4.982948303222656e-05
+batch_size:128,correct_num:128
+[2023-10-24_10:59:57] Epoch:18/100, iteration:227\468,lr: 0.1, loss: 0.019194841384887695, time: 7.510185241699219e-05
+batch_size:128,correct_num:127
+[2023-10-24_10:59:59] Epoch:18/100, iteration:327\468,lr: 0.1, loss: 0.018477944657206535, time: 7.271766662597656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:00] Epoch:18/100, iteration:427\468,lr: 0.1, loss: 0.005637637339532375, time: 5.5789947509765625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:02] Epoch:19/100, iteration:58\468,lr: 0.1, loss: 0.019891407340765, time: 0.00013065338134765625
+batch_size:128,correct_num:128
+[2023-10-24_11:00:03] Epoch:19/100, iteration:158\468,lr: 0.1, loss: 0.013380207121372223, time: 5.435943603515625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:05] Epoch:19/100, iteration:258\468,lr: 0.1, loss: 0.012062221765518188, time: 6.246566772460938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:06] Epoch:19/100, iteration:358\468,lr: 0.1, loss: 0.022890212014317513, time: 7.104873657226562e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:08] Epoch:19/100, iteration:458\468,lr: 0.1, loss: 0.03297280892729759, time: 8.20159912109375e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:00:10] Epoch:20/100, iteration:89\468,lr: 0.1, loss: 0.027441367506980896, time: 0.00013637542724609375
+batch_size:128,correct_num:126
+[2023-10-24_11:00:11] Epoch:20/100, iteration:189\468,lr: 0.1, loss: 0.022233303636312485, time: 5.91278076171875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:13] Epoch:20/100, iteration:289\468,lr: 0.1, loss: 0.0585518442094326, time: 6.0558319091796875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:14] Epoch:20/100, iteration:389\468,lr: 0.1, loss: 0.018561508506536484, time: 5.745887756347656e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:16] Epoch:21/100, iteration:20\468,lr: 0.1, loss: 0.02090509422123432, time: 0.0001304149627685547
+batch_size:128,correct_num:127
+[2023-10-24_11:00:17] Epoch:21/100, iteration:120\468,lr: 0.1, loss: 0.06986048072576523, time: 7.367134094238281e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:00:19] Epoch:21/100, iteration:220\468,lr: 0.1, loss: 0.01144656166434288, time: 6.723403930664062e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:20] Epoch:21/100, iteration:320\468,lr: 0.1, loss: 0.048833638429641724, time: 7.104873657226562e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:22] Epoch:21/100, iteration:420\468,lr: 0.1, loss: 0.008009468205273151, time: 5.9604644775390625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:24] Epoch:22/100, iteration:51\468,lr: 0.1, loss: 0.027993930503726006, time: 0.00013446807861328125
+batch_size:128,correct_num:126
+[2023-10-24_11:00:25] Epoch:22/100, iteration:151\468,lr: 0.1, loss: 0.02262856997549534, time: 5.316734313964844e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:27] Epoch:22/100, iteration:251\468,lr: 0.1, loss: 0.009359103627502918, time: 0.00010347366333007812
+batch_size:128,correct_num:128
+[2023-10-24_11:00:28] Epoch:22/100, iteration:351\468,lr: 0.1, loss: 0.01872887648642063, time: 7.390975952148438e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:30] Epoch:22/100, iteration:451\468,lr: 0.1, loss: 0.028734508901834488, time: 5.435943603515625e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:32] Epoch:23/100, iteration:82\468,lr: 0.1, loss: 0.007890559732913971, time: 0.00013113021850585938
+batch_size:128,correct_num:128
+[2023-10-24_11:00:33] Epoch:23/100, iteration:182\468,lr: 0.1, loss: 0.012429038994014263, time: 8.845329284667969e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:35] Epoch:23/100, iteration:282\468,lr: 0.1, loss: 0.04590661823749542, time: 6.985664367675781e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:00:36] Epoch:23/100, iteration:382\468,lr: 0.1, loss: 0.05631987378001213, time: 6.580352783203125e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:00:38] Epoch:24/100, iteration:13\468,lr: 0.1, loss: 0.008488967083394527, time: 0.0001201629638671875
+batch_size:128,correct_num:128
+[2023-10-24_11:00:39] Epoch:24/100, iteration:113\468,lr: 0.1, loss: 0.012772094458341599, time: 6.222724914550781e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:41] Epoch:24/100, iteration:213\468,lr: 0.1, loss: 0.04115450754761696, time: 9.34600830078125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:42] Epoch:24/100, iteration:313\468,lr: 0.1, loss: 0.08653940260410309, time: 5.5789947509765625e-05
+batch_size:128,correct_num:124
+[2023-10-24_11:00:44] Epoch:24/100, iteration:413\468,lr: 0.1, loss: 0.03393293544650078, time: 6.031990051269531e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:46] Epoch:25/100, iteration:44\468,lr: 0.1, loss: 0.05336437746882439, time: 0.00012993812561035156
+batch_size:128,correct_num:126
+[2023-10-24_11:00:47] Epoch:25/100, iteration:144\468,lr: 0.1, loss: 0.06737165153026581, time: 5.340576171875e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:00:49] Epoch:25/100, iteration:244\468,lr: 0.1, loss: 0.0069819241762161255, time: 8.511543273925781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:50] Epoch:25/100, iteration:344\468,lr: 0.1, loss: 0.0094889672473073, time: 5.125999450683594e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:00:52] Epoch:25/100, iteration:444\468,lr: 0.1, loss: 0.06777177006006241, time: 7.033348083496094e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:54] Epoch:26/100, iteration:75\468,lr: 0.1, loss: 0.02001824602484703, time: 0.00013017654418945312
+batch_size:128,correct_num:127
+[2023-10-24_11:00:55] Epoch:26/100, iteration:175\468,lr: 0.1, loss: 0.015915196388959885, time: 6.961822509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:00:57] Epoch:26/100, iteration:275\468,lr: 0.1, loss: 0.03392414748668671, time: 7.700920104980469e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:00:58] Epoch:26/100, iteration:375\468,lr: 0.1, loss: 0.009436721913516521, time: 6.246566772460938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:00] Epoch:27/100, iteration:6\468,lr: 0.1, loss: 0.030349424108862877, time: 0.0001361370086669922
+batch_size:128,correct_num:126
+[2023-10-24_11:01:02] Epoch:27/100, iteration:106\468,lr: 0.1, loss: 0.0478992722928524, time: 6.723403930664062e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:03] Epoch:27/100, iteration:206\468,lr: 0.1, loss: 0.015442777425050735, time: 7.009506225585938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:04] Epoch:27/100, iteration:306\468,lr: 0.1, loss: 0.030680673196911812, time: 7.653236389160156e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:06] Epoch:27/100, iteration:406\468,lr: 0.1, loss: 0.049349162727594376, time: 5.5789947509765625e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:01:08] Epoch:28/100, iteration:37\468,lr: 0.1, loss: 0.024064671248197556, time: 0.00013446807861328125
+batch_size:128,correct_num:127
+[2023-10-24_11:01:09] Epoch:28/100, iteration:137\468,lr: 0.1, loss: 0.028870975598692894, time: 5.340576171875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:11] Epoch:28/100, iteration:237\468,lr: 0.1, loss: 0.032315824180841446, time: 6.842613220214844e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:13] Epoch:28/100, iteration:337\468,lr: 0.1, loss: 0.015411143191158772, time: 6.365776062011719e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:14] Epoch:28/100, iteration:437\468,lr: 0.1, loss: 0.023599501699209213, time: 5.793571472167969e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:16] Epoch:29/100, iteration:68\468,lr: 0.1, loss: 0.02155749872326851, time: 0.00014972686767578125
+batch_size:128,correct_num:127
+[2023-10-24_11:01:26] Epoch:29/100, iteration:168\468,lr: 0.1, loss: 0.005028688348829746, time: 7.581710815429688e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:28] Epoch:29/100, iteration:268\468,lr: 0.1, loss: 0.03771127387881279, time: 7.62939453125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:29] Epoch:29/100, iteration:368\468,lr: 0.1, loss: 0.03638232499361038, time: 5.817413330078125e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:30] Epoch:29/100, iteration:468\468,lr: 0.1, loss: 0.01944604516029358, time: 8.726119995117188e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:32] Epoch:30/100, iteration:99\468,lr: 0.1, loss: 0.0066702887415885925, time: 0.00013256072998046875
+batch_size:128,correct_num:128
+[2023-10-24_11:01:34] Epoch:30/100, iteration:199\468,lr: 0.1, loss: 0.01096345018595457, time: 6.079673767089844e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:35] Epoch:30/100, iteration:299\468,lr: 0.1, loss: 0.10151445865631104, time: 5.364418029785156e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:01:37] Epoch:30/100, iteration:399\468,lr: 0.1, loss: 0.13183535635471344, time: 6.079673767089844e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:01:39] Epoch:31/100, iteration:30\468,lr: 0.1, loss: 0.008562818169593811, time: 0.00010848045349121094
+batch_size:128,correct_num:128
+[2023-10-24_11:01:40] Epoch:31/100, iteration:130\468,lr: 0.1, loss: 0.027235236018896103, time: 5.5789947509765625e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:42] Epoch:31/100, iteration:230\468,lr: 0.1, loss: 0.007206748705357313, time: 6.127357482910156e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:43] Epoch:31/100, iteration:330\468,lr: 0.1, loss: 0.03405839577317238, time: 6.270408630371094e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:45] Epoch:31/100, iteration:430\468,lr: 0.1, loss: 0.028133897110819817, time: 6.580352783203125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:46] Epoch:32/100, iteration:61\468,lr: 0.1, loss: 0.017872432246804237, time: 0.00015878677368164062
+batch_size:128,correct_num:127
+[2023-10-24_11:01:48] Epoch:32/100, iteration:161\468,lr: 0.1, loss: 0.03713368624448776, time: 4.792213439941406e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:50] Epoch:32/100, iteration:261\468,lr: 0.1, loss: 0.02804619073867798, time: 5.4836273193359375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:01:51] Epoch:32/100, iteration:361\468,lr: 0.1, loss: 0.03562289848923683, time: 5.9604644775390625e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:53] Epoch:32/100, iteration:461\468,lr: 0.1, loss: 0.03861114755272865, time: 6.866455078125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:54] Epoch:33/100, iteration:92\468,lr: 0.1, loss: 0.020247580483555794, time: 0.0001227855682373047
+batch_size:128,correct_num:128
+[2023-10-24_11:01:56] Epoch:33/100, iteration:192\468,lr: 0.1, loss: 0.03394060209393501, time: 5.602836608886719e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:01:57] Epoch:33/100, iteration:292\468,lr: 0.1, loss: 0.017749294638633728, time: 7.534027099609375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:01:59] Epoch:33/100, iteration:392\468,lr: 0.1, loss: 0.02504017762839794, time: 6.127357482910156e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:01] Epoch:34/100, iteration:23\468,lr: 0.1, loss: 0.008380078710615635, time: 0.00013566017150878906
+batch_size:128,correct_num:128
+[2023-10-24_11:02:02] Epoch:34/100, iteration:123\468,lr: 0.1, loss: 0.009426884353160858, time: 4.839897155761719e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:04] Epoch:34/100, iteration:223\468,lr: 0.1, loss: 0.006628370378166437, time: 8.726119995117188e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:05] Epoch:34/100, iteration:323\468,lr: 0.1, loss: 0.0366273932158947, time: 5.4836273193359375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:07] Epoch:34/100, iteration:423\468,lr: 0.1, loss: 0.007783395238220692, time: 8.487701416015625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:08] Epoch:35/100, iteration:54\468,lr: 0.1, loss: 0.0036599806044250727, time: 0.00011539459228515625
+batch_size:128,correct_num:128
+[2023-10-24_11:02:10] Epoch:35/100, iteration:154\468,lr: 0.1, loss: 0.04413687437772751, time: 7.104873657226562e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:02:11] Epoch:35/100, iteration:254\468,lr: 0.1, loss: 0.008971817791461945, time: 5.698204040527344e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:13] Epoch:35/100, iteration:354\468,lr: 0.1, loss: 0.04309248551726341, time: 5.173683166503906e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:14] Epoch:35/100, iteration:454\468,lr: 0.1, loss: 0.008235357701778412, time: 4.363059997558594e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:16] Epoch:36/100, iteration:85\468,lr: 0.1, loss: 0.004267110023647547, time: 0.0001304149627685547
+batch_size:128,correct_num:128
+[2023-10-24_11:02:17] Epoch:36/100, iteration:185\468,lr: 0.1, loss: 0.03846776485443115, time: 5.698204040527344e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:19] Epoch:36/100, iteration:285\468,lr: 0.1, loss: 0.013589734211564064, time: 7.319450378417969e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:20] Epoch:36/100, iteration:385\468,lr: 0.1, loss: 0.028908560052514076, time: 6.961822509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:22] Epoch:37/100, iteration:16\468,lr: 0.1, loss: 0.01693177968263626, time: 9.965896606445312e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:24] Epoch:37/100, iteration:116\468,lr: 0.1, loss: 0.07480088621377945, time: 6.771087646484375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:02:25] Epoch:37/100, iteration:216\468,lr: 0.1, loss: 0.015827324241399765, time: 6.580352783203125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:27] Epoch:37/100, iteration:316\468,lr: 0.1, loss: 0.04035763815045357, time: 8.606910705566406e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:28] Epoch:37/100, iteration:416\468,lr: 0.1, loss: 0.041431717574596405, time: 6.246566772460938e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:02:30] Epoch:38/100, iteration:47\468,lr: 0.1, loss: 0.031449589878320694, time: 0.0001475811004638672
+batch_size:128,correct_num:127
+[2023-10-24_11:02:32] Epoch:38/100, iteration:147\468,lr: 0.1, loss: 0.01478537730872631, time: 6.771087646484375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:33] Epoch:38/100, iteration:247\468,lr: 0.1, loss: 0.03292078897356987, time: 6.723403930664062e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:35] Epoch:38/100, iteration:347\468,lr: 0.1, loss: 0.051427457481622696, time: 5.91278076171875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:36] Epoch:38/100, iteration:447\468,lr: 0.1, loss: 0.03466213867068291, time: 6.961822509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:02:38] Epoch:39/100, iteration:78\468,lr: 0.1, loss: 0.008533868938684464, time: 0.00013756752014160156
+batch_size:128,correct_num:128
+[2023-10-24_11:02:39] Epoch:39/100, iteration:178\468,lr: 0.1, loss: 0.003987018018960953, time: 8.96453857421875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:41] Epoch:39/100, iteration:278\468,lr: 0.1, loss: 0.03772793710231781, time: 5.7220458984375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:02:42] Epoch:39/100, iteration:378\468,lr: 0.1, loss: 0.009695416316390038, time: 7.367134094238281e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:44] Epoch:40/100, iteration:9\468,lr: 0.1, loss: 0.0025833367835730314, time: 9.107589721679688e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:46] Epoch:40/100, iteration:109\468,lr: 0.1, loss: 0.052376072853803635, time: 8.797645568847656e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:02:47] Epoch:40/100, iteration:209\468,lr: 0.1, loss: 0.011207183822989464, time: 6.794929504394531e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:49] Epoch:40/100, iteration:309\468,lr: 0.1, loss: 0.09627735614776611, time: 6.103515625e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:02:50] Epoch:40/100, iteration:409\468,lr: 0.1, loss: 0.013531673699617386, time: 6.222724914550781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:52] Epoch:41/100, iteration:40\468,lr: 0.1, loss: 0.0123447822406888, time: 0.00012612342834472656
+batch_size:128,correct_num:128
+[2023-10-24_11:02:54] Epoch:41/100, iteration:140\468,lr: 0.1, loss: 0.0057272943668067455, time: 7.2479248046875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:55] Epoch:41/100, iteration:240\468,lr: 0.1, loss: 0.005643812473863363, time: 6.794929504394531e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:57] Epoch:41/100, iteration:340\468,lr: 0.1, loss: 0.002297065919265151, time: 4.76837158203125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:02:58] Epoch:41/100, iteration:440\468,lr: 0.1, loss: 0.016929777339100838, time: 8.511543273925781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:00] Epoch:42/100, iteration:71\468,lr: 0.1, loss: 0.028687896206974983, time: 0.00014328956604003906
+batch_size:128,correct_num:126
+[2023-10-24_11:03:01] Epoch:42/100, iteration:171\468,lr: 0.1, loss: 0.012819552794098854, time: 9.775161743164062e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:03] Epoch:42/100, iteration:271\468,lr: 0.1, loss: 0.045683734118938446, time: 6.67572021484375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:04] Epoch:42/100, iteration:371\468,lr: 0.1, loss: 0.06049848347902298, time: 5.841255187988281e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:06] Epoch:43/100, iteration:2\468,lr: 0.1, loss: 0.024136584252119064, time: 9.298324584960938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:08] Epoch:43/100, iteration:102\468,lr: 0.1, loss: 0.008246693760156631, time: 5.793571472167969e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:09] Epoch:43/100, iteration:202\468,lr: 0.1, loss: 0.017074983566999435, time: 6.389617919921875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:11] Epoch:43/100, iteration:302\468,lr: 0.1, loss: 0.012808000668883324, time: 5.8650970458984375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:12] Epoch:43/100, iteration:402\468,lr: 0.1, loss: 0.015595808625221252, time: 7.081031799316406e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:14] Epoch:44/100, iteration:33\468,lr: 0.1, loss: 0.008183065801858902, time: 9.274482727050781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:15] Epoch:44/100, iteration:133\468,lr: 0.1, loss: 0.07244955748319626, time: 6.937980651855469e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:03:17] Epoch:44/100, iteration:233\468,lr: 0.1, loss: 0.02243044413626194, time: 5.602836608886719e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:18] Epoch:44/100, iteration:333\468,lr: 0.1, loss: 0.032116521149873734, time: 6.556510925292969e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:20] Epoch:44/100, iteration:433\468,lr: 0.1, loss: 0.006218687631189823, time: 6.246566772460938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:22] Epoch:45/100, iteration:64\468,lr: 0.1, loss: 0.00712300930172205, time: 0.0001609325408935547
+batch_size:128,correct_num:128
+[2023-10-24_11:03:23] Epoch:45/100, iteration:164\468,lr: 0.1, loss: 0.01171132456511259, time: 6.699562072753906e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:25] Epoch:45/100, iteration:264\468,lr: 0.1, loss: 0.02789180725812912, time: 0.00010180473327636719
+batch_size:128,correct_num:127
+[2023-10-24_11:03:26] Epoch:45/100, iteration:364\468,lr: 0.1, loss: 0.02523035928606987, time: 6.151199340820312e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:28] Epoch:45/100, iteration:464\468,lr: 0.1, loss: 0.03066406399011612, time: 6.437301635742188e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:30] Epoch:46/100, iteration:95\468,lr: 0.1, loss: 0.01355828158557415, time: 0.0001583099365234375
+batch_size:128,correct_num:128
+[2023-10-24_11:03:31] Epoch:46/100, iteration:195\468,lr: 0.1, loss: 0.026460574939846992, time: 0.00010013580322265625
+batch_size:128,correct_num:127
+[2023-10-24_11:03:33] Epoch:46/100, iteration:295\468,lr: 0.1, loss: 0.056158509105443954, time: 5.6743621826171875e-05
+batch_size:128,correct_num:124
+[2023-10-24_11:03:34] Epoch:46/100, iteration:395\468,lr: 0.1, loss: 0.010026024654507637, time: 6.031990051269531e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:36] Epoch:47/100, iteration:26\468,lr: 0.1, loss: 0.001560406875796616, time: 0.00012874603271484375
+batch_size:128,correct_num:128
+[2023-10-24_11:03:37] Epoch:47/100, iteration:126\468,lr: 0.1, loss: 0.016114505007863045, time: 5.5789947509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:39] Epoch:47/100, iteration:226\468,lr: 0.1, loss: 0.03190436586737633, time: 5.91278076171875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:40] Epoch:47/100, iteration:326\468,lr: 0.1, loss: 0.004192165099084377, time: 6.461143493652344e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:42] Epoch:47/100, iteration:426\468,lr: 0.1, loss: 0.03188236057758331, time: 7.772445678710938e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:44] Epoch:48/100, iteration:57\468,lr: 0.1, loss: 0.005197463557124138, time: 0.00012922286987304688
+batch_size:128,correct_num:128
+[2023-10-24_11:03:45] Epoch:48/100, iteration:157\468,lr: 0.1, loss: 0.011939411982893944, time: 7.009506225585938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:47] Epoch:48/100, iteration:257\468,lr: 0.1, loss: 0.019415073096752167, time: 6.818771362304688e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:48] Epoch:48/100, iteration:357\468,lr: 0.1, loss: 0.05486370250582695, time: 8.511543273925781e-05
+batch_size:128,correct_num:124
+[2023-10-24_11:03:50] Epoch:48/100, iteration:457\468,lr: 0.1, loss: 0.03452543914318085, time: 6.246566772460938e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:03:51] Epoch:49/100, iteration:88\468,lr: 0.1, loss: 0.012578223831951618, time: 0.00014781951904296875
+batch_size:128,correct_num:128
+[2023-10-24_11:03:53] Epoch:49/100, iteration:188\468,lr: 0.1, loss: 0.008882774040102959, time: 6.127357482910156e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:55] Epoch:49/100, iteration:288\468,lr: 0.1, loss: 0.023428356274962425, time: 5.5789947509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:03:56] Epoch:49/100, iteration:388\468,lr: 0.1, loss: 0.007121497765183449, time: 6.246566772460938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:03:58] Epoch:50/100, iteration:19\468,lr: 0.1, loss: 0.027592642232775688, time: 0.00011205673217773438
+batch_size:128,correct_num:126
+[2023-10-24_11:03:59] Epoch:50/100, iteration:119\468,lr: 0.1, loss: 0.016620125621557236, time: 5.8650970458984375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:01] Epoch:50/100, iteration:219\468,lr: 0.1, loss: 0.010765930637717247, time: 5.3882598876953125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:02] Epoch:50/100, iteration:319\468,lr: 0.1, loss: 0.03009524568915367, time: 6.175041198730469e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:04] Epoch:50/100, iteration:419\468,lr: 0.1, loss: 0.006269730627536774, time: 6.341934204101562e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:06] Epoch:51/100, iteration:50\468,lr: 0.1, loss: 0.03613009303808212, time: 0.00011706352233886719
+batch_size:128,correct_num:125
+[2023-10-24_11:04:07] Epoch:51/100, iteration:150\468,lr: 0.1, loss: 0.018550794571638107, time: 6.651878356933594e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:09] Epoch:51/100, iteration:250\468,lr: 0.1, loss: 0.01597522385418415, time: 5.7220458984375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:10] Epoch:51/100, iteration:350\468,lr: 0.1, loss: 0.09112109243869781, time: 8.177757263183594e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:11] Epoch:51/100, iteration:450\468,lr: 0.1, loss: 0.03953056409955025, time: 5.745887756347656e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:13] Epoch:52/100, iteration:81\468,lr: 0.1, loss: 0.006658073049038649, time: 0.00011491775512695312
+batch_size:128,correct_num:128
+[2023-10-24_11:04:15] Epoch:52/100, iteration:181\468,lr: 0.1, loss: 0.007238239981234074, time: 4.792213439941406e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:16] Epoch:52/100, iteration:281\468,lr: 0.1, loss: 0.012831572443246841, time: 5.888938903808594e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:18] Epoch:52/100, iteration:381\468,lr: 0.1, loss: 0.017260435968637466, time: 7.581710815429688e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:20] Epoch:53/100, iteration:12\468,lr: 0.1, loss: 0.009899218566715717, time: 0.00014281272888183594
+batch_size:128,correct_num:128
+[2023-10-24_11:04:21] Epoch:53/100, iteration:112\468,lr: 0.1, loss: 0.04850536957383156, time: 6.67572021484375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:23] Epoch:53/100, iteration:212\468,lr: 0.1, loss: 0.015411904081702232, time: 6.127357482910156e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:24] Epoch:53/100, iteration:312\468,lr: 0.1, loss: 0.03489385172724724, time: 7.653236389160156e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:26] Epoch:53/100, iteration:412\468,lr: 0.1, loss: 0.055877674371004105, time: 7.987022399902344e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:28] Epoch:54/100, iteration:43\468,lr: 0.1, loss: 0.011933723464608192, time: 0.00012803077697753906
+batch_size:128,correct_num:127
+[2023-10-24_11:04:29] Epoch:54/100, iteration:143\468,lr: 0.1, loss: 0.025124335661530495, time: 5.984306335449219e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:31] Epoch:54/100, iteration:243\468,lr: 0.1, loss: 0.00547458091750741, time: 7.891654968261719e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:32] Epoch:54/100, iteration:343\468,lr: 0.1, loss: 0.015577035024762154, time: 7.62939453125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:34] Epoch:54/100, iteration:443\468,lr: 0.1, loss: 0.008575407788157463, time: 5.936622619628906e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:36] Epoch:55/100, iteration:74\468,lr: 0.1, loss: 0.010306979529559612, time: 0.00014781951904296875
+batch_size:128,correct_num:128
+[2023-10-24_11:04:37] Epoch:55/100, iteration:174\468,lr: 0.1, loss: 0.014067783951759338, time: 7.796287536621094e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:38] Epoch:55/100, iteration:274\468,lr: 0.1, loss: 0.025445744395256042, time: 7.05718994140625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:40] Epoch:55/100, iteration:374\468,lr: 0.1, loss: 0.020240716636180878, time: 6.651878356933594e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:42] Epoch:56/100, iteration:5\468,lr: 0.1, loss: 0.0067648752592504025, time: 0.00011515617370605469
+batch_size:128,correct_num:128
+[2023-10-24_11:04:43] Epoch:56/100, iteration:105\468,lr: 0.1, loss: 0.019178571179509163, time: 4.506111145019531e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:45] Epoch:56/100, iteration:205\468,lr: 0.1, loss: 0.009916701354086399, time: 4.76837158203125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:46] Epoch:56/100, iteration:305\468,lr: 0.1, loss: 0.019925912842154503, time: 7.081031799316406e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:48] Epoch:56/100, iteration:405\468,lr: 0.1, loss: 0.004073936026543379, time: 4.792213439941406e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:49] Epoch:57/100, iteration:36\468,lr: 0.1, loss: 0.010377341881394386, time: 0.00013208389282226562
+batch_size:128,correct_num:128
+[2023-10-24_11:04:51] Epoch:57/100, iteration:136\468,lr: 0.1, loss: 0.12553398311138153, time: 7.343292236328125e-05
+batch_size:128,correct_num:123
+[2023-10-24_11:04:52] Epoch:57/100, iteration:236\468,lr: 0.1, loss: 0.002478283364325762, time: 6.532669067382812e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:04:54] Epoch:57/100, iteration:336\468,lr: 0.1, loss: 0.017453273758292198, time: 7.009506225585938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:04:55] Epoch:57/100, iteration:436\468,lr: 0.1, loss: 0.030553456395864487, time: 6.771087646484375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:04:57] Epoch:58/100, iteration:67\468,lr: 0.1, loss: 0.011189330369234085, time: 0.0001442432403564453
+batch_size:128,correct_num:128
+[2023-10-24_11:04:59] Epoch:58/100, iteration:167\468,lr: 0.1, loss: 0.09042558819055557, time: 6.270408630371094e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:00] Epoch:58/100, iteration:267\468,lr: 0.1, loss: 0.01519138552248478, time: 7.271766662597656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:02] Epoch:58/100, iteration:367\468,lr: 0.1, loss: 0.03756120800971985, time: 7.677078247070312e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:03] Epoch:58/100, iteration:467\468,lr: 0.1, loss: 0.007805311121046543, time: 6.556510925292969e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:05] Epoch:59/100, iteration:98\468,lr: 0.1, loss: 0.006775315385311842, time: 0.00013828277587890625
+batch_size:128,correct_num:128
+[2023-10-24_11:05:07] Epoch:59/100, iteration:198\468,lr: 0.1, loss: 0.05961627513170242, time: 8.20159912109375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:08] Epoch:59/100, iteration:298\468,lr: 0.1, loss: 0.021691642701625824, time: 5.1021575927734375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:10] Epoch:59/100, iteration:398\468,lr: 0.1, loss: 0.018208730965852737, time: 7.510185241699219e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:12] Epoch:60/100, iteration:29\468,lr: 0.1, loss: 0.03274234011769295, time: 0.00013113021850585938
+batch_size:128,correct_num:126
+[2023-10-24_11:05:13] Epoch:60/100, iteration:129\468,lr: 0.1, loss: 0.013286559842526913, time: 7.033348083496094e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:15] Epoch:60/100, iteration:229\468,lr: 0.1, loss: 0.017368026077747345, time: 8.797645568847656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:16] Epoch:60/100, iteration:329\468,lr: 0.1, loss: 0.054434631019830704, time: 5.745887756347656e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:18] Epoch:60/100, iteration:429\468,lr: 0.1, loss: 0.044507790356874466, time: 5.626678466796875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:19] Epoch:61/100, iteration:60\468,lr: 0.1, loss: 0.016854988411068916, time: 0.00011587142944335938
+batch_size:128,correct_num:127
+[2023-10-24_11:05:21] Epoch:61/100, iteration:160\468,lr: 0.1, loss: 0.017545683309435844, time: 0.00010395050048828125
+batch_size:128,correct_num:127
+[2023-10-24_11:05:22] Epoch:61/100, iteration:260\468,lr: 0.1, loss: 0.0631675124168396, time: 5.173683166503906e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:24] Epoch:61/100, iteration:360\468,lr: 0.1, loss: 0.06746100634336472, time: 7.200241088867188e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:25] Epoch:61/100, iteration:460\468,lr: 0.1, loss: 0.007026649080216885, time: 6.008148193359375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:27] Epoch:62/100, iteration:91\468,lr: 0.1, loss: 0.041239816695451736, time: 0.00014019012451171875
+batch_size:128,correct_num:126
+[2023-10-24_11:05:29] Epoch:62/100, iteration:191\468,lr: 0.1, loss: 0.005302715115249157, time: 6.985664367675781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:30] Epoch:62/100, iteration:291\468,lr: 0.1, loss: 0.004217142704874277, time: 7.534027099609375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:32] Epoch:62/100, iteration:391\468,lr: 0.1, loss: 0.02381773665547371, time: 4.839897155761719e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:34] Epoch:63/100, iteration:22\468,lr: 0.1, loss: 0.05097264423966408, time: 0.00012183189392089844
+batch_size:128,correct_num:125
+[2023-10-24_11:05:35] Epoch:63/100, iteration:122\468,lr: 0.1, loss: 0.0033318824134767056, time: 5.7697296142578125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:37] Epoch:63/100, iteration:222\468,lr: 0.1, loss: 0.010744353756308556, time: 6.961822509765625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:38] Epoch:63/100, iteration:322\468,lr: 0.1, loss: 0.011440962553024292, time: 6.270408630371094e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:40] Epoch:63/100, iteration:422\468,lr: 0.1, loss: 0.03137120604515076, time: 7.867813110351562e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:42] Epoch:64/100, iteration:53\468,lr: 0.1, loss: 0.05621985346078873, time: 0.0001881122589111328
+batch_size:128,correct_num:125
+[2023-10-24_11:05:43] Epoch:64/100, iteration:153\468,lr: 0.1, loss: 0.039281219244003296, time: 5.53131103515625e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:45] Epoch:64/100, iteration:253\468,lr: 0.1, loss: 0.02944938838481903, time: 5.91278076171875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:46] Epoch:64/100, iteration:353\468,lr: 0.1, loss: 0.004429852124303579, time: 7.772445678710938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:47] Epoch:64/100, iteration:453\468,lr: 0.1, loss: 0.02768268994987011, time: 5.91278076171875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:49] Epoch:65/100, iteration:84\468,lr: 0.1, loss: 0.059661343693733215, time: 0.00013899803161621094
+batch_size:128,correct_num:127
+[2023-10-24_11:05:51] Epoch:65/100, iteration:184\468,lr: 0.1, loss: 0.0027632133569568396, time: 5.602836608886719e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:05:52] Epoch:65/100, iteration:284\468,lr: 0.1, loss: 0.030268289148807526, time: 5.316734313964844e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:05:54] Epoch:65/100, iteration:384\468,lr: 0.1, loss: 0.019504424184560776, time: 7.534027099609375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:05:56] Epoch:66/100, iteration:15\468,lr: 0.1, loss: 0.005788000766187906, time: 0.00013685226440429688
+batch_size:128,correct_num:128
+[2023-10-24_11:05:57] Epoch:66/100, iteration:115\468,lr: 0.1, loss: 0.026598680764436722, time: 6.175041198730469e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:05:59] Epoch:66/100, iteration:215\468,lr: 0.1, loss: 0.04383360221982002, time: 6.890296936035156e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:00] Epoch:66/100, iteration:315\468,lr: 0.1, loss: 0.0022163523826748133, time: 0.00011014938354492188
+batch_size:128,correct_num:128
+[2023-10-24_11:06:02] Epoch:66/100, iteration:415\468,lr: 0.1, loss: 0.042493876069784164, time: 6.794929504394531e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:04] Epoch:67/100, iteration:46\468,lr: 0.1, loss: 0.010239480063319206, time: 0.0001251697540283203
+batch_size:128,correct_num:128
+[2023-10-24_11:06:05] Epoch:67/100, iteration:146\468,lr: 0.1, loss: 0.03823254629969597, time: 7.009506225585938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:07] Epoch:67/100, iteration:246\468,lr: 0.1, loss: 0.014967638999223709, time: 5.626678466796875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:08] Epoch:67/100, iteration:346\468,lr: 0.1, loss: 0.048878394067287445, time: 7.2479248046875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:06:10] Epoch:67/100, iteration:446\468,lr: 0.1, loss: 0.007526556961238384, time: 7.843971252441406e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:11] Epoch:68/100, iteration:77\468,lr: 0.1, loss: 0.013036159798502922, time: 0.0001366138458251953
+batch_size:128,correct_num:128
+[2023-10-24_11:06:13] Epoch:68/100, iteration:177\468,lr: 0.1, loss: 0.010890193283557892, time: 7.891654968261719e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:14] Epoch:68/100, iteration:277\468,lr: 0.1, loss: 0.007760730572044849, time: 7.319450378417969e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:16] Epoch:68/100, iteration:377\468,lr: 0.1, loss: 0.007405498996376991, time: 5.054473876953125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:18] Epoch:69/100, iteration:8\468,lr: 0.1, loss: 0.03539489582180977, time: 0.00010347366333007812
+batch_size:128,correct_num:127
+[2023-10-24_11:06:19] Epoch:69/100, iteration:108\468,lr: 0.1, loss: 0.021409019827842712, time: 5.984306335449219e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:21] Epoch:69/100, iteration:208\468,lr: 0.1, loss: 0.03486769273877144, time: 6.580352783203125e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:06:22] Epoch:69/100, iteration:308\468,lr: 0.1, loss: 0.009690288454294205, time: 8.0108642578125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:24] Epoch:69/100, iteration:408\468,lr: 0.1, loss: 0.007332788314670324, time: 8.7738037109375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:26] Epoch:70/100, iteration:39\468,lr: 0.1, loss: 0.02693704143166542, time: 0.000133514404296875
+batch_size:128,correct_num:127
+[2023-10-24_11:06:27] Epoch:70/100, iteration:139\468,lr: 0.1, loss: 0.01474327314645052, time: 7.796287536621094e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:29] Epoch:70/100, iteration:239\468,lr: 0.1, loss: 0.02018379047513008, time: 6.842613220214844e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:30] Epoch:70/100, iteration:339\468,lr: 0.1, loss: 0.025602729991078377, time: 6.604194641113281e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:32] Epoch:70/100, iteration:439\468,lr: 0.1, loss: 0.01923546753823757, time: 7.867813110351562e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:34] Epoch:71/100, iteration:70\468,lr: 0.1, loss: 0.00919035542756319, time: 0.00011920928955078125
+batch_size:128,correct_num:128
+[2023-10-24_11:06:35] Epoch:71/100, iteration:170\468,lr: 0.1, loss: 0.03737231716513634, time: 6.4849853515625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:37] Epoch:71/100, iteration:270\468,lr: 0.1, loss: 0.013163297437131405, time: 7.677078247070312e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:38] Epoch:71/100, iteration:370\468,lr: 0.1, loss: 0.031226318329572678, time: 5.1021575927734375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:40] Epoch:72/100, iteration:1\468,lr: 0.1, loss: 0.03362060710787773, time: 0.00010180473327636719
+batch_size:128,correct_num:126
+[2023-10-24_11:06:42] Epoch:72/100, iteration:101\468,lr: 0.1, loss: 0.04044155776500702, time: 8.296966552734375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:06:43] Epoch:72/100, iteration:201\468,lr: 0.1, loss: 0.05319620296359062, time: 7.152557373046875e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:45] Epoch:72/100, iteration:301\468,lr: 0.1, loss: 0.0336146242916584, time: 5.269050598144531e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:06:46] Epoch:72/100, iteration:401\468,lr: 0.1, loss: 0.027776429429650307, time: 7.081031799316406e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:48] Epoch:73/100, iteration:32\468,lr: 0.1, loss: 0.014464071951806545, time: 0.0001499652862548828
+batch_size:128,correct_num:127
+[2023-10-24_11:06:49] Epoch:73/100, iteration:132\468,lr: 0.1, loss: 0.01854782924056053, time: 5.8650970458984375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:06:51] Epoch:73/100, iteration:232\468,lr: 0.1, loss: 0.01023288443684578, time: 6.4849853515625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:52] Epoch:73/100, iteration:332\468,lr: 0.1, loss: 0.058066293597221375, time: 5.91278076171875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:06:54] Epoch:73/100, iteration:432\468,lr: 0.1, loss: 0.008498340845108032, time: 6.937980651855469e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:56] Epoch:74/100, iteration:63\468,lr: 0.1, loss: 0.018807847052812576, time: 0.0001404285430908203
+batch_size:128,correct_num:126
+[2023-10-24_11:06:57] Epoch:74/100, iteration:163\468,lr: 0.1, loss: 0.008175025694072247, time: 5.4836273193359375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:06:59] Epoch:74/100, iteration:263\468,lr: 0.1, loss: 0.0071268645115196705, time: 6.818771362304688e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:00] Epoch:74/100, iteration:363\468,lr: 0.1, loss: 0.029439076781272888, time: 8.916854858398438e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:02] Epoch:74/100, iteration:463\468,lr: 0.1, loss: 0.019033439457416534, time: 8.749961853027344e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:04] Epoch:75/100, iteration:94\468,lr: 0.1, loss: 0.0836179256439209, time: 0.0001327991485595703
+batch_size:128,correct_num:125
+[2023-10-24_11:07:05] Epoch:75/100, iteration:194\468,lr: 0.1, loss: 0.028769200667738914, time: 6.151199340820312e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:07:07] Epoch:75/100, iteration:294\468,lr: 0.1, loss: 0.03396185487508774, time: 4.982948303222656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:08] Epoch:75/100, iteration:394\468,lr: 0.1, loss: 0.023768428713083267, time: 6.103515625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:10] Epoch:76/100, iteration:25\468,lr: 0.1, loss: 0.0050687664188444614, time: 0.00013327598571777344
+batch_size:128,correct_num:128
+[2023-10-24_11:07:11] Epoch:76/100, iteration:125\468,lr: 0.1, loss: 0.012734941206872463, time: 8.273124694824219e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:13] Epoch:76/100, iteration:225\468,lr: 0.1, loss: 0.030310427770018578, time: 5.817413330078125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:14] Epoch:76/100, iteration:325\468,lr: 0.1, loss: 0.015022318810224533, time: 7.915496826171875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:16] Epoch:76/100, iteration:425\468,lr: 0.1, loss: 0.022177167236804962, time: 4.792213439941406e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:07:18] Epoch:77/100, iteration:56\468,lr: 0.1, loss: 0.021731911227107048, time: 0.00012111663818359375
+batch_size:128,correct_num:127
+[2023-10-24_11:07:19] Epoch:77/100, iteration:156\468,lr: 0.1, loss: 0.02872677706182003, time: 7.224082946777344e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:21] Epoch:77/100, iteration:256\468,lr: 0.1, loss: 0.010586663149297237, time: 5.53131103515625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:22] Epoch:77/100, iteration:356\468,lr: 0.1, loss: 0.012352275662124157, time: 5.412101745605469e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:24] Epoch:77/100, iteration:456\468,lr: 0.1, loss: 0.02071291208267212, time: 4.673004150390625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:26] Epoch:78/100, iteration:87\468,lr: 0.1, loss: 0.019747162237763405, time: 0.00012636184692382812
+batch_size:128,correct_num:127
+[2023-10-24_11:07:27] Epoch:78/100, iteration:187\468,lr: 0.1, loss: 0.055976029485464096, time: 7.05718994140625e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:07:29] Epoch:78/100, iteration:287\468,lr: 0.1, loss: 0.018795613199472427, time: 7.009506225585938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:30] Epoch:78/100, iteration:387\468,lr: 0.1, loss: 0.004074723459780216, time: 5.555152893066406e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:32] Epoch:79/100, iteration:18\468,lr: 0.1, loss: 0.006411837413907051, time: 0.00011897087097167969
+batch_size:128,correct_num:128
+[2023-10-24_11:07:34] Epoch:79/100, iteration:118\468,lr: 0.1, loss: 0.04578709602355957, time: 5.316734313964844e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:35] Epoch:79/100, iteration:218\468,lr: 0.1, loss: 0.009107254445552826, time: 5.054473876953125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:36] Epoch:79/100, iteration:318\468,lr: 0.1, loss: 0.006331766024231911, time: 5.698204040527344e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:38] Epoch:79/100, iteration:418\468,lr: 0.1, loss: 0.020718442276120186, time: 8.940696716308594e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:40] Epoch:80/100, iteration:49\468,lr: 0.1, loss: 0.028129953891038895, time: 0.00011420249938964844
+batch_size:128,correct_num:127
+[2023-10-24_11:07:41] Epoch:80/100, iteration:149\468,lr: 0.1, loss: 0.005727705545723438, time: 6.866455078125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:43] Epoch:80/100, iteration:249\468,lr: 0.1, loss: 0.009444036521017551, time: 6.580352783203125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:44] Epoch:80/100, iteration:349\468,lr: 0.1, loss: 0.007778563536703587, time: 6.556510925292969e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:46] Epoch:80/100, iteration:449\468,lr: 0.1, loss: 0.10532578825950623, time: 6.651878356933594e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:07:48] Epoch:81/100, iteration:80\468,lr: 0.1, loss: 0.02993793785572052, time: 0.00013446807861328125
+batch_size:128,correct_num:126
+[2023-10-24_11:07:49] Epoch:81/100, iteration:180\468,lr: 0.1, loss: 0.01338359247893095, time: 6.222724914550781e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:07:51] Epoch:81/100, iteration:280\468,lr: 0.1, loss: 0.0069683752954006195, time: 4.839897155761719e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:52] Epoch:81/100, iteration:380\468,lr: 0.1, loss: 0.0034738825634121895, time: 7.176399230957031e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:54] Epoch:82/100, iteration:11\468,lr: 0.1, loss: 0.022123750299215317, time: 0.00010728836059570312
+batch_size:128,correct_num:126
+[2023-10-24_11:07:55] Epoch:82/100, iteration:111\468,lr: 0.1, loss: 0.010961280204355717, time: 5.4836273193359375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:07:57] Epoch:82/100, iteration:211\468,lr: 0.1, loss: 0.03669919818639755, time: 0.00012135505676269531
+batch_size:128,correct_num:127
+[2023-10-24_11:07:58] Epoch:82/100, iteration:311\468,lr: 0.1, loss: 0.04283945634961128, time: 5.936622619628906e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:08:00] Epoch:82/100, iteration:411\468,lr: 0.1, loss: 0.024202877655625343, time: 0.00011610984802246094
+batch_size:128,correct_num:127
+[2023-10-24_11:08:02] Epoch:83/100, iteration:42\468,lr: 0.1, loss: 0.01185455173254013, time: 0.0001418590545654297
+batch_size:128,correct_num:128
+[2023-10-24_11:08:03] Epoch:83/100, iteration:142\468,lr: 0.1, loss: 0.0019689116161316633, time: 6.437301635742188e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:05] Epoch:83/100, iteration:242\468,lr: 0.1, loss: 0.012302958406507969, time: 5.698204040527344e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:06] Epoch:83/100, iteration:342\468,lr: 0.1, loss: 0.004686804488301277, time: 5.2928924560546875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:08] Epoch:83/100, iteration:442\468,lr: 0.1, loss: 0.03345946595072746, time: 4.8160552978515625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:10] Epoch:84/100, iteration:73\468,lr: 0.1, loss: 0.011301146820187569, time: 0.0001308917999267578
+batch_size:128,correct_num:128
+[2023-10-24_11:08:11] Epoch:84/100, iteration:173\468,lr: 0.1, loss: 0.009812546893954277, time: 6.508827209472656e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:13] Epoch:84/100, iteration:273\468,lr: 0.1, loss: 0.042117491364479065, time: 8.869171142578125e-05
+batch_size:128,correct_num:124
+[2023-10-24_11:08:14] Epoch:84/100, iteration:373\468,lr: 0.1, loss: 0.013366819359362125, time: 6.914138793945312e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:16] Epoch:85/100, iteration:4\468,lr: 0.1, loss: 0.021720442920923233, time: 0.00010442733764648438
+batch_size:128,correct_num:127
+[2023-10-24_11:08:17] Epoch:85/100, iteration:104\468,lr: 0.1, loss: 0.06598472595214844, time: 6.270408630371094e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:08:19] Epoch:85/100, iteration:204\468,lr: 0.1, loss: 0.026937656104564667, time: 7.772445678710938e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:21] Epoch:85/100, iteration:304\468,lr: 0.1, loss: 0.053352516144514084, time: 6.031990051269531e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:08:22] Epoch:85/100, iteration:404\468,lr: 0.1, loss: 0.023827532306313515, time: 8.296966552734375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:24] Epoch:86/100, iteration:35\468,lr: 0.1, loss: 0.007431200705468655, time: 0.00016188621520996094
+batch_size:128,correct_num:128
+[2023-10-24_11:08:25] Epoch:86/100, iteration:135\468,lr: 0.1, loss: 0.016196608543395996, time: 6.270408630371094e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:27] Epoch:86/100, iteration:235\468,lr: 0.1, loss: 0.025364762172102928, time: 5.7697296142578125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:29] Epoch:86/100, iteration:335\468,lr: 0.1, loss: 0.02099229395389557, time: 5.4836273193359375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:30] Epoch:86/100, iteration:435\468,lr: 0.1, loss: 0.03481509909033775, time: 4.982948303222656e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:08:32] Epoch:87/100, iteration:66\468,lr: 0.1, loss: 0.01827516406774521, time: 0.00014138221740722656
+batch_size:128,correct_num:128
+[2023-10-24_11:08:34] Epoch:87/100, iteration:166\468,lr: 0.1, loss: 0.029374485835433006, time: 5.054473876953125e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:35] Epoch:87/100, iteration:266\468,lr: 0.1, loss: 0.03898502513766289, time: 8.797645568847656e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:08:37] Epoch:87/100, iteration:366\468,lr: 0.1, loss: 0.03125470131635666, time: 5.1975250244140625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:38] Epoch:87/100, iteration:466\468,lr: 0.1, loss: 0.010231469757854939, time: 6.246566772460938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:40] Epoch:88/100, iteration:97\468,lr: 0.1, loss: 0.0155639024451375, time: 0.00011086463928222656
+batch_size:128,correct_num:128
+[2023-10-24_11:08:42] Epoch:88/100, iteration:197\468,lr: 0.1, loss: 0.05681982263922691, time: 5.793571472167969e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:08:43] Epoch:88/100, iteration:297\468,lr: 0.1, loss: 0.004300178959965706, time: 8.344650268554688e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:45] Epoch:88/100, iteration:397\468,lr: 0.1, loss: 0.038403987884521484, time: 7.176399230957031e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:08:46] Epoch:89/100, iteration:28\468,lr: 0.1, loss: 0.03494024649262428, time: 0.00013637542724609375
+batch_size:128,correct_num:126
+[2023-10-24_11:08:48] Epoch:89/100, iteration:128\468,lr: 0.1, loss: 0.0066754757426679134, time: 8.535385131835938e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:49] Epoch:89/100, iteration:228\468,lr: 0.1, loss: 0.002590486081317067, time: 7.104873657226562e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:51] Epoch:89/100, iteration:328\468,lr: 0.1, loss: 0.013843844644725323, time: 7.271766662597656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:52] Epoch:89/100, iteration:428\468,lr: 0.1, loss: 0.01375704724341631, time: 5.221366882324219e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:54] Epoch:90/100, iteration:59\468,lr: 0.1, loss: 0.03040466643869877, time: 0.0001494884490966797
+batch_size:128,correct_num:128
+[2023-10-24_11:08:56] Epoch:90/100, iteration:159\468,lr: 0.1, loss: 0.005342632997781038, time: 5.841255187988281e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:08:57] Epoch:90/100, iteration:259\468,lr: 0.1, loss: 0.01683793030679226, time: 6.532669067382812e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:08:59] Epoch:90/100, iteration:359\468,lr: 0.1, loss: 0.023369384929537773, time: 5.745887756347656e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:00] Epoch:90/100, iteration:459\468,lr: 0.1, loss: 0.009500958025455475, time: 5.6743621826171875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:02] Epoch:91/100, iteration:90\468,lr: 0.1, loss: 0.05240672454237938, time: 0.00012040138244628906
+batch_size:128,correct_num:125
+[2023-10-24_11:09:04] Epoch:91/100, iteration:190\468,lr: 0.1, loss: 0.021544313058257103, time: 9.822845458984375e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:05] Epoch:91/100, iteration:290\468,lr: 0.1, loss: 0.03801853582262993, time: 5.626678466796875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:07] Epoch:91/100, iteration:390\468,lr: 0.1, loss: 0.03187263384461403, time: 7.605552673339844e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:09] Epoch:92/100, iteration:21\468,lr: 0.1, loss: 0.0031280976254493, time: 0.00016045570373535156
+batch_size:128,correct_num:128
+[2023-10-24_11:09:10] Epoch:92/100, iteration:121\468,lr: 0.1, loss: 0.04311416298151016, time: 5.91278076171875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:12] Epoch:92/100, iteration:221\468,lr: 0.1, loss: 0.02523123100399971, time: 7.033348083496094e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:13] Epoch:92/100, iteration:321\468,lr: 0.1, loss: 0.016761090606451035, time: 7.677078247070312e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:15] Epoch:92/100, iteration:421\468,lr: 0.1, loss: 0.02299218624830246, time: 5.817413330078125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:17] Epoch:93/100, iteration:52\468,lr: 0.1, loss: 0.014283617027103901, time: 0.00013327598571777344
+batch_size:128,correct_num:127
+[2023-10-24_11:09:18] Epoch:93/100, iteration:152\468,lr: 0.1, loss: 0.01757388561964035, time: 8.273124694824219e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:20] Epoch:93/100, iteration:252\468,lr: 0.1, loss: 0.01946365460753441, time: 6.175041198730469e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:21] Epoch:93/100, iteration:352\468,lr: 0.1, loss: 0.005522900260984898, time: 8.416175842285156e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:23] Epoch:93/100, iteration:452\468,lr: 0.1, loss: 0.01066330075263977, time: 6.937980651855469e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:24] Epoch:94/100, iteration:83\468,lr: 0.1, loss: 0.03595414757728577, time: 0.0001385211944580078
+batch_size:128,correct_num:127
+[2023-10-24_11:09:26] Epoch:94/100, iteration:183\468,lr: 0.1, loss: 0.011544836685061455, time: 7.200241088867188e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:27] Epoch:94/100, iteration:283\468,lr: 0.1, loss: 0.009130245074629784, time: 8.440017700195312e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:29] Epoch:94/100, iteration:383\468,lr: 0.1, loss: 0.04293777793645859, time: 5.936622619628906e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:31] Epoch:95/100, iteration:14\468,lr: 0.1, loss: 0.006564350798726082, time: 0.00013637542724609375
+batch_size:128,correct_num:128
+[2023-10-24_11:09:32] Epoch:95/100, iteration:114\468,lr: 0.1, loss: 0.0021886585745960474, time: 6.29425048828125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:34] Epoch:95/100, iteration:214\468,lr: 0.1, loss: 0.009360221214592457, time: 6.0558319091796875e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:35] Epoch:95/100, iteration:314\468,lr: 0.1, loss: 0.042868711054325104, time: 4.9114227294921875e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:37] Epoch:95/100, iteration:414\468,lr: 0.1, loss: 0.024387314915657043, time: 6.890296936035156e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:38] Epoch:96/100, iteration:45\468,lr: 0.1, loss: 0.010580542497336864, time: 0.0001468658447265625
+batch_size:128,correct_num:128
+[2023-10-24_11:09:40] Epoch:96/100, iteration:145\468,lr: 0.1, loss: 0.010030369274318218, time: 8.416175842285156e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:42] Epoch:96/100, iteration:245\468,lr: 0.1, loss: 0.03898147866129875, time: 7.677078247070312e-05
+batch_size:128,correct_num:125
+[2023-10-24_11:09:43] Epoch:96/100, iteration:345\468,lr: 0.1, loss: 0.012584843672811985, time: 5.030632019042969e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:44] Epoch:96/100, iteration:445\468,lr: 0.1, loss: 0.021284090355038643, time: 5.173683166503906e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:46] Epoch:97/100, iteration:76\468,lr: 0.1, loss: 0.034758370369672775, time: 0.00013947486877441406
+batch_size:128,correct_num:126
+[2023-10-24_11:09:48] Epoch:97/100, iteration:176\468,lr: 0.1, loss: 0.008916414342820644, time: 5.650520324707031e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:49] Epoch:97/100, iteration:276\468,lr: 0.1, loss: 0.053820040076971054, time: 5.14984130859375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:09:51] Epoch:97/100, iteration:376\468,lr: 0.1, loss: 0.008146964013576508, time: 8.7738037109375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:52] Epoch:98/100, iteration:7\468,lr: 0.1, loss: 0.007297076750546694, time: 0.0001456737518310547
+batch_size:128,correct_num:128
+[2023-10-24_11:09:54] Epoch:98/100, iteration:107\468,lr: 0.1, loss: 0.014801980927586555, time: 6.985664367675781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:55] Epoch:98/100, iteration:207\468,lr: 0.1, loss: 0.03838955610990524, time: 5.888938903808594e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:09:57] Epoch:98/100, iteration:307\468,lr: 0.1, loss: 0.01589825376868248, time: 8.511543273925781e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:09:59] Epoch:98/100, iteration:407\468,lr: 0.1, loss: 0.06674517691135406, time: 5.1975250244140625e-05
+batch_size:128,correct_num:124
+[2023-10-24_11:10:00] Epoch:99/100, iteration:38\468,lr: 0.1, loss: 0.01551838219165802, time: 0.00011205673217773438
+batch_size:128,correct_num:127
+[2023-10-24_11:10:02] Epoch:99/100, iteration:138\468,lr: 0.1, loss: 0.013461711816489697, time: 5.14984130859375e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:10:03] Epoch:99/100, iteration:238\468,lr: 0.1, loss: 0.014267954044044018, time: 5.9604644775390625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:10:05] Epoch:99/100, iteration:338\468,lr: 0.1, loss: 0.0069889347068965435, time: 5.5789947509765625e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:10:06] Epoch:99/100, iteration:438\468,lr: 0.1, loss: 0.016967272385954857, time: 7.128715515136719e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:10:08] Epoch:100/100, iteration:69\468,lr: 0.1, loss: 0.006713571026921272, time: 0.00011754035949707031
+batch_size:128,correct_num:128
+[2023-10-24_11:10:10] Epoch:100/100, iteration:169\468,lr: 0.1, loss: 0.03528207913041115, time: 5.435943603515625e-05
+batch_size:128,correct_num:127
+[2023-10-24_11:10:11] Epoch:100/100, iteration:269\468,lr: 0.1, loss: 0.03791852295398712, time: 6.008148193359375e-05
+batch_size:128,correct_num:126
+[2023-10-24_11:10:13] Epoch:100/100, iteration:369\468,lr: 0.1, loss: 0.0065851337276399136, time: 5.7697296142578125e-05
+batch_size:128,correct_num:128
+[2023-10-24_11:10:14] Epoch:100/100, iteration:469\468,lr: 0.1, loss: 0.0033974286634474993, time: 6.890296936035156e-05
+batch_size:128,correct_num:96
+
+==========Execute model test in BaselineMNISTNetwork_MNIST at 2023-10-24_13:45:30==========
+
+==========Execute model test in BaselineMNISTNetwork_MNIST at 2023-10-24_13:53:44==========
+
+==========Test result on test dataset==========
+Top-1 correct / Total: 9926/10000, Top-1 accuracy: 0.9926, Top-5 correct / Total: 10000/10000, Top-5 accuracy: 1.0, time: 5.64482569694519

@@ -65,8 +65,6 @@ testset = dataset(datasets_root_dir, train=False, transform=transform_test, down
 optimizer = torch.optim.SGD
 schedule = {
     'experiment': 'ResNet-18_CIFAR-10_Adaptive-Patch',
-    "train_strategy": BaseTrainer,
-
     # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,

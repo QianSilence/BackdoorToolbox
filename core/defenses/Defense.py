@@ -17,11 +17,11 @@
 from abc import ABC, abstractmethod
 class Defense(ABC):
     @abstractmethod
-    def repair(self):
+    def repair(self, dataset=None, schedule=None):
         raise NotImplementedError
     # if the defense strategy is based data filter,then it must shíxiàn gāi method
     @abstractmethod
-    def filter(self, dataset, schedule=None):
+    def filter(self, dataset=None, schedule=None):
         pass
 
 

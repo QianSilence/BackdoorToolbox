@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from core.attacks import BadNets,BackdoorAttack
-from core.base import Observer, Base, BaseTrainer
+from core.base import Observer, Base
 from models import BaselineMNISTNetwork
 import random
 import time
@@ -38,7 +38,7 @@ CUDA_VISIBLE_DEVICES = '6'
 datasets_root_dir = BASE_DIR + '/datasets/'
 date = datetime.date.today()
 work_dir = os.path.join(BASE_DIR,'experiments/BaselineMNISTNetwork_MNIST_BadNets')
-
+# work_dir = os.path.join(BASE_DIR,'experiments/Mine/BaselineMNISTNetwork_MNIST_BadNets_Mine')
 datasets_dir = os.path.join(work_dir,'datasets')
 poison_datasets_dir = os.path.join(datasets_dir, 'poisoned_MNIST')
 predict_dir = os.path.join(datasets_dir,'predict')
@@ -71,7 +71,6 @@ weight = torch.zeros((28, 28), dtype=torch.float32)
 weight[-3:, -3:] = 1.0
 schedule = {
     'experiment': 'BaselineMNISTNetwork_MNIST',
-    "train_strategy": BaseTrainer,
     # Settings for reproducible/repeatable experiments
     'seed': global_seed,
     'deterministic': deterministic,
@@ -98,67 +97,6 @@ schedule = {
     'log_iteration_interval': 100,
     # 日志的保存路径 work_dir+experiment+当前时间
 }
-"""
-
-\min\sum_{i}^{k} \pi_{i}E(log|\Sigma_{i}| )+CE(P(Y│Z),P(Y))
-
-通过该损失函数的定义掌握:
-1.如何自定义损失函数
-2.pytorch影响的模块,如:优化模块
-
-__init__：初始化超参数
-forward：定义损失的计算方式，并进行前向传播
-backward：反向传播(暂未遇到需要修改的情况)
-
-"""
-class Loss(nn.Module):
-    # 超参数初始化，如
-    def __init__(self, beta, regularize = True, regularize_layer = None):
-        # super(nn.Module, self).__init__()
-        super(Loss,self).__init__()
-        self.beta = beta
-        self.softmax = nn.Softmax()
-        self.cross_entropy_Loss = nn.CrossEntropyLoss()
-        self.regularize = regularize,
-        self.regularize_layer = regularize_layer
-    # 一般是预测值和label
-    def forward(self, latents_z, predict, label):
-        # n*k ---> n*k
-        gamma_matrix= self.softmax(predict)
-        print("gamma_matrix")
-        print(gamma_matrix.shape)
-        # n*k ---> k
-        N_vector = torch.sum(gamma_matrix, 0) 
-        N = gamma_matrix.size[0]
-        pi_vector  = N_vector / N
-        print("pi_vector")
-        print(pi_vector.shape)
-
-        # gamma_matrix^T * latents_z  ---> mu_matrix
-        # k*n * (n*m) ---> k*m
-        mu_matrix = torch.mm(torch.transpose(gamma_matrix,0,1), latents_z) 
-        print("mu_matrix")
-        print(mu_matrix.shape)
-
-
-        # k*n*m - k*1*m  ---->  k*n*m 
-        delta_matrix = latents_z.unsqueeze(0) - mu_matrix.unsqueeze(1)
-        # gamma_matrix: n*k--> k*n*1 ---> k*n*1 *  k*n*m ---> k*n*m
-        middle_matrix = torch.transpose(gamma_matrix,0,1).unsqueeze(2) * delta_matrix
-        print("middle_matrix")
-        print(middle_matrix.shape)
-        #  k*m*n * k*n*m ---> k*m*m
-        sigma_matrix = torch.matmul(delta_matrix.permute(0, 2, 1),middle_matrix)
-        print("sigma_matrix")
-        print(sigma_matrix.shape)
-
-        loss1 = self.cross_entropy_Loss(predict,label)
-        # 1*k * k*1 --> 1
-        loss2 = torch.mm(pi_vector,torch.det(sigma_matrix))  
-        loss = loss1 + self.beta * loss2
-        return loss
-
-
 task = {
     'train_dataset': trainset,
     'test_dataset' : testset,
@@ -185,7 +123,7 @@ attack_schedule ={
     'batch_size': None,
     'num_workers': None,
     # Settings related to saving model,data and logs
-    'work_dir': 'experiments',
+    'work_dir': work_dir,
     'train_schedule':schedule,
 }
 
@@ -235,13 +173,22 @@ if __name__ == "__main__":
         # Generate backdoor sample
         log("\n==========Generate backdoor samples==========\n")
         poisoned_train_dataset = backdoor.get_poisoned_train_dataset()
-        poisoned_test_dataset = backdoor.get_poisoned_test_dataset()
         poison_indices = poisoned_train_dataset.get_poison_indices()
         benign_indexs = list(set(range(len(poisoned_train_dataset))) - set(poison_indices))
-        log("Total samples:{0}, poisoning samples:{1}, benign samples:{2}".format(len(poisoned_train_dataset),\
-        len(poison_indices),len(benign_indexs)))
+        # Statistically generated poisoned datasets information
+        real_targets = poisoned_train_dataset.get_real_targets()
+        labels = real_targets[poison_indices]
+        log(f"Total samples:{len(poisoned_train_dataset)}, poisoning samples:{len(poison_indices)}, benign samples:{len(benign_indexs)}\n")
+        for i, label in enumerate(poisoned_train_dataset.classes):
+            print(f"the number of sample with label:{label} in poisoned_train_dataset:{labels.tolist().count(i)}\n")
         #Save poisoned dataset
         torch.save(poisoned_train_dataset, os.path.join(poison_datasets_dir,'train.pt'))
+
+        poisoned_test_dataset = backdoor.get_poisoned_test_dataset()
+        poison_test_indices =  poisoned_test_dataset.get_poison_indices()
+        benign_test_indexs = list(set(range(len(poisoned_test_dataset))) - set(poison_test_indices))
+        log("Total samples:{0}, poisoning samples:{1}, benign samples:{2}".format(len(poisoned_test_dataset),\
+        len(poison_test_indices),len(benign_test_indexs)))
         torch.save(poisoned_test_dataset, os.path.join(poison_datasets_dir,'test.pt'))
 
     elif args.task == "show train backdoor samples":
@@ -275,6 +222,7 @@ if __name__ == "__main__":
     elif args.task == "attack":
         #Train and get backdoor model
         log("\n==========Train on poisoned_train_dataset and get backdoor model==========\n")
+        
         poisoned_model = backdoor.get_backdoor_model()
         torch.save(poisoned_model.state_dict(), os.path.join(model_dir, 'backdoor_model.pth'))
         log("Save backdoor model to" + os.path.join(model_dir, 'backdoor_model.pth'))
@@ -287,10 +235,10 @@ if __name__ == "__main__":
         poisoned_test_indexs = list(testset.get_poison_indices())
         benign_test_indexs = list(set(range(len(testset))) - set(poisoned_test_indexs))
         #Alreadly exsiting trained model
-        model = nn.DataParallel(BaselineMNISTNetwork())
-        model.load_state_dict(torch.load(os.path.join(work_dir, 'model/backdoor_model.pth')),strict=False)
+        model = BaselineMNISTNetwork()
+        # model.load_state_dict(torch.load(os.path.join(work_dir, 'model/backdoor_model.pth')),strict=False)
+        model.load_state_dict(torch.load(os.path.join(model_dir, 'backdoor_model.pth')),strict=False)
         predict_digits, labels = backdoor.test(model=model, test_dataset=testset)
-        predict_digits, labels = backdoor.test()
 
         benign_accuracy = compute_accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs],topk=(1,3,5))
         poisoning_accuracy = compute_accuracy(predict_digits[poisoned_test_indexs],labels[poisoned_test_indexs],topk=(1,3,5))
