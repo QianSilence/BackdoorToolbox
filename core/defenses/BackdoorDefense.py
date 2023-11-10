@@ -103,6 +103,9 @@ class BackdoorDefense(object):
     def test(self, schedule=None, model=None, test_dataset=None): 
         return self.defense_method.test(schedule, model, test_dataset)
     
+    def invert_random_labels(self):
+        return self.defense_method.invert_random_labels()
+    
 
     def add_training_observer(self,observer):
         self.attack_method.add_training_observer(observer)

@@ -1,0 +1,37 @@
+---
+Spectral:
+  #Defense config 
+  defense_strategy: Spectral
+  # Is training required to get poisoned models when performing data filtering defense?
+  train: null
+  # The saving path of the backdoor model. When train = True, it is the path to save 
+  # the trained model. When train = False, it is the path to load the model.
+  trained_model: null
+  backdoor_model_path: null 
+  y_target: null
+  poisoned_trainset: null
+  poisoned_testset: null
+  percentile: 85
+
+Mine:
+  # defense config:
+  defense_strategy: Mine
+  supervised_loss_type: CBCELoss
+  volume: 5000
+  start_epoch: 0
+  beta: 0.001
+  delta_beta: 0.001
+  beta_threshold: 0.01
+  layer: null
+  #related filtering config
+  poison_rate: 0.05
+  init_size_clean_data_pool: 500
+  filter_epoch_interation: 5
+  #1.4172, 1.8931
+  threshold: 1.4172
+
+  #unlearning config
+  unlearning_threshold: 1.0e-7
+  #"times":2,
+  
+

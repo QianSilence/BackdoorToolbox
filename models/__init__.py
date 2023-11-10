@@ -13,10 +13,9 @@
 from .autoencoder import AutoEncoder
 from .baseline_MNIST_network import BaselineMNISTNetwork
 from .vgg import *
-from .resnet import ResNet
+from .resnet import ResNet, _ResNet
 
-
-__all__ = ["AutoEncoder","BaselineMNISTNetwork","ResNet"]
+__all__ = ["AutoEncoder","BaselineMNISTNetwork","ResNet","_ResNet"]
 __path__=["./","./trainedModels/"]
 # print(__all__)
 # print(dir())

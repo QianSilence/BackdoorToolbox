@@ -1,0 +1,75 @@
+---
+BaselineMNISTNetwork_MNIST:
+  dataset: MNIST
+  model : BaselineMNISTNetwork
+  optimizer: SGD
+  loss: CrossEntropyLoss
+  data:
+    dataset_root_dir: /home/zzq/CreatingSpace/BackdoorToolbox/datasets
+    num_classes: 10
+
+  schedule:
+    #BaselineMNISTNetwork_MNIST_BadNets
+    # null represents None
+    experiment: BaselineMNISTNetwork_MNIST
+    # repeatability_setting
+    seed: 333
+    deterministic: True
+    # related_device
+    device: GPU
+    CUDA_VISIBLE_DEVICES: 0,1,2,3,4,5
+    GPU_num: 1
+    # related_tarin
+    pretrain: null
+    epochs: 100
+    batch_size: 128
+    num_workers: 2
+    # related_optimization
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5e-4
+    gamma: 0.1  
+    # log
+    work_dir: null
+    log_iteration_interval: 100
+
+ResNet-18_CIFAR-10:
+  dataset: CIFAR-10
+  model : ResNet-18
+  #Adam
+  optimizer: SGD
+  loss: CrossEntropyLoss
+  data:
+    dataset_root_dir: /home/zzq/CreatingSpace/BackdoorToolbox/datasets
+    num_classes: 10
+  schedule:
+    #{model}_{datasets}_{defense}_for_{attack} 
+    experiment: ResNet-18_CIFAR-10
+    # repeatability_setting
+    seed: 333
+    deterministic: True
+    # related_device
+    device: GPU
+    CUDA_VISIBLE_DEVICES: 0,1,2,3,4,5
+    GPU_num: 1
+    # related_tarin
+    pretrain: null
+    epochs: 200
+    batch_size: 256
+    num_workers: 2
+    # related_optimization
+    lr: 0.002
+    momentum: 0.9
+    weight_decay: 5e-4
+    gamma: 0.1  
+    # log
+    # os.path.join(BASE_DIR,'experiments/' + task + '/'+ dir)
+    work_dir: work_dir
+    log_iteration_interval: 100
+
+experiment: 
+task: ResNet-18_CIFAR-100
+attack: BadNets
+defense: Mine
+
+

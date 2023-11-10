@@ -227,6 +227,16 @@ class RCELoss(nn.Module):
             loss = loss.mean()
         return loss
 
+class  EntropyLoss(nn.Module):
+    def __init__(self, num_classes=10, reduction="mean"):
+        super(EntropyLoss, self).__init__()
+        self.num_classes = num_classes
+        self.reduction = reduction
+    def forward(self,x):
+        loss = -1.0* torch.sum(x * torch.log(x), dim=1)
+        # print(f"entropy:{-1 * x * torch.log(x)}")        
+        return loss.item()
+    
 # def is_singular_matrix(matrices):
 #     with torch.no_grad():
 #         determinantes = torch.det(matrices)
@@ -246,17 +256,23 @@ class RCELoss(nn.Module):
 #             exit(-1)
 
 def is_singular_matrix(matrices):
+    print(f"matrices.shape:{matrices.shape},matrices:{matrices}\n")
     determinantes = torch.prod(matrices, dim=1)
+    print(f"determinantes.shape:{determinantes.shape},determinantes:{determinantes}\n")
+    
+
     with torch.no_grad():
         indexs = torch.le(determinantes, 0)
+        # print(f"indexs:{indexs}\n")
         if torch.any(indexs).item():
-            index = np.where(np.array(indexs) == True)
-            matrix = matrices[index]
+            index = np.where(np.array(indexs) == True)[0]
+            matrix = matrices[index[0]]
+            # print(f"index:{index},matrix:{matrix}")
             is_positive_definite = all(matrix[0:-1] > 0)
             if not is_positive_definite:
                 print(f"index:{index},deter:{determinantes[index]},eigenvalues:{matrix},\n")
-                print(matrices)
             exit(-1)
+            
 
 
          

@@ -117,17 +117,6 @@ defense_shedule ={
     'poisoned_trainset':poisoned_trainset,
     'poisoned_testset':poisoned_testset,
     'percentile':85,
-
-    # Device config
-    'device': 'GPU',
-    'CUDA_VISIBLE_DEVICES': CUDA_VISIBLE_DEVICES,
-    'GPU_num': 1,
-    'batch_size': batch_size,
-    'num_workers': num_workers,
-
-    # Settings related to saving model data and logs
-    'work_dir': 'experiments',
-    'train_schedule':schedule,
 }
 
 # badnets = BadNets(

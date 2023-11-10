@@ -5,9 +5,28 @@
 # @Affiliation : Harbin Institute of Technology, Shenzhen
 # @File        : plot.py
 # @Description : Some drawing tools are implemented through matplotlib
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 from sklearn import datasets, manifold
+import numpy as np
+def plot_line(x, y1,y2,labels = [],colors=[],title="",xlabel="",ylabel="",path=""):
+    # 创建直线图
+    plt.plot(x, y1, label=labels[0], color=colors[0], linestyle='-', marker='o', markersize=5)
+    plt.scatter(x, y1, color='black', marker='o', s=10)  # s参数用于设置圆点的大小
+    plt.plot(x, y2, label=labels[1], color=colors[1], linestyle='-', marker='o', markersize=5)
+    plt.scatter(x, y2, color='black', marker='o', s=10)  # s参数用于设置圆点的大小
+    # 添加标题和标签
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    # 添加图例
+    plt.legend()
+    # 显示图形
+    plt.show()
+    if path is not None:
+        plt.savefig(path,dpi=600,format='png')
+    plt.close()
 
 def plot_2d(points, points_color, title=" ", cmap=None,path=None):
     """
@@ -82,6 +101,27 @@ if __name__ == "__main__":
     )
     S_t_sne = t_sne.fit_transform(S_points)
     plot_3d(S_t_sne, S_color, "T-distributed Stochastic  \n Neighbor Embedding")
+
+# Here, a variable parameter x is defined and multiple ndarrray can be passed in to display in the histogram.
+def plot_hist(*x, colors = ["blue"], title = "Histogram", xlabel = "", ylabel = ""):
+    num_bins = 50
+    fig, ax = plt.subplots()
+    # the histogram of the data
+    if x.dim == 1:
+        n, bins, patches = ax.hist(x, num_bins, density=True, color=colors[0])
+    elif x.dim == 2:
+        for i in range(x.shape[0]):
+            n, bins, patches = ax.hist(x[i], num_bins, density=True,color = colors[i])
+    n, bins, patches = ax.hist(x, num_bins, density=True)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title )
+    plt.legend()
+    # Tweak spacing to prevent clipping of ylabel
+    fig.tight_layout()
+    plt.show()
+
+
 
 
 

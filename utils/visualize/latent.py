@@ -10,8 +10,9 @@ import torch
 import torch.nn as nn
 import os 
 import numpy as np
-from models import ResNet
 from tqdm import trange
+from models import BaselineMNISTNetwork, _ResNet
+import threading
 def get_latent_rep(model, layer, datasets, device = None):
     if device is None:
         device = torch.device("cpu")
@@ -44,16 +45,27 @@ def get_latent_rep(model, layer, datasets, device = None):
     y_labels = np.array(y_labels)
     return latents,y_labels
 
-def get_latent_rep_without_detach(model, layer, samples):
+def get_latent_rep_without_detach(model, layer, samples, device = torch.device("cpu")):
     """
     ouuput:(torch.tensor,torch.tensor)
     Returns the output of the specified layer of the model, but does not detach it from the compution graph.
+    Notice: "latents" are not the final output of the model, so when using nn.DataParallel() for multi-GPU training, 
+    In order to merge the intermediate output of the model on multiple GPUs, there are 2 methods:
+    1. In the function "forward" of model , extract the intermediate output ,then return it and the final output of the model.
+    2. Use dict types to prevent multiple GPUs from affecting each other and finally merge the intermediate output of each GPU.
+       This method must ensure that the intermediate output to the same device.
     """
-    latents = None 
+    
+    latent_dict = {}
     def layer_hook(module, inp, out):
         # Use the global keyword to declare that declare global variables to be modified
-        nonlocal latents
-        latents = out
+        nonlocal latent_dict
+        if isinstance(model, BaselineMNISTNetwork) or isinstance(model.module, BaselineMNISTNetwork):
+            latent_dict[inp[0].device] = out
+        elif isinstance(model, _ResNet) or isinstance(model.module, _ResNet):
+            latent_dict[inp[0].device] = inp[0]
+            
+    
          # outs.append(torch.reshape(inp[0].detach().cpu(), (-1,)).numpy())
     # if isinstance(model, nn.DataParallel):
     #     hook = model.module.layer4.register_forward_hook(layer_hook)
@@ -67,6 +79,38 @@ def get_latent_rep_without_detach(model, layer, samples):
         hook = dict(model.named_children())[layer].register_forward_hook(layer_hook)
     predicts = model(samples)
     hook.remove()
+    latents = None
+    for key in latent_dict.keys():
+        if latents is None:
+            latents = latent_dict[key].to(device)
+        else:
+            latents = torch.cat((latents,latent_dict[key].to(device)))
     return latents, predicts
+
+# def get_ResNet_latent_rep_without_detach(model, layer, samples):
+#     """
+#     ouuput:(torch.tensor,torch.tensor)
+#     Returns the output of the specified layer of the model, but does not detach it from the compution graph.
+#     """
+#     latents = None 
+#     # For the "resnet" model, we take the input of the last linear layer
+#     def layer_hook(module, inp, out):
+#         # Use the global keyword to declare that global variables to be modified
+#         nonlocal latents
+#         latents = inp
+#         # outs.append(torch.reshape(inp[0].detach().cpu(), (-1,)).numpy())
+#     # if isinstance(model, nn.DataParallel):
+#     #     hook = model.module.layer4.register_forward_hook(layer_hook)
+#     #     hook = model.linear.register_forward_hook(layer_hook)
+#     # else:
+#     #     hook = model.layer4.register_forward_hook(layer_hook)
+#     #     hook = model.linear.register_forward_hook(layer_hook)
+#     if isinstance(model, nn.DataParallel):
+#         hook = dict(model.module.named_children())[layer].register_forward_hook(layer_hook)
+#     else:
+#         hook = dict(model.named_children())[layer].register_forward_hook(layer_hook)
+#     predicts = model(samples)
+#     hook.remove()
+#     return latents, predicts
 
     
