@@ -16,7 +16,7 @@ from .load_config import load_config
 
 config, inner_dir, config_name = load_config(os.path.join(os.path.dirname(os.path.abspath(__file__)),"defense_config.yaml"))
 
-support_defense_strategies = ["Spectral","Mine"]
+support_defense_strategies = ["Spectral", "Mine", "MIMRL"]
 
 def get_Spectral_config():
     defense_config = {
@@ -73,6 +73,34 @@ def get_Mine_config():
     defense_config['layer'] = config['Mine']['layer']
 
     return defense_config
+
+def get_MIMRL_config():
+    defense_config = {
+        # defense config:
+        'defense_strategy':"MIMRL",
+        'loss':'MIMRLLoss',
+        'beta': 20.0,
+        'x_dim': 784,
+        'dim': 10,
+        # related Infor-max   
+        'lr_dis': 0.00001,
+        'layer': None,
+        #related filtering config
+        'poison_rate':None,
+        'threshold': 1.4172
+    }
+    defense_config['defense_strategy'] = config['MIMRL']['defense_strategy']
+    defense_config['loss'] = config['MIMRL']['loss']
+    defense_config['beta'] = config['MIMRL']['beta']
+    defense_config['x_dim'] = config['MIMRL']['x_dim']
+    defense_config["dim"] = config['MIMRL']["dim"]
+    defense_config['lr_dis'] = config['MIMRL']['lr_dis']
+    defense_config['layer'] = config['MIMRL']['layer']
+    defense_config['poison_rate'] = config['MIMRL']['poison_rate']
+    defense_config['threshold'] = config['MIMRL']['threshold']
+
+    return defense_config
+    
     
 def get_defense_config(defense_strategy = None):
     assert defense_strategy in support_defense_strategies, f"{defense_strategy} is not in support_datasets:{support_defense_strategies}"
@@ -80,6 +108,8 @@ def get_defense_config(defense_strategy = None):
         defense_config = get_Spectral_config()
     if defense_strategy == "Mine":
         defense_config = get_Mine_config()
+    if defense_strategy == "MIMRL":
+        defense_config = get_MIMRL_config()
 
     return defense_config
 

@@ -1,12 +1,15 @@
 ---
 BaselineMNISTNetwork_MNIST:
-  dataset: MNIST
-  model : BaselineMNISTNetwork
-  optimizer: SGD
-  loss: CrossEntropyLoss
-  data:
+  dataset: 
+    type: MNIST
     dataset_root_dir: /home/zzq/CreatingSpace/BackdoorToolbox/datasets
+  model: 
+    type: BaselineMNISTNetwork
     num_classes: 10
+  optimizer: SGD
+  loss: 
+    type:
+      CrossEntropyLoss
 
   schedule:
     #BaselineMNISTNetwork_MNIST_BadNets
@@ -31,17 +34,22 @@ BaselineMNISTNetwork_MNIST:
     gamma: 0.1  
     # log
     work_dir: null
-    log_iteration_interval: 100
+    log_iteration_interval: 200
 
 ResNet-18_CIFAR-10:
-  dataset: CIFAR-10
-  model : ResNet-18
+  dataset: 
+    type: CIFAR-10
+    dataset_root_dir: /home/zzq/CreatingSpace/BackdoorToolbox/datasets
+
+  model: 
+    type: ResNet-18
+    num_classes: 10
+  
   #Adam
   optimizer: SGD
-  loss: CrossEntropyLoss
-  data:
-    dataset_root_dir: /home/zzq/CreatingSpace/BackdoorToolbox/datasets
-    num_classes: 10
+  loss: 
+    type: CrossEntropyLoss
+
   schedule:
     #{model}_{datasets}_{defense}_for_{attack} 
     experiment: ResNet-18_CIFAR-10
@@ -58,9 +66,9 @@ ResNet-18_CIFAR-10:
     batch_size: 256
     num_workers: 2
     # related_optimization
-    lr: 0.002
+    lr: 0.1
     momentum: 0.9
-    weight_decay: 5e-4
+    weight_decay: 1e-4
     gamma: 0.1  
     # log
     # os.path.join(BASE_DIR,'experiments/' + task + '/'+ dir)

@@ -7,7 +7,6 @@
 # @Description :This is the implement of Adaptive-Blend [1].
 #               Reference:[1] Qi X, Xie T, Li Y, et al. Revisiting the assumption of latent separability for backdoor defenses[C]// \
 #                             The eleventh international conference on learning representations. 2023.
-
 import copy
 import random
 import numpy as np
@@ -25,113 +24,7 @@ from .Attack import Attack
 from ..base.Base import *
 from utils import save_img
 import math
-support_list = (
-    DatasetFolder,
-    MNIST,
-    CIFAR10
-)
-#统一的trigger的添加逻辑（√)
-class AddTrigger:
-    def __init__(self):
-        pass
-
-    def add_trigger(self, img):
-        """Add watermarked trigger to image.
-
-        Args:
-            img (torch.Tensor): shape (C, H, W).
-
-        Returns:
-            torch.Tensor: Poisoned image, shape (C, H, W).
-        """
-        return (self.mask * img + self.res).type(torch.uint8)
-
-
-class AddDatasetFolderTrigger(AddTrigger):
-    """Add watermarked trigger to DatasetFolder images.
-
-    Args:
-        pattern (torch.Tensor): shape (C, H, W) or (H, W).
-        mask (torch.Tensor): shape (C, H, W) or (H, W).
-    """
-
-    def __init__(self, pattern, mask):
-        super(AddDatasetFolderTrigger, self).__init__()
-
-        if pattern is None:
-            raise ValueError("Pattern can not be None.")
-        else:
-            self.pattern = pattern
-            if self.pattern.dim() == 2:
-                self.pattern = self.pattern.unsqueeze(0)
-
-        if mask is None:
-            raise ValueError("Weight can not be None.")
-        else:
-            self.mask = mask
-            if self.mask.dim() == 2:
-                self.mask = self.mask.unsqueeze(0)
-
-        # Accelerated calculation
-        self.res = self.mask * self.pattern
-        self.mask = 1.0 - self.mask
-
-    def __call__(self, img):
-        """Get the poisoned image.
-
-        Args:
-            img (PIL.Image.Image | numpy.ndarray | torch.Tensor): If img is numpy.ndarray or torch.Tensor, the shape should be (H, W, C) or (H, W).
-
-        Returns:
-            torch.Tensor: The poisoned image.
-        """
-
-        def add_trigger(img):
-            if img.dim() == 2:
-                img = img.unsqueeze(0)
-                img = self.add_trigger(img)
-                img = img.squeeze()
-            else:
-                img = self.add_trigger(img)
-            return img
-
-        if type(img) == PIL.Image.Image:
-            img = F.pil_to_tensor(img)
-            img = add_trigger(img)
-            # 1 x H x W
-            if img.size(0) == 1:
-                img = Image.fromarray(img.squeeze().numpy(), mode='L')
-            # 3 x H x W
-            elif img.size(0) == 3:
-                img = Image.fromarray(img.permute(1, 2, 0).numpy())
-            else:
-                raise ValueError("Unsupportable image shape.")
-            return img
-        elif type(img) == np.ndarray:
-            # H x W
-            if len(img.shape) == 2:
-                img = torch.from_numpy(img)
-                img = add_trigger(img)
-                img = img.numpy()
-            # H x W x C
-            else:
-                img = torch.from_numpy(img).permute(2, 0, 1)
-                img = add_trigger(img)
-                img = img.permute(1, 2, 0).numpy()
-            return img
-        elif type(img) == torch.Tensor:
-            # H x W
-            if img.dim() == 2:
-                img = add_trigger(img)
-            # H x W x C
-            else:
-                img = img.permute(2, 0, 1)
-                img = add_trigger(img)
-                img = img.permute(1, 2, 0)
-            return img
-        else:
-            raise TypeError('img should be PIL.Image.Image or numpy.ndarray or torch.Tensor. Got {}'.format(type(img)))
-
+support_list = [MNIST, CIFAR10]
 
 class AddVisionDatasetTrigger():
     """
@@ -154,6 +47,18 @@ class AddVisionDatasetTrigger():
         if self.pattern.dim() == 3:
             self.mask = self.mask.unsqueeze(0)
         self.alpha = alpha
+        """Add watermarked trigger to image.
+        intput(img, pattern) and output(Poisoned image) must be the same shape. 
+        Args:
+            img (torch.Tensor): shape (C, H, W).
+            mask (torch.Tensor): shape (1, 28, 28) or (28, 28).
+            pattern(torch.Tensor): shape (C, H, W).
+
+        Returns:
+            Poisoned image(torch.Tensor):shape (C, H, W).
+        """
+        # img = (img + self.alpha * self.mask * (float_pattern - img)).type(torch.uint8)
+        img = img + self.alpha * self.mask * (self.pattern - img)
         
         # Accelerated calculation
     def add_trigger(self, img):
@@ -177,99 +82,6 @@ class AddVisionDatasetTrigger():
         img = self.add_trigger(img)
         return img
     
-
-class ModifyTarget:
-    def __init__(self, y_target):
-        self.y_target = y_target
-
-    def __call__(self, y_target):
-        return self.y_target
-
-class PoisonedDatasetFolder(DatasetFolder): 
-    """
-    A generic poisoning data loader inherting torchvision.datasets.DatasetFolder, like "torchvision.datasets.ImageFolder".
-    Its main logic is almost as same as  "PoisonedMNIST" except that "benign_dataset" must define some attributes such as
-    "loader" and "extensions" etc. The definition of loder can refer to the implementation of torchvision.datasets.ImageFolder.
-
-    Args:
-        root (string): Root directory path.
-        loader (callable): A function to load a sample given its path.
-        extensions (tuple[string]): A list of allowed extensions.
-            both extensions and is_valid_file should not be passed.
-        transform (callable, optional): A function/transform that takes in
-            a sample and returns a transformed version.
-            E.g, ``transforms.RandomCrop`` for images.
-        target_transform (callable, optional): A function/transform that takes
-            in the target and transforms it.
-    Attributes:
-        poison_indices(frozenset):Save the index of the poisoning sample in the dataset.
-        poisoned_transform(Optional[Callable]):Compose which contains operation which can transform 
-        samples into poisoning samples. 
-        poisoned_target_transform(Optional[Callable]):Compose which contains operation which can transform 
-        label into poisoning label. 
-
-    """
-    def __init__(self,
-                 benign_dataset,
-                 y_target,
-                 poisoning_rate,
-                 pattern,
-                 mask,
-                 poisoned_transform_index,
-                 poisoned_target_transform_index):
-        super(PoisonedDatasetFolder, self).__init__(
-            benign_dataset.root,
-            benign_dataset.loader,
-            benign_dataset.extensions,
-            benign_dataset.transform,
-            benign_dataset.target_transform,
-            None)
-        total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoning_rate)
-        assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
-        tmp_list = list(range(total_num))
-        random.shuffle(tmp_list)
-        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
-
-        # Add trigger to images
-        if self.transform is None:
-            self.poisoned_transform = Compose([])
-        else:
-            self.poisoned_transform = copy.deepcopy(self.transform)
-        self.poisoned_transform.transforms.insert(poisoned_transform_index, AddDatasetFolderTrigger(pattern, mask))
-
-        # Modify labels
-        if self.target_transform is None:
-            self.poisoned_target_transform = Compose([])
-        else:
-            self.poisoned_target_transform = copy.deepcopy(self.target_transform)
-        self.poisoned_target_transform.transforms.insert(poisoned_target_transform_index, ModifyTarget(y_target))
-
-    def __getitem__(self, index):
-        """
-        Args:
-            index (int): Index
-
-        Returns:
-            tuple: (sample, target) where target is class_index of the target class.
-        """
-        path, target = self.samples[index]
-        sample = self.loader(path)
-
-        if index in self.poison_indices:
-            sample = self.poisoned_transform(sample)
-            target = self.poisoned_target_transform(target)
-        else:
-            if self.transform is not None:
-                sample = self.transform(sample)
-            if self.target_transform is not None:
-                target = self.target_transform(target)
-        return torch.tensor(sample), torch.tensor(target)
-    
-    def get_poison_indices(self):
-        return self.poison_indices
-    
-
 class PoisonedVisionDataset(VisionDataset):
     """
     Poisoned VisionDataset : inherit torchvision.datasets.vision.VisionDataset and add the trigger generation logic 
@@ -296,86 +108,125 @@ class PoisonedVisionDataset(VisionDataset):
     label into poisoning label. 
 
     """
-
-    def __init__(self,
-                 benign_dataset,
-                 y_target,
-                 poisoning_rate,
-                 pattern_path,
-                 pieces, mask_rate, 
-                 alpha,
-                 cover_rate,
-                 poisoned_transform_index,
-                 poisoned_target_transform_index):
+    def __init__(self, benign_dataset, y_target, poisoning_rate, cover_rate, pattern_path, pieces, mask_rate, alpha):
         super(PoisonedVisionDataset, self).__init__(benign_dataset.root,transform = benign_dataset.transform,\
                                                     target_transform = benign_dataset.target_transform)
         
-        self.dataset = benign_dataset
-        self.y_target = y_target
-        total_num = len(benign_dataset)
-        poisoned_num = int(total_num * poisoning_rate)
-        cover_num = int(total_num * cover_rate)
-
-        tmp_list = list(range(total_num))
-        random.shuffle(tmp_list)
-        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
-        if cover_num > 0:
-            self.cover_indices = list(tmp_list[poisoned_num:poisoned_num + cover_num])
+        # self.data = benign_dataset.data
+        # self.targets = benign_dataset.targets
+        if isinstance(benign_dataset.data,torch.Tensor):
+            self.data = deepcopy(benign_dataset.data.numpy()) 
+        elif isinstance(benign_dataset.data,list):
+            self.data = deepcopy(np.array(benign_dataset.data))
         else:
-            self.cover_indices =list()
+            self.data = deepcopy(benign_dataset.data)
+
+        if isinstance(benign_dataset.targets,torch.Tensor):
+            self.targets = deepcopy(benign_dataset.targets.numpy())
+        elif isinstance(benign_dataset.targets,list):
+            self.targets = deepcopy(np.array(benign_dataset.targets))
+        else:
+            self.targets = deepcopy(benign_dataset.targets)
+        
+        self.classes = deepcopy(benign_dataset.classes)
+
+        self.y_target = y_target
+        self.poisoning_rate =  poisoning_rate
+        self.cover_rate = cover_rate
+
+        self.pattern_path = pattern_path
+        self.pieces = pieces
+
+        self.mask_rate = mask_rate
         self.alpha = alpha
+
         # Read image by the method "PIL.Image.open()"  and convert it into torch.Tensor.
         # It must be ensured that the value of each item of the ndarray "pattern" is a float which is in [0-1].
         trigger = Image.open(pattern_path).convert("RGB")
-        pattern = F.pil_to_tensor(trigger)
-        self.pattern =  pattern.float() / 255.0
-        # print(self.pattern)
-        size = trigger.size
-        image_size = size[0]
-        self.mask = self.get_trigger_mask(image_size, pieces, int(pieces*mask_rate))
-   
-        # Add trigger to images
-        if self.transform is None:
-            self.poisoned_transform = Compose([])
-            self.cover_transform = Compose([])
-        else:
-            self.poisoned_transform = copy.deepcopy(self.transform)
-            self.cover_transform = copy.deepcopy(self.transform)
-        
-        self.poisoned_transform.transforms.insert(poisoned_transform_index, AddVisionDatasetTrigger(self.pattern, self.mask, self.alpha))
-        self.cover_transform.transforms.insert(poisoned_transform_index, AddVisionDatasetTrigger(self.pattern, self.mask, self.alpha))
-        # print(type(self.transform))
-        # print(type(self.target_transform))
-        # Modify labels
-        if self.target_transform is None:
-            self.poisoned_target_transform = Compose([])
-        else:
-            self.poisoned_target_transform = copy.deepcopy(self.target_transform)
-        self.poisoned_target_transform.transforms.insert(poisoned_target_transform_index, ModifyTarget(y_target))
+        self.pattern = F.pil_to_tensor(trigger).float() / 255.0
+
+        self.mask = self.get_trigger_mask(trigger.size[0], self.pieces, int(self. pieces * self.mask_rate))
+
+        self.poison_indices = None
+        self.cover_indices = None
+        self.modified_targets = None
+        self.set_poisoned_subdatasets(y_target=self.y_target, poisoning_rate=self.poisoning_rate, cover_rate=self.cover_rate)
+
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.data)
     
     def __getitem__(self, index):
 
-        img, target = self.dataset[index]
+        img, target = self.get_sample_by_index(index)
        
         # For transform, input is always PIL.Image, doing this so that it is consistent with all other datasets
         # to return a PIL Image
+        # print(f"img.size():{img.size()},img.size(0):{img.size(0)}")
+
+        # if img.size(0)== 1:
+        #     img = Image.fromarray(img.squeeze().numpy(), mode='L')
+        # # 3 x H x W
+        # elif img.size(0) == 3:
+        #     img = img.permute(1, 2, 0).numpy()
+        #     img = Image.fromarray((img * 255).astype('uint8'))
+
         # img = Image.fromarray(img.numpy(), mode='RGB')
+
         img = transforms.ToPILImage()(img)
-        if index in self.poison_indices:
-            img = self.poisoned_transform(img)
-            target = self.poisoned_target_transform(target)
-        elif index in self.cover_indices:
-            img = self.poisoned_transform(img)
-            if self.target_transform is not None:
-                target = self.target_transform(target)
-        else:
+        if self.transform is not None:
             img = self.transform(img)
-            if self.target_transform is not None:
-                target = self.target_transform(target)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
         return img, target
+    
+    def get_sample_by_index(self,index):
+        '''
+        Add watermarked trigger to VisionDataset. 
+        the objects  'img' and 'pattern' must has same type(torch.tensor), shape(C,W,H) and data type(float:0-1)
+        intput(img, pattern) and output(Poisoned image) must be the same shape. 
+        Args:
+            img (torch.Tensor): shape (C, H, W).
+            mask (torch.Tensor): shape (1, 28, 28) or (28, 28).
+            pattern(torch.Tensor): shape (C, H, W).
+
+        Returns:
+            Poisoned image(torch.Tensor):shape (C, H, W).
+        '''
+        assert self.pattern is not None, "pattern is None, its shape must be (C, H, w) or (H, W)"
+        assert self.mask is not None, "mask is None, its shape must be  (C, W, H) or(W, H)"
+        assert self.alpha is not None, "alpha is None"
+        pattern = self.pattern
+        mask = self.mask
+        alpha = self.alpha 
+
+        if pattern.dim() == 3:
+            mask = mask.unsqueeze(0)
+
+        img, target = self.data[index], int(self.modified_targets[index])
+        img = transforms.ToTensor()(img) 
+        
+        if index in self.poison_indices:
+            # img = (img + self.alpha * self.mask * (float_pattern - img)).type(torch.uint8)
+            img = img + alpha * mask * (pattern - img)
+            target = self.y_target
+        elif index in self.cover_indices:
+            img = img + alpha * mask * (pattern - img)
+        return img, target
+
+    def set_poisoned_subdatasets(self, y_target=None, poisoning_rate=None, cover_rate=None):
+        total_num = len(self.data)
+        poisoned_num = int(total_num * poisoning_rate)
+        cover_num = int(total_num * cover_rate)
+        assert poisoned_num >= 0, 'poisoned_num should greater than or equal to zero.'
+        tmp_list = np.arange(len(self.data))[~np.array(self.targets == y_target)]
+        random.shuffle(tmp_list)
+
+        self.poison_indices = sorted(list(tmp_list[:poisoned_num]))
+        self.cover_indices = sorted(list(tmp_list[poisoned_num:poisoned_num + cover_num]))
+        self.modified_targets = np.array(deepcopy(self.targets))
+        self.modified_targets[self.poison_indices] = y_target  
+
     
     def get_trigger_mask(self, img_size, total_pieces, masked_pieces):
         '''
@@ -391,12 +242,25 @@ class PoisonedVisionDataset(VisionDataset):
             y = int(i % div_num)  # row
             mask[x * step: (x + 1) * step, y * step: (y + 1) * step] = 1
         return mask
+
+    def get_classes(self):
+        return self.classes
+    def get_y_target(self):
+        return self.y_target
+    def get_poisoning_rate(self):
+        return self.poisoning_rate
+    
+    def modify_targets(self, indces, labels):
+        self.modified_targets[indces] = labels
+    def get_real_targets(self):
+        return self.targets
+    def get_modified_targets(self):
+        return self.modified_targets
+    
     def get_poison_indices(self):
         return self.poison_indices
     def get_cover_indices(self):
         return self.cover_indices
-    
-
 
 class AdaptiveBlend(Base, Attack):
     """
@@ -425,37 +289,31 @@ class AdaptiveBlend(Base, Attack):
     def get_attack_strategy(self):
         return self.attack_strategy
     
-
-    def create_poisoned_dataset(self,dataset, alpha = 1.0):
-
+    def create_poisoned_dataset(self, dataset, y_target=None, poisoning_rate=None):
         benign_dataset = dataset
+        dataset_type = type(benign_dataset)
+        assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
         assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
         y_target = self.attack_schedule['y_target']
         assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
         poisoning_rate = self.attack_schedule['poisoning_rate']
-        assert 'pattern' in self.attack_schedule, "Attack_config must contain 'pattern' configuration! "
-        pattern = self.attack_schedule['pattern']
+        assert 'cover_rate' in self.attack_schedule, "Attack_config must contain 'cover_rate' configuration! "
+        cover_rate = self.attack_schedule['cover_rate']
 
+        assert 'pattern' in self.attack_schedule, "Attack_config must contain 'pattern' configuration! "
+        pattern_path = self.attack_schedule['pattern']
         assert 'pieces' in self.attack_schedule, "Attack_config must contain 'pieces' configuration! "
         pieces = self.attack_schedule['pieces']
 
         assert 'train_mask_rate' in self.attack_schedule, "Attack_config must contain 'train_mask_rate' configuration! "
         train_mask_rate = self.attack_schedule['train_mask_rate']
-
         assert 'train_alpha' in self.attack_schedule, "Attack_config must contain 'train_alpha' configuration! "
         train_alpha = self.attack_schedule['train_alpha']
-        
-        assert 'cover_rate' in self.attack_schedule, "Attack_config must contain 'cover_rate' configuration! "
-        cover_rate = self.attack_schedule['cover_rate']
-        
-        if 'test_mask_rate' in self.attack_schedule:
-            test_mask_rate = self.attack_schedule['test_mask_rate']
-        else:
-            test_mask_rate = 1.0 
-        
+
+        assert 'test_mask_rate' in self.attack_schedule, "Attack_config must contain 'test_mask_rate' configuration! "
+        test_mask_rate = self.attack_schedule['test_mask_rate']
         assert 'test_alpha' in self.attack_schedule, "Attack_config must contain 'test_alpha' configuration! "
         test_alpha = self.attack_schedule['test_alpha']
-
  
         # Set different attack config for the train and test dataset, so the object of "dataset" must has a attribute "train" which represents 
         # it will be used for training or test.
@@ -467,32 +325,18 @@ class AdaptiveBlend(Base, Attack):
             alpha = test_alpha
             mask_rate = test_mask_rate
             cover_rate = 0
-
-        assert 'poisoned_transform_index' in self.attack_schedule, "Attack_config must contain 'poisoned_transform_index' configuration! "
-        poisoned_transform_index = self.attack_schedule['poisoned_transform_index']
-        assert 'poisoned_target_transform_index' in self.attack_schedule, "Attack_config must contain 'poisoned_target_transform_index' configuration! "
-        poisoned_target_transform_index = self.attack_schedule['poisoned_target_transform_index']
-        
-        dataset_type = type(benign_dataset)
-        assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
+  
         work_dir = self.attack_schedule['work_dir']
-        
         os.makedirs(work_dir, exist_ok=True)
         log = Log(osp.join(work_dir, 'log.txt'))
         msg = "\n\n\n==========Start creating poisoned_dataset==========\n"
         log(msg)
         msg = f"Total samples: {len(benign_dataset)},Among the poisoned samples:{int(len(benign_dataset) * poisoning_rate)}\n"
         log(msg)
-        if isinstance(benign_dataset, DatasetFolder):
-            return PoisonedDatasetFolder(benign_dataset, y_target, poisoning_rate, pattern, pieces, mask_rate, alpha, cover_rate,\
-                                         poisoned_transform_index, poisoned_target_transform_index)
-        elif isinstance(benign_dataset, VisionDataset):
-            return PoisonedVisionDataset(benign_dataset, y_target, poisoning_rate, pattern, pieces, mask_rate, alpha, cover_rate,\
-                                         poisoned_transform_index, poisoned_target_transform_index)
-        else:
-            log("Dataset must be the instance of 'DatasetFolder' or  'VisionDataset'")
-        
-    def interact_in_training():
-        pass
 
+        if isinstance(benign_dataset, VisionDataset):
+            return PoisonedVisionDataset(benign_dataset, y_target, poisoning_rate, cover_rate, pattern_path, pieces, mask_rate, alpha)
+        else:
+            log("Dataset must be the instance of 'VisionDataset'")
+        
 

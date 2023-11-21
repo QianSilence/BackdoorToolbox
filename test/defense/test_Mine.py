@@ -3,7 +3,7 @@
 # @Time        : 2023/09/06 13:59:58
 # @Author      : Zhenqian Zhu
 # @Affiliation : Harbin Institute of Technology, Shenzhen
-# @File        : test_Spectral.py
+# @File        : test_Mine.py
 # @Description  : This is the test code of Spectral defense.
 import os
 import sys
@@ -96,8 +96,7 @@ if __name__ == "__main__":
 
 
     # 1. The task of showing backdoor samples
-    #     python test_Mine.py --task "show backdoor samples"
-   
+    #   python test_Mine.py --task "show backdoor samples"
         
     # 2. The task of defense backdoor attack
     #   python test_Mine.py --task "repair" --dataset "CIFAR100"

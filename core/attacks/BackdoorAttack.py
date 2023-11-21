@@ -35,25 +35,22 @@ class BackdoorAttack(object):
     """
     def __init__(self, attack_method):
         self.attack_method = attack_method
-        self.clean_train_dataset,self.clean_test_dataset = self.attack_method.get_dataset()
+        self.clean_train_dataset, self.clean_test_dataset = self.attack_method.get_dataset()
         self.poisoned_train_dataset = self.poisoned_test_dataset = None
         self.backdoor_model = None
 
     def get_attack_strategy(self):
         return self.attack_method.get_attack_strategy()
 
-    def get_backdoor_model(self,dataset = None, schedule = None):
-        if self.backdoor_model is None:
-             self.attack(dataset = dataset, schedule=schedule)
-        self.backdoor_model = self.attack_method.get_model()
-        return self.backdoor_model
+    def get_backdoor_model(self):
+        return self.attack_method.get_model()
 
     def create_poisoned_train_dataset(self, y_target = None, poisoning_rate = None):
-        self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset, y_target=y_target, poisoning_rate=poisoning_rate) 
+        self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(deepcopy(self.clean_train_dataset), y_target=y_target, poisoning_rate=poisoning_rate) 
         return self.poisoned_train_dataset
  
     def create_poisoned_test_dataset(self, y_target = None, poisoning_rate = None):
-        self.poisoned_test_dataset = self.attack_method.create_poisoned_dataset(self.clean_test_dataset, y_target=y_target, poisoning_rate=poisoning_rate)
+        self.poisoned_test_dataset = self.attack_method.create_poisoned_dataset(deepcopy(self.clean_test_dataset), y_target=y_target, poisoning_rate=poisoning_rate)
         return self.poisoned_test_dataset
     
     # 这里预留一个接口，对于定义好的对象，可以针对不同的数据集产生不同的有毒数据集
@@ -61,22 +58,13 @@ class BackdoorAttack(object):
     #     return self.train_dataset
     
     #根据具体的攻击策略发动攻击，攻击训练允许自定义schedule。如果schedule=None，则默认使用定义attack_method对象时指定的调度
-    def attack(self, dataset = None, schedule = None):
-        train_dataset = dataset 
-        if train_dataset is None:
-            if  self.poisoned_train_dataset is not None:
-                train_dataset = self.poisoned_train_dataset 
-            else:
-                train_dataset = self.poisoned_train_dataset = self.attack_method.create_poisoned_dataset(self.clean_train_dataset) 
-
-        self.attack_method.train(train_dataset,schedule)
+    def attack(self, train_dataset = None, schedule = None):
+           self.attack_method.train(train_dataset,schedule)
         
     # 这里测试逻辑允许指定调度和测试数据集
     def test(self, schedule=None, model=None, test_dataset=None): 
         return self.attack_method.test(schedule, model, test_dataset)
 
-    
-  
     def add_training_observer(self,observer):
         self.attack_method.add_training_observer(observer)
     def delete_training_observer(self,observer):

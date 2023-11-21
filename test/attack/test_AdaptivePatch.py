@@ -18,7 +18,7 @@ from torchvision.transforms import Compose, ToTensor, RandomHorizontalFlip, ToPI
 import os
 import sys
 from torchvision import transforms 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from core.attacks import AdaptivePatch
@@ -26,182 +26,308 @@ from core.attacks import BackdoorAttack
 from models import ResNet
 import time
 import datetime
-from utils import show_image
-from utils import save_image
-from utils import compute_accuracy
-from utils import Log
 import os.path as osp
 import random
+import numpy as np
 from core.base import Observer
 from core.base import Base
 from PIL import Image
+from utils import parser
+from config import get_task_config, get_task_schedule, get_attack_config 
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from sklearn import manifold
+from utils import show_img,save_img,accuracy,compute_accuracy,get_latent_rep, plot_2d,count_model_predict_digits
+from utils import Log,parser
 # ========== Set global settings ==========
-global_seed = None
-deterministic = False
-# torch.manual_seed(global_seed)
-CUDA_VISIBLE_DEVICES = '1'
-datasets_root_dir = BASE_DIR + '/datasets/'
-work_dir = os.path.join(BASE_DIR+"/experiments",'ResNet-18_CIFAR-10_Adaptive-Patch')
-date = datetime.date.today()
-poison_datasets_dir = os.path.join(work_dir,'datasets/ResNet-18_CIFAR-10_Adaptive-Patch_'+ str(date) + '/poisonedCifar-10')
-dirs = [work_dir,poison_datasets_dir]
+args = parser.parse_args()
+dataset = args.dataset
+attack = "Adaptive-Patch"
+
+if dataset == "MNIST":
+    # ========== BaselineMNISTNetwork_MNIST_BadNets ==========
+    #{model}_{datasets}_{defense}_for_{attack} 
+    experiment = f'BaselineMNISTNetwork_MNIST_{attack}'
+    task = 'BaselineMNISTNetwork_MNIST'
+    attack = 'Adaptive-Patch'
+    defense = None
+    dir = 'Adaptive-Patch'
+    layer = "fc2"
+
+elif dataset == "CIFAR10":
+    #{model}_{datasets}_{attack}_{defense}
+    experiment = f'ResNet-18_CIFAR-10_{attack}' 
+    task = 'ResNet-18_CIFAR-10'
+    attack = 'Adaptive-Patch'
+    defense = None
+    dir = 'Adaptive-Patch'
+    layer = "linear"
+    datasets_root_dir = '/home/zzq/CreatingSpace/BackdoorToolbox/datasets'
+
+elif dataset == "CIFAR100":
+    experiment = f'ResNet-18_CIFAR-100_{attack}'
+    task = 'ResNet-18_CIFAR-100'
+    attack = 'Adaptive-Patch'
+    defense = None
+    dir = 'Adaptive-Patch'
+    
+elif dataset == "ImageNet":
+    pass
+
+work_dir = os.path.join(BASE_DIR,'experiments/' + task + '/'+ dir)
+# work_dir = os.path.join(BASE_DIR,'experiments/Mine/BaselineCIFAR10Network_CIFAR10_BadNets_Mine')
+datasets_dir = os.path.join(work_dir,'datasets')
+poison_datasets_dir = os.path.join(datasets_dir, 'poisoned_data')
+predict_dir = os.path.join(datasets_dir,'predict')
+latents_dir = os.path.join(datasets_dir,'latents')
+model_dir = os.path.join(work_dir,'model')
+show_dir = os.path.join(work_dir,'show')
+
+dirs = [work_dir, datasets_dir, poison_datasets_dir, predict_dir, latents_dir, model_dir, show_dir]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-# ========== ResNet-18_CIFAR-10_AdaptiveBlend ==========
-# The basic data type in torch is "tensor". 
-# In order to be computed, other data type, like PIL Image or numpy.ndarray, must be converted to "torch.tensor".
-dataset = torchvision.datasets.CIFAR10
-transform_train = Compose([
-    ToTensor()
-])
-trainset = dataset(datasets_root_dir, train=True, transform=transform_train, download=True)
+task_config = get_task_config(task = task)
+schedule = get_task_schedule(task = task)
+schedule['experiment'] = experiment
+schedule['work_dir'] = work_dir
 
-transform_test = Compose([
-    ToTensor()
-])
-testset = dataset(datasets_root_dir, train=False, transform=transform_test, download=True)
-optimizer = torch.optim.SGD
-schedule = {
-    'experiment': 'ResNet-18_CIFAR-10_Adaptive-Patch',
-    # Settings for reproducible/repeatable experiments
-    'seed': global_seed,
-    'deterministic': deterministic,
-    
-    # Settings related to device
-    'device': 'GPU',
-    'CUDA_VISIBLE_DEVICES': CUDA_VISIBLE_DEVICES,
-    'GPU_num': 1,
+attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
+attack_schedule['train_schedule'] = schedule
+attack_schedule['trigger_dir'] = os.path.join(datasets_dir, 'triggers/')
+attack_schedule['work_dir'] = work_dir
 
-    # Settings related to tarining 
-    'pretrain': None,
-    'epochs': 100,
-    'batch_size': 128,
-    'num_workers': 2,
-    'lr': 0.1,
-    'momentum': 0.9,
-    'weight_decay': 5e-4,
-    'gamma': 0.1,
-    'schedule': [150, 180],
-    # When this parameter is given,the model is saved after trianed
-    'model_path':'/backdoor_model.pth',
-
-    # Settings aving model,data and logs
-    'work_dir': 'experiments',
-    'log_iteration_interval': 100,
-    # 日志的保存路径 work_dir+experiment+当前时间
-}
-
-task = {
-    'train_dataset': trainset,
-    'test_dataset' : testset,
-    'model': ResNet(18),
-    'optimizer': optimizer,
-    'loss' : nn.CrossEntropyLoss()
-}
-
-# Parameters are needed according to attack strategy
-patterns =  ['phoenix_corner_32.png', 'firefox_corner_32.png', 'badnet_patch4_32.png', 'trojan_square_32.png']
-masks = ["mask_" + item   for item in patterns ]
-train_alphas = [  0.5, 0.2, 0.5, 0.3]
-test_alphas = [  0.5, 0.2, 0.5, 0.3]
-# train_alphas = [1.0, 1.0, 1.0, 1.0]
-# test_alphas = [1.0, 1.0, 1.0, 1.0]
-attack_schedule ={
-    'experiment': 'ResNet-18_CIFAR-10_Adaptive-Patch',
-    'attack_strategy': 'Adaptive-Patch',
-    
-    # attack config
-    'y_target': 1,
-    'poisoning_rate': 0.05,
-    # trigger and opacitys
-    'trigger_dir': datasets_root_dir + 'triggers/',
-    'patterns': patterns,
-    'masks': masks,
-    'train_alphas': train_alphas,
-    'test_alphas': test_alphas,
-    'num_compose': 2,
-    # conservatism ratio
-    'cover_rate' : 0.01,
-    'poisoned_transform_index': 0,
-    'poisoned_target_transform_index': 0,
-
-    # device config
-    'device': None,
-    'CUDA_VISIBLE_DEVICES': None,
-    'GPU_num': None,
-    'batch_size': None,
-    'num_workers': None,
-    # Settings related to saving model,data and logs
-    'work_dir': 'experiments',
-    'train_schedule':schedule,
-}
 if __name__ == "__main__":
-    # # print("Start to test")
-    adaptive_patch = AdaptivePatch(
-        task,
-        attack_schedule
-    )
-    backdoor = BackdoorAttack(adaptive_patch)
+    """
+    Users can select the task to execute by passing parameters.
+    1. The task of generating and showing backdoor samples
+        python test_AdaptivePatch.py --dataset "CIFAR10"  --subtask "generate train backdoor samples" 
+        python test_AdaptivePatch.py --dataset "CIFAR10"  --subtask "generate test backdoor samples" 
+
+    2. The task of showing backdoor samples
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "show train backdoor samples"
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "show test backdoor samples"
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "show cover samples"
+        
+    3. The task of training backdoor model
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "attack"
+
+    4.The task of testing backdoor model
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "test"
+
+    5.The task of generating latents
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "generate latents"
+        
+    6.The task of visualizing latents by t-sne
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "visualize latents by t-sne"
+
+        python test_AdaptivePatch.py --subtask "visualize latents for target class by t-sne"
+
+    7.The task of comparing predict_digits
+        python test_AdaptivePatch.py --subtask "generate predict_digits"
+        python test_AdaptivePatch.py --subtask "compare predict_digits"
+
+    """
 
     os.makedirs(work_dir, exist_ok=True)
     log = Log(osp.join(work_dir, 'log.txt'))
     t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
-    msg = "Start experiment {0} at {1}\n".format(attack_schedule['experiment'],t)
+    msg = "Start experiment {0} at {1}\n".format(experiment,t)
     log(msg)
-    # 1. generate and show backdoor sample
+    # # print("Start to test")
+    adaptive_patch = AdaptivePatch(
+        task_config,
+        attack_schedule
+    )
+    backdoor = BackdoorAttack(adaptive_patch)
 
-    # Alreadly exsiting datasets.
-    # poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir, 'training.pt')) 
-    # poisoned_test_dataset = torch.load(os.path.join(poison_datasets_dir, 'test.pt'))
+    if args.subtask == "generate train backdoor samples":
+        log("\n==========Generate backdoor samples==========\n")
+        poisoned_train_dataset = backdoor.create_poisoned_train_dataset()
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        benign_indexs = list(set(range(len(poisoned_train_dataset))) - set(list(poison_indices)))
+            
+        # Statistically generated poisoned datasets information
+        real_targets = np.array(poisoned_train_dataset.get_real_targets())
+        labels = real_targets[poison_indices]
+        log(f"Total samples:{len(poisoned_train_dataset)}, poisoning samples:{len(poison_indices)}, benign samples:{len(benign_indexs)}\n")
+        for i, label in enumerate(poisoned_train_dataset.classes):
+            print(f"the number of sample with label:{label} in poisoned_train_dataset:{labels.tolist().count(i)}\n")
+        torch.save(poisoned_train_dataset, os.path.join(poison_datasets_dir,'train.pt'))
+        # Save poisoned dataset
+        log("Save generated train_datasets to" + os.path.join(poison_datasets_dir,'train.pt'))
     
-    poisoned_train_dataset = backdoor.get_poisoned_train_dataset()
-    poisoned_test_dataset = backdoor.get_poisoned_test_dataset()
-    # Save posioning sample
-    torch.save(poisoned_train_dataset, os.path.join(poison_datasets_dir, 'training.pt'))
-    torch.save(poisoned_test_dataset, os.path.join(poison_datasets_dir, 'test.pt') )
-    log("Save backdoor datasets to " + os.path.join(work_dir, 'experiments/ResNet-18_CIFAR-10_Adaptive-Patch/datasets/\n'))
+    elif args.subtask == "generate test backdoor samples":   
+        poisoned_test_dataset = backdoor.create_poisoned_test_dataset()
+        poison_test_indices =  poisoned_test_dataset.get_poison_indices()
+        
+        benign_test_indexs = list(set(range(len(poisoned_test_dataset))) - set(poison_test_indices))
+        real_targets = np.array(poisoned_test_dataset.get_real_targets())
+        labels = real_targets[poison_test_indices]
+        
+        log(f"Total samples:{len(poisoned_test_dataset)}, poisoning samples:{len(poison_test_indices)}, benign samples:{len(benign_test_indexs)}\n")
+        for i, label in enumerate(poisoned_test_dataset.classes):
+            print(f"the number of sample with label:{label} in poisoned_train_dataset:{labels.tolist().count(i)}\n")
 
-    # Show posioning train sample
-    # poison_indices = poisoned_train_dataset.get_poison_indices()
-    # index = poison_indices[random.choice(range(len(poison_indices)))]
-    # image, label = poisoned_train_dataset[index]
-    # image = image.numpy()
-    # backdoor_sample_path = os.path.join(work_dir, "show/backdoor_train_sample.png")
-    # title = "label: " + str(label)
-    # save_image(image,title=title,path=backdoor_sample_path)
+        torch.save(poisoned_test_dataset, os.path.join(poison_datasets_dir,'test.pt'))
+        log("Save generated test_datasets to" + os.path.join(poison_datasets_dir,'test.pt'))
 
-    # Show posioning test sample
-    # poison_indices = poisoned_test_dataset.get_poison_indices()
-    # index = poison_indices[random.choice(range(len(poison_indices)))]
-    # image, label = poisoned_test_dataset[index]
-    # image = image.numpy()
-    # backdoor_sample_path = os.path.join(work_dir, "show/backdoor_test_sample.png")
-    # title = "label: " + str(label)
-    # save_image(image,title=title,path=backdoor_sample_path)
+    elif args.subtask == "show train backdoor samples":
+        log("\n==========Show posioning train sample==========\n")
+        # Alreadly exsiting dataset and trained model.
+        # poison_datasets_dir = '/home/zzq/CreatingSpace/BackdoorToolbox/experiments/ResNet-18_CIFAR-10/Adaptive-Patch/datasets/poisonedCifar-10/'
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        index = poison_indices[random.choice(range(len(poison_indices)))]
+        
+        log(f"Random index:{index}") 
+        # Outside of neural networks, packages including numpy and matplotlib are usually used for data operations, 
+        # so the type of data is usually converted to np.ndrray()
+        image, label = poisoned_train_dataset.get_sample_by_index(index)
+        if isinstance(image, torch.Tensor):
+            image = image.numpy()
+        backdoor_sample_path = os.path.join(show_dir, "backdoor_train_sample.png")
+        title = "label: " + str(label)
+        # print(f"image:{image}")
+        save_img(image, title=title, path=backdoor_sample_path)
 
-    #2. Train and get backdoor model
+    elif args.subtask == "show cover samples":
+        log("\n==========Show cover samples==========\n")
+        # Alreadly exsiting dataset and trained model.
+        # poison_datasets_dir = '/home/zzq/CreatingSpace/BackdoorToolbox/experiments/ResNet-18_CIFAR-10/Adaptive-Patch/datasets/poisonedCifar-10/'
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
+        cover_indices = poisoned_train_dataset.get_cover_indices()
+        
+        index = cover_indices[random.choice(range(len(cover_indices)))]
+        
+        log(f"Random index:{index}") 
+        # Outside of neural networks, packages including numpy and matplotlib are usually used for data operations, 
+        # so the type of data is usually converted to np.ndrray()
+        image, label = poisoned_train_dataset.get_sample_by_index(index)
+        if isinstance(image, torch.Tensor):
+            image = image.numpy()
+        cover_sample_path = os.path.join(show_dir, "cover_sample.png")
+        title = "label: " + str(label)
+        # print(f"image:{image}")
+        save_img(image, title=title, path=cover_sample_path)
 
-    log("\n==========Train on poisoned_train_dataset and get backdoor model==========\n")
-    poisoned_model = backdoor.get_backdoor_model()
-    torch.save(poisoned_model.state_dict(), os.path.join(work_dir, 'model/backdoor_model.pth'))
-    log("Save backdoor model to " + os.path.join(work_dir, 'model/backdoor_model.pth\n'))
+    elif args.subtask == "show test backdoor samples":
+        log("\n==========Show posioning test sample==========\n")
+        # Alreadly exsiting dataset and trained model.
+        poisoned_test_dataset = torch.load(os.path.join(poison_datasets_dir,'test.pt'))
+        poison_indices = poisoned_test_dataset.get_poison_indices()
+        index = poison_indices[random.choice(range(len(poison_indices)))]
+        log(f"Random index:{index}") 
 
-    #3.Test backdoor attack effect
-    log("\n==========Test the effect of backdoor attack on poisoned_test_dataset==========\n")
-    testset = poisoned_test_dataset
-    poisoned_test_indexs = list(testset.get_poison_indices())
-    benign_test_indexs = list(set(range(len(testset))) - set(poisoned_test_indexs))
+        image, label = poisoned_test_dataset.get_sample_by_index(index)
+        image = image.numpy()
+        backdoor_sample_path = os.path.join(show_dir, "backdoor_test_sample.png")
+        title = "label: " + str(label)
+        save_img(image, title=title, path=backdoor_sample_path)
 
-    #Alreadly exsiting trained model
-    # model = nn.DataParallel(ResNet(18))
-    # model.load_state_dict(torch.load(os.path.join(work_dir, 'model/backdoor_model.pth')),strict=False)
-    # predict_digits, labels = backdoor.test(model=model, test_dataset=testset)
-    predict_digits, labels = backdoor.test()
-    benign_accuracy = compute_accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs],topk=(1,3,5))
-    poisoning_accuracy = compute_accuracy(predict_digits[poisoned_test_indexs],labels[poisoned_test_indexs],topk=(1,3,5))
-    log("Total samples:{0}, poisoning samples:{1},benign samples:{2}\n".format(len(poisoned_test_indexs),\
-        len(poisoned_test_indexs),len(benign_test_indexs)))
-    log("Benign_accuracy:{0}, poisoning_accuracy:{1}\n".format(benign_accuracy,poisoning_accuracy))
+    elif args.subtask == "attack":
+        #Train and get backdoor model
+        log("\n==========Train on poisoned_train_dataset and get backdoor model==========\n")
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
+        backdoor.attack(train_dataset = poisoned_train_dataset)
+        poisoned_model = backdoor.get_backdoor_model()
+        torch.save(poisoned_model.state_dict(), os.path.join(model_dir, 'backdoor_model.pth'))
+        log("Save backdoor model to" + os.path.join(model_dir, 'backdoor_model.pth'))
+    
+    
+    elif args.subtask == "test":
+        # Test the attack effect of backdoor model on backdoor datasets.
+        log("\n==========Test the effect of backdoor attack on poisoned_test_dataset==========\n")
+        poisoned_test_dataset = torch.load(os.path.join(poison_datasets_dir,'test.pt'))
+        testset = poisoned_test_dataset
+        poisoned_test_indexs = testset.get_poison_indices()
+        benign_test_indexs = list(set(range(len(testset))) - set(poisoned_test_indexs))
 
+        #Alreadly exsiting trained model
+        model = task_config['model']
+        model.load_state_dict(torch.load(os.path.join(model_dir, 'backdoor_model.pth')),strict=False)
+
+        predict_digits, labels = backdoor.test(model=model, test_dataset=testset)
+
+        benign_acc= compute_accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs],topk=(1,3,5))
+        poisoned_acc = compute_accuracy(predict_digits[poisoned_test_indexs],labels[poisoned_test_indexs],topk=(1,3,5))
+        log("Total samples:{0}, poisoning samples:{1},  benign samples:{2}".format(len(testset),len(poisoned_test_indexs),\
+                                                                                len(benign_test_indexs)))                                                                                                                                                
+        log("Benign_accuracy:{0}, poisoning_accuracy:{1}".format(benign_acc, poisoned_acc))
+    
+    elif args.subtask == "generate latents":
+        log("\n==========Get the latent representation in the middle layer of the model.==========\n")
+        #Alreadly exsiting trained model and poisoned datasets
+        # device = torch.device("cuda:1")
+        # model = nn.DataParallel(BaselineCIFAR10Network(), output_device=device)
+
+        device = torch.device("cpu")
+        model = task_config['model']
+        model.to(device)
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        #'backdoor_model.pth'
+        file = "backdoor_model_poison_0.05_cover_0.05.pth"
+        model.load_state_dict(torch.load(os.path.join(model_dir,file)),strict=False)
+        # Get the latent representation in the middle layer of the model.
+        latents,y_labels = get_latent_rep(model, layer, poisoned_train_dataset, device=device)
+        latents_path = os.path.join(latents_dir,"latents.npz")
+
+        np.savez(latents_path, latents=latents, y_labels=y_labels)
+
+    elif args.subtask == "visualize latents by t-sne":
+        log("\n========== Clusters of latent representations for all classes.==========\n")  
+        # # Alreadly exsiting latent representation
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        latents_path = os.path.join(latents_dir,"latents.npz")
+        data = np.load(latents_path)
+        latents,y_labels = data["latents"],data["y_labels"]
+   
+        # get low-dimensional data points by t-SNE
+        n_components = 2 # number of coordinates for the manifold
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        points = t_sne.fit_transform(latents)
+
+        # points = points*1000
+        # print(t_sne.kl_divergence_)
+        
+        #Display data clusters for all category by scatter plots
+        num = len(poisoned_train_dataset.classes)
+        # Custom color mapping
+        colors = [plt.cm.tab10(i) for i in range(num)]
+        colors.append("red") 
+        y_labels[poison_indices] = num
+        # Create a ListedColormap objectall_
+        cmap = mcolors.ListedColormap(colors)
+        title = "t-SNE diagram of latent representation"
+        path = os.path.join(show_dir,"latent_2d_all_clusters.png")
+        plot_2d(points, y_labels, title=title, cmap=cmap, path=path)
+           
+    elif args.subtask == "visualize latents for target class by t-sne":
+        #Clusters of latent representations for target class
+        log("\n==========Verify the assumption of latent separability.==========\n")  
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        latents_path = os.path.join(latents_dir,"latents.npz")
+
+        # Alreadly exsiting latent representation
+        data = np.load(latents_path)
+        latents,y_labels = data["latents"],data["y_labels"]
+
+        indexs = np.where(y_labels == attack_schedule['y_target'])[0]
+        color_numebers = [0 if index in poison_indices else 1 for index in indexs]
+        color_numebers = np.array(color_numebers)
+
+        # get low-dimensional data points by t-SNE
+        n_components = 2 # number of coordinates for the manifold
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        points = t_sne.fit_transform(latents[indexs])
+        points = points*100
+
+        colors = ["blue","red"]
+        cmap = mcolors.ListedColormap(colors)
+        title = "t-SNE diagram of latent representation"
+        path = os.path.join(show_dir,"latent_2d_clusters.png")
+        plot_2d(points, color_numebers, title=title, cmap=cmap, path=path)

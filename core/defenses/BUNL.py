@@ -4,7 +4,7 @@
 # @Author      : Zhenqian Zhu
 # @Affiliation : Harbin Institute of Technology, Shenzhen
 # @File        : test_Mine.py
-# @Description  : backdoor unLearning with Noisy Labels  
+# @Description  : Backdoor UnLearning with Noisy Labels  
 import torch
 import torch.nn as nn
 import os

@@ -36,12 +36,12 @@ def plot_2d(points, points_color, title=" ", cmap=None,path=None):
     fig, ax = plt.subplots(figsize=(10, 10), facecolor="white", constrained_layout=True)
     fig.suptitle(title, size=16)
     x, y = points.T
-    col = ax.scatter(x, y, c=points_color, cmap=cmap, s=30, alpha=1.0)
+    col = ax.scatter(x, y, c=points_color, cmap=cmap, s=5, alpha=1.0)
     ax.set_title(title)
     # ax.xaxis.set_major_formatter(ticker.NullFormatter())
     # ax.yaxis.set_major_formatter(ticker.NullFormatter())
     # ax.set_xlim(-100,100)
-    # ax.set_ylim(-100,100)
+    # ax.set_ylim(-10,10)
     # plt.xlim(-1, 1)  # 设置 x 轴范围为 [2, 4]
     # plt.ylim(-1, 1)  # 设置 y 轴范围为 [15, 25]
     fig.colorbar(col, ax=ax, orientation="horizontal", shrink=0.6, aspect=60, pad=0.01)

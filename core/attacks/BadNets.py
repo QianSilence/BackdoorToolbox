@@ -381,7 +381,7 @@ class PoisonedVisionDataset(VisionDataset):
         elif isinstance(benign_dataset.data,list):
             self.data = np.array(benign_dataset.data)
         else:
-            self.data =benign_dataset.data
+            self.data = benign_dataset.data
 
         if isinstance(benign_dataset.targets,torch.Tensor):
             self.targets = benign_dataset.targets.numpy()
@@ -399,7 +399,7 @@ class PoisonedVisionDataset(VisionDataset):
         self.poisoning_rate = poisoning_rate
         self.poison_indices = None
         self.modified_targets = None
-        self.set_poisoned_subdatasets(y_target = self.y_target, poisoning_rate = self.poisoning_rate )
+        self.set_poisoned_subdatasets(y_target = self.y_target, poisoning_rate = self.poisoning_rate)
 
         # Add trigger to images
         if self.transform is None:
@@ -437,8 +437,13 @@ class PoisonedVisionDataset(VisionDataset):
         #     img = Image.fromarray(img.numpy(), mode='L')
         # else:
             # img = Image.fromarray(img)
+        if img.shape[0] == 1:
+            img = Image.fromarray(img.squeeze(), mode='L')
+        # 3 x H x W
+        elif img.shape[0] == 3:
+            img = Image.fromarray(np.moveaxis(img, [0, 1, 2], [1, 2, 0]))
             
-        img = Image.fromarray(img)
+        # img = Image.fromarray(img)
         if index in self.poison_indices:
             img = self.poisoned_transform(img)
         elif self.transform is not None:
@@ -461,6 +466,7 @@ class PoisonedVisionDataset(VisionDataset):
    
     def modify_targets(self, indces, labels):
         self.modified_targets[indces] = labels
+        
     def get_real_targets(self):
         return self.targets
     def get_classes(self):
@@ -764,8 +770,3 @@ class BadNets(Base, Attack):
             return PoisonedCIFAR100(benign_dataset, y_target, poisoning_rate, pattern, weight, poisoned_transform_index, poisoned_target_transform_index)
         else:
             raise NotImplementedError
-        
-    def interact_in_training():
-        pass
-
-

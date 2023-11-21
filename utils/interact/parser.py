@@ -3,6 +3,7 @@ parser = argparse.ArgumentParser(description='Select task to execute.')
 # choices=['attack',"defense","test",'visualize']
 parser.add_argument('--dataset', type=str, default="CIFAR10", required=False, help='the dataset which is selected to execute,such as ')
 parser.add_argument('--subtask', type=str, default="attack", required=False, help='the task which is selected to execute,such as ')
+parser.add_argument('--attack', type=str, default="BadNets", required=False, help='the task which is selected to execute,such as ')
 # parser.add_argument('--item', type=str, choices=['generate backdoor samples', ], required=True, help='A specific item under the task')
 # parser.add_argument('--sum', dest='accumulate', action='store_const',
 #                     const=sum, default=max,

@@ -80,6 +80,7 @@ for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
 # pdb.set_trace()
+
 task_config = get_task_config(task = task)
 schedule = get_task_schedule(task = task)
 schedule['experiment'] = experiment
@@ -87,37 +88,40 @@ schedule['work_dir'] = work_dir
 attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
 attack_schedule['work_dir'] = work_dir
 attack_schedule['train_schedule'] = schedule
-
+#  0.4, 0.6, 0.8
+cover_rate = 0.8
 
 if __name__ == "__main__":
     """
     Users can select the task to execute by passing parameters.
     1. The task of generating and showing backdoor samples
-        python test_BadNets.py --dataset "MNIST"  --task "generate backdoor samples" 
-        python test_BadNets.py --dataset "CIFAR10"  --task "generate backdoor samples" 
+        python test_BadNets.py --dataset "MNIST"  --subtask "generate backdoor samples" 
+        python test_BadNets.py --dataset "CIFAR10"  --subtask "generate backdoor samples" 
 
     2. The task of showing backdoor samples
-        python test_BadNets.py --dataset "MNIST" --task "show train backdoor samples"
-        python test_BadNets.py --dataset "CIFAR10" --task "show train backdoor samples"
-        python test_BadNets.py --dataset "MNIST" --task "show test backdoor samples"
-        python test_BadNets.py --dataset "CIFAR10" --task "show test backdoor samples"
+        python test_BadNets.py --dataset "MNIST" --subtask "show train backdoor samples"
+        python test_BadNets.py --dataset "CIFAR10" --subtask "show train backdoor samples"
+        python test_BadNets.py --dataset "MNIST" --subtask "show test backdoor samples"
+        python test_BadNets.py --dataset "CIFAR10" --subtask "show test backdoor samples"
         
     3. The task of training backdoor model
-        python test_BadNets.py --dataset "MNIST" --task "attack"
+        3.1 python test_BadNets.py --dataset "MNIST" --subtask "attack"
+        3.2 python test_BadNets.py --dataset "MNIST" --subtask "adptive attack"
 
     4.The task of testing backdoor model
-        python test_BadNets.py --dataset "CIFAR100" --task "test"
+        python test_BadNets.py --dataset "MNIST" --subtask "test"
 
     5.The task of generating latents
-        python test_BadNets.py --dataset "CIFAR100" --task "generate latents"
-
+        python test_BadNets.py --dataset "MNIST" --subtask "generate latents"
+        
     6.The task of visualizing latents by t-sne
-        python test_BadNets.py --task "visualize latents by t-sne"
-        python test_BadNets.py --task "visualize latents for target class by t-sne"
+        python test_BadNets.py --dataset "MNIST" --subtask "visualize latents by t-sne"
+
+        python test_BadNets.py --subtask "visualize latents for target class by t-sne"
 
     7.The task of comparing predict_digits
-        python test_BadNets.py --task "generate predict_digits"
-        python test_BadNets.py --task "compare predict_digits"
+        python test_BadNets.py --subtask "generate predict_digits"
+        python test_BadNets.py --subtask "compare predict_digits"
 
     """
     log = Log(osp.join(work_dir, 'log.txt'))
@@ -133,7 +137,7 @@ if __name__ == "__main__":
     )
     backdoor = BackdoorAttack(badnets)
  
-    if args.task == "generate backdoor samples":
+    if args.subtask == "generate backdoor samples":
         # Generate backdoor sample
         log("\n==========Generate backdoor samples==========\n")
         poisoned_train_dataset = backdoor.create_poisoned_train_dataset()
@@ -159,7 +163,7 @@ if __name__ == "__main__":
         torch.save(poisoned_test_dataset, os.path.join(poison_datasets_dir,'test.pt'))
         log("Save generated test_datasets to" + os.path.join(poison_datasets_dir,'test.pt'))
 
-    elif args.task == "show train backdoor samples":
+    elif args.subtask == "show train backdoor samples":
         log("\n==========Show posioning train sample==========\n")
         # Alreadly exsiting dataset and trained model.
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
@@ -176,7 +180,7 @@ if __name__ == "__main__":
         title = "label: " + str(label)
         save_img(image, title=title, path=backdoor_sample_path)
 
-    elif args.task == "show test backdoor samples":
+    elif args.subtask == "show test backdoor samples":
         log("\n==========Show posioning test sample==========\n")
         # Alreadly exsiting dataset and trained model.
         poisoned_test_dataset = torch.load(os.path.join(poison_datasets_dir,'test.pt'))
@@ -190,15 +194,28 @@ if __name__ == "__main__":
         title = "label: " + str(label)
         save_img(image, title=title, path=backdoor_sample_path)
 
-    elif args.task == "attack":
+    elif args.subtask == "attack":
         #Train and get backdoor model
         log("\n==========Train on poisoned_train_dataset and get backdoor model==========\n")
-        
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
+        backdoor.attack(train_dataset = poisoned_train_dataset)
         poisoned_model = backdoor.get_backdoor_model()
         torch.save(poisoned_model.state_dict(), os.path.join(model_dir, 'backdoor_model.pth'))
         log("Save backdoor model to" + os.path.join(model_dir, 'backdoor_model.pth'))
+
+    elif args.subtask == "adptive attack":
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        indces = np.random.choice(np.arange(len(poison_indices)),size = int(len(poison_indices) * cover_rate))
+        real_targets = poisoned_train_dataset.get_real_targets()
+        log(f"The number of poisoned data:{len(poison_indices)}, modify indexes:{len(indces)}, modify indexes:{indces}, real targets:{real_targets[indces]}\n")
+        poisoned_train_dataset.modify_targets(indces, real_targets[indces])
+        backdoor.attack(dataset = poisoned_train_dataset)
+        poisoned_model = backdoor.get_backdoor_model()
+        torch.save(poisoned_model.state_dict(), os.path.join(model_dir, f'backdoor_model_cover_{cover_rate}.pth'))
+        log("Save backdoor model to" + os.path.join(model_dir, f'backdoor_model_cover_{cover_rate}.pth'))
     
-    elif args.task == "test":
+    elif args.subtask == "test":
         # Test the attack effect of backdoor model on backdoor datasets.
         log("\n==========Test the effect of backdoor attack on poisoned_test_dataset==========\n")
         poisoned_test_dataset = torch.load(os.path.join(poison_datasets_dir,'test.pt'))
@@ -208,7 +225,7 @@ if __name__ == "__main__":
        
         #Alreadly exsiting trained model
         model = task_config['model']
-        model.load_state_dict(torch.load(os.path.join(model_dir, 'backdoor_model.pth')),strict=False)
+        model.load_state_dict(torch.load(os.path.join(model_dir, f'backdoor_model.pth')),strict=False)
         predict_digits, labels = backdoor.test(model=model, test_dataset=testset)
 
         benign_acc= compute_accuracy(predict_digits[benign_test_indexs],labels[benign_test_indexs],topk=(1,3,5))
@@ -217,7 +234,7 @@ if __name__ == "__main__":
                                                                                 len(benign_test_indexs)))                                                                                                                                                
         log("Benign_accuracy:{0}, poisoning_accuracy:{1}".format(benign_acc, poisoned_acc))
     
-    elif args.task == "generate latents":
+    elif args.subtask == "generate latents":
         log("\n==========Get the latent representation in the middle layer of the model.==========\n")
         #Alreadly exsiting trained model and poisoned datasets
         # device = torch.device("cuda:1")
@@ -228,19 +245,19 @@ if __name__ == "__main__":
         model.to(device)
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
         poison_indices = poisoned_train_dataset.get_poison_indices()
-        model.load_state_dict(torch.load(os.path.join(work_dir, 'model/backdoor_model.pth')),strict=False)
+        model.load_state_dict(torch.load(os.path.join(work_dir, f'model/backdoor_model.pth')),strict=False)
         # Get the latent representation in the middle layer of the model.
         latents,y_labels = get_latent_rep(model, layer, poisoned_train_dataset, device=device)
-        latents_path = os.path.join(latents_dir,"latents.npz")
+        latents_path = os.path.join(latents_dir, f"latents.npz")
 
         np.savez(latents_path, latents=latents, y_labels=y_labels)
 
-    elif args.task == "visualize latents by t-sne":
+    elif args.subtask == "visualize latents by t-sne":
         log("\n========== Clusters of latent representations for all classes.==========\n")  
         # # Alreadly exsiting latent representation
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
         poison_indices = poisoned_train_dataset.get_poison_indices()
-        latents_path = os.path.join(latents_dir,"latents.npz")
+        latents_path = os.path.join(latents_dir, f"latents.npz")
         data = np.load(latents_path)
         latents,y_labels = data["latents"],data["y_labels"]
    
@@ -261,10 +278,10 @@ if __name__ == "__main__":
         # Create a ListedColormap objectall_
         cmap = mcolors.ListedColormap(colors)
         title = "t-SNE diagram of latent representation"
-        path = os.path.join(show_dir,"latent_2d_all_clusters.png")
+        path = os.path.join(show_dir, f"latent_2d_all_clusters_poison_rate_0.1.png")
         plot_2d(points, y_labels, title=title, cmap=cmap, path=path)
            
-    elif args.task == "visualize latents for target class by t-sne":
+    elif args.subtask == "visualize latents for target class by t-sne":
         #Clusters of latent representations for target class
         log("\n==========Verify the assumption of latent separability.==========\n")  
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
@@ -291,7 +308,7 @@ if __name__ == "__main__":
         path = os.path.join(show_dir,"latent_2d_clusters.png")
         plot_2d(points, color_numebers, title=title, cmap=cmap, path=path)
 
-    elif args.task == "generate predict_digits":
+    elif args.subtask == "generate predict_digits":
         log("\n==========generate predict_digits.==========\n") 
         device = torch.device("cpu")
         model = BaselineMNISTNetwork()
@@ -305,7 +322,7 @@ if __name__ == "__main__":
         # print(predict_digits.shape)
         np.savez(predict_digits_path, predict_digits=predict_digits.numpy(), y_labels=labels.numpy())
         
-    elif args.task == "compare predict_digits": 
+    elif args.subtask == "compare predict_digits": 
         log("\n==========compare predict_digits.==========\n") 
        
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'test.pt'))

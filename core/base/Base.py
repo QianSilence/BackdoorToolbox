@@ -71,6 +71,7 @@ class Base(TrainingObservable):
         self.test_dataset = task['test_dataset']
         assert 'model' in task, "task must contain 'model' configuration! "
         self.model =  task['model'] 
+        self.init_state_dict = self.model.state_dict()
         assert 'loss' in task, "task must contain 'loss' configuration! "
         self.loss = task['loss']
 
@@ -78,8 +79,7 @@ class Base(TrainingObservable):
         self.optimizer = task['optimizer']
 
         self.global_schedule = deepcopy(schedule)
-        current_schedule = None
-
+    
         assert 'seed' in schedule, "task must contain 'seed' configuration! "
         assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
         if 'seed' in schedule and schedule['seed'] is not None and 'deterministic' in schedule and schedule['deterministic']: 
@@ -122,12 +122,17 @@ class Base(TrainingObservable):
         worker_seed = torch.initial_seed() % 2**32
         np.random.seed(worker_seed)
         random.seed(worker_seed)
+
+    def init_model(self):
+        self.model.load(self.init_state_dict)
+
     #Here ensure that the type of the output model is nn.module 
     def get_model(self):
         if isinstance(self.model,nn.DataParallel):
             return deepcopy(self.model.module)
         else:
             return deepcopy(self.model)
+        
     def set_train_dataset(self, dataset):
         self.train_dataset = dataset
     def set_test_dataset(self,dataset):
@@ -152,9 +157,10 @@ class Base(TrainingObservable):
             raise AttributeError("Training schedule is None, please check your schedule setting.")
 
         if dataset is not None:
-            self.train_dataset = dataset
-     
-
+            train_dataset = dataset
+        else:
+            train_dataset = self.train_dataset
+    
         if 'pretrain' in current_schedule and current_schedule['pretrain'] is not None:
             self.model.load_state_dict(torch.load(current_schedule['pretrain']), strict=False)
 
@@ -175,9 +181,8 @@ class Base(TrainingObservable):
         # Use CPU
         else:
             device = torch.device("cpu")
-
         train_loader = DataLoader(
-                self.train_dataset,
+                train_dataset,
                 batch_size=current_schedule['batch_size'],
                 shuffle=True,
                 num_workers=current_schedule['num_workers'],
@@ -201,7 +206,7 @@ class Base(TrainingObservable):
         iteration = 0
         last_time = time.time()
         
-        msg = f"Total train samples: {len(self.train_dataset)}\nTotal test samples: {len(self.train_dataset)}\nBatch size: {current_schedule['batch_size']}\niteration every epoch: {len(self.train_dataset) // current_schedule['batch_size']}\nInitial learning rate: {current_schedule['lr']}\n"
+        msg = f"Total train samples: {len(train_dataset)}\nTotal test samples: {len(train_dataset)}\nBatch size: {current_schedule['batch_size']}\niteration every epoch: {len(train_dataset) // current_schedule['batch_size']}\nInitial learning rate: {current_schedule['lr']}\n"
         log(msg)
 
         for i in range(current_schedule['epochs']):
@@ -221,7 +226,7 @@ class Base(TrainingObservable):
 
                 if iteration % current_schedule['log_iteration_interval'] == 0:
                     last_time = time.time()
-                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(self.train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
+                    msg = time.strftime("[%Y-%m-%d_%H:%M:%S] ", time.localtime()) +f"Epoch:{i+1}/{current_schedule['epochs']}, iteration:{batch_id + 1}\{len(train_dataset)//current_schedule['batch_size']},lr: {current_schedule['lr']}, loss: {float(loss)}, time: {time.time()-last_time}\n"
                     log(msg)
                     max_num , index = torch.max(predict_digits, dim=1)
                     equal_matrix = torch.eq(index,batch_label)

@@ -34,4 +34,22 @@ Mine:
   unlearning_threshold: 1.0e-7
   #"times":2,
   
+MIMRL:
+  # defense config:
+  defense_strategy: MIMRL
+  loss: MIMRLLoss
+  beta: 0.3
+  x_dim: 784
+  dim: 10
+  # related Infor-max   
+  lr_dis: 0.005
+  layer: null
+  #related filtering config
+  poison_rate: 0.05
+  #1.4172, 1.8931
+  threshold: 1.4172
+  
+    
+
+
 

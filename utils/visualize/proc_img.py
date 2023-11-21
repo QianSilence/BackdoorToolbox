@@ -34,7 +34,7 @@ def save_img(img, title=None, path=None):
     plt.figure()
     plt.imshow(img)
     if title is not None:
-        plt.title(f"title: {title}")
+        plt.title(title)
     plt.axis('off') 
     plt.savefig(path,dpi=600,format='png')
 if __name__ == "__main__":

@@ -22,37 +22,38 @@ support_models = ["BaselineMNISTNetwork","ResNet-18","ResNet-18","ResNet-18","Re
 support_optimizers = ["SGD","Adam"]
 support_losses = ["CrossEntropyLoss"]
 
-def get_dataset(datasets=None, datasets_root_dir=None):
-    assert datasets in support_datasets, f"{datasets} is not in support_datasets:{support_datasets}"
-    if datasets == "MNIST":
-        dataset = torchvision.datasets.MNIST
+def get_dataset(dataset_info=None):
+    dataset_type = dataset_info['type']
+    assert dataset_type in support_datasets, f"{dataset_type} is not in support_datasets:{support_datasets}"
+    datasets_root_dir = dataset_info["dataset_root_dir"]
+    if dataset_type == "MNIST":
         transform_train = Compose([
             ToTensor()
         ])
-        trainset = dataset(datasets_root_dir, train=True, transform=transform_train, download=True)
+        trainset = torchvision.datasets.MNIST(datasets_root_dir, train=True, transform=transform_train, download=True)
         transform_test = Compose([
             ToTensor()
         ])
-        testset = dataset(datasets_root_dir, train=False, transform=transform_test, download=True)
+        testset = torchvision.datasets.MNIST(datasets_root_dir, train=False, transform=transform_test, download=True)
+        classes = trainset.classes
         num_classes = 10
-    elif datasets == "CIFAR-10":
-        dataset = torchvision.datasets.CIFAR10
+    elif dataset_type == "CIFAR-10": 
         transform_train = Compose([
             RandomCrop(32, padding=4, padding_mode="reflect"),
             RandomHorizontalFlip(p=0.5),
             ToTensor(),
             Normalize([0.4914, 0.4822, 0.4465],[0.2023, 0.1994, 0.2010])
         ])
-        trainset = dataset(datasets_root_dir, train=True, transform=transform_train, download=True)
+        trainset = torchvision.datasets.CIFAR10(datasets_root_dir, train=True, transform=transform_train, download=True)
         transform_test = Compose([
             ToTensor(),
             Normalize([0.4914, 0.4822, 0.4465],[0.2023, 0.1994, 0.2010])
         ])
-        testset = dataset(datasets_root_dir, train=True, transform=transform_test, download=True)
+        testset = torchvision.datasets.CIFAR10(datasets_root_dir, train=False, transform=transform_test, download=True)
+        classes = trainset.classes
         num_classes = 10
 
-    elif datasets == "CIFAR-100":
-        dataset = torchvision.datasets.CIFAR100
+    elif dataset_type == "CIFAR-100":
         transform_train = Compose([
             transforms.Pad(4, padding_mode='reflect'),
             transforms.RandomHorizontalFlip(),
@@ -68,32 +69,35 @@ def get_dataset(datasets=None, datasets_root_dir=None):
                 np.array([125.3, 123.0, 113.9]) / 255.0,
                 np.array([63.0, 62.1, 66.7]) / 255.0),
         ])
-        trainset = dataset(datasets_root_dir, train=True, transform=transform_train, download=True)
-        testset = dataset(datasets_root_dir, train=True, transform=transform_test, download=True)
+        trainset = torchvision.datasets.CIFAR100(datasets_root_dir, train=True, transform=transform_train, download=True)
+        testset = torchvision.datasets.CIFAR100(datasets_root_dir, train=True, transform=transform_test, download=True)
+        classes = trainset.classes
         num_classes = 100
-    elif datasets == "ImageNet":
+    elif dataset_type == "ImageNet":
         pass
-    return trainset, testset, num_classes
+    return trainset, testset, classes, num_classes
 
-def get_model(model=None,num_classes=10):
-    assert model in support_models, f"{model} is not in support_datasets:{support_models}"
-    if model == "BaselineMNISTNetwork":
+def get_model(model_info=None):
+    model_type = model_info['type']
+    assert model_type in support_models, f"{model_type} is not in support_datasets:{support_models}"
+    if model_type == "BaselineMNISTNetwork":
         model = BaselineMNISTNetwork()
-    elif model == "ResNet-18":
-        model = ResNet(18,num_classes = num_classes)
-    elif model == "ResNet-34":
-        model = ResNet(34,num_classes = num_classes)
-    elif model == "ResNet-50":
-        model = ResNet(50,num_classes = num_classes)
-    elif model == "ResNet-101":
-        model = ResNet(101,num_classes = num_classes)
-    elif model == "ResNet-152":
-        model = ResNet(152,num_classes = num_classes)
+    elif model_type == "ResNet-18":
+        model = ResNet(18,num_classes=model_info['num_classes'])
+    elif model_type == "ResNet-34":
+        model = ResNet(34,num_classes=model_info['num_classes'])
+    elif model_type == "ResNet-50":
+        model = ResNet(50,num_classes=model_info['num_classes'])
+    elif model_type == "ResNet-101":
+        model = ResNet(101,num_classes=model_info['num_classes'])
+    elif model_type == "ResNet-152":
+        model = ResNet(152,num_classes=model_info['num_classes'])
     return model
 
-def get_loss(loss=None):
-    assert loss in support_losses, f"{loss} is not in support_datasets:{support_losses}"
-    if loss == "CrossEntropyLoss":
+def get_loss(loss_info=None):
+    loss_type = loss_info['type']
+    assert loss_type in support_losses, f"{loss_type} is not in support_datasets:{support_losses}"
+    if loss_type == "CrossEntropyLoss":
         loss = torch.nn.CrossEntropyLoss()
     return loss
 
@@ -114,9 +118,9 @@ def get_task_config(task = None):
         'optimizer': None,
         "loss": None,
     }
-    task_config['train_dataset'], task_config['test_dataset'], num_classes = get_dataset(datasets=config[task]["dataset"],datasets_root_dir=config[task]["data"]["dataset_root_dir"])
-    task_config['model'] = get_model(model = config[task]["model"], num_classes=num_classes)
-    task_config['loss'] = get_loss(loss=config[task]["loss"])
+    task_config['train_dataset'], task_config['test_dataset'], _,_ = get_dataset(dataset_info=config[task]["dataset"])
+    task_config['model'] = get_model(model_info=config[task]["model"])
+    task_config['loss'] = get_loss(loss_info=config[task]["loss"])
     task_config['optimizer'] = get_optimizer(optimizer=config[task]["optimizer"])
     return task_config
 
