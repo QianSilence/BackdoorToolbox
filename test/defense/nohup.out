@@ -1,0 +1,1221 @@
+<frozen importlib._bootstrap>:228: RuntimeWarning: scipy._lib.messagestream.MessageStream size changed, may indicate binary incompatibility. Expected 56 from C header, got 64 from PyObject
+[W Context.cpp:70] Warning: torch.use_deterministic_algorithms is in beta, and its design and functionality may change in the future. (function operator())
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_MIMRL_for_Adaptive-Patch at 2023-11-29_09:43:35==========
+
+
+==========get poisoning train_dataset and test_dataset dataset and repair model ==========
+
+_ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+  (linear): Linear(in_features=512, out_features=10, bias=True)
+)
+This machine has 6 cuda devices, and use 1 of them to train.
+<frozen importlib._bootstrap>:228: RuntimeWarning: scipy._lib.messagestream.MessageStream size changed, may indicate binary incompatibility. Expected 56 from C header, got 64 from PyObject
+[W Context.cpp:70] Warning: torch.use_deterministic_algorithms is in beta, and its design and functionality may change in the future. (function operator())
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_MIMRL_for_BadNets at 2023-11-29_09:45:16==========
+
+
+==========get poisoning train_dataset and test_dataset dataset and repair model ==========
+
+_ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+  (linear): Linear(in_features=512, out_features=10, bias=True)
+)
+This machine has 4 cuda devices, and use 1 of them to train.
+[2023-11-29_09:45:16]Epoch:1/100, iteration:100\195,lr:0.1, ls_dist:0.005, loss:2.393231286929772, supervise_loss:2.262094497680664, info_xz:-0.005633413791656494, whiten_loss:131.70017235152497, time:0.00022363662719726562
+
+batch_size:256,correct_num:43
+
+<frozen importlib._bootstrap>:228: RuntimeWarning: scipy._lib.messagestream.MessageStream size changed, may indicate binary incompatibility. Expected 56 from C header, got 64 from PyObject
+[W Context.cpp:70] Warning: torch.use_deterministic_algorithms is in beta, and its design and functionality may change in the future. (function operator())
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_MIMRL_for_BadNets at 2023-11-29_09:48:36==========
+
+
+==========get poisoning train_dataset and test_dataset dataset and repair model ==========
+
+_ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+  (linear): Linear(in_features=512, out_features=10, bias=True)
+)
+This machine has 4 cuda devices, and use 1 of them to train.
+<frozen importlib._bootstrap>:228: RuntimeWarning: scipy._lib.messagestream.MessageStream size changed, may indicate binary incompatibility. Expected 56 from C header, got 64 from PyObject
+[W Context.cpp:70] Warning: torch.use_deterministic_algorithms is in beta, and its design and functionality may change in the future. (function operator())
+[2023-11-29_09:47:21]Epoch:1/100, iteration:100\195,lr:0.1, ls_dist:0.005, loss:2.404173385692379, supervise_loss:2.275219440460205, info_xz:-0.003687143325805664, whiten_loss:129.3225403554648, time:0.004549503326416016
+
+batch_size:256,correct_num:30
+
+Files already downloaded and verified
+Files already downloaded and verified
+
+
+
+==========Start ResNet-18_CIFAR-10_MIMRL_for_BadNets at 2023-11-29_09:49:02==========
+
+
+==========get poisoning train_dataset and test_dataset dataset and repair model ==========
+
+_ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (shortcut): Sequential()
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+  (linear): Linear(in_features=512, out_features=10, bias=True)
+)
+This machine has 4 cuda devices, and use 1 of them to train.
+CUBLAS error: out of memory (3) in magma_dgetrf_gpu_expert at /opt/conda/conda-bld/magma-cuda111_1605822518874/work/src/dgetrf_gpu.cpp:126
+CUBLAS error: not initialized (1) in magma_dgetrf_gpu_expert at /opt/conda/conda-bld/magma-cuda111_1605822518874/work/src/dgetrf_gpu.cpp:126
+CUBLAS error: out of memory (3) in magma_dgetrf_gpu_expert at /opt/conda/conda-bld/magma-cuda111_1605822518874/work/src/dgetrf_gpu.cpp:126
+CUBLAS error: not initialized (1) in magma_dgetrf_gpu_expert at /opt/conda/conda-bld/magma-cuda111_1605822518874/work/src/dgetrf_gpu.cpp:126
+Traceback (most recent call last):
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/test/defense/test_MIMRL.py", line 219, in <module>
+    defense.repair(dataset = poisoned_train_dataset)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/BackdoorDefense.py", line 76, in repair
+    self.defense_method.repair( dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 206, in repair
+    self.train(dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 300, in train
+    loss, supervise_loss, info_xz, whiten_loss = self.loss(predict_digits, batch_label, batch_img, latents.to(device))
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 133, in forward
+    whiten_loss = self.whiten_loss(z, labels)
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 78, in forward
+    loss = loss + self.KL_Divergence(latents_z)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 66, in KL_Divergence
+    sign, log_det = torch.slogdet(matrix)
+RuntimeError: CUDA error: out of memory
+Traceback (most recent call last):
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/test/defense/test_MIMRL.py", line 219, in <module>
+    defense.repair(dataset = poisoned_train_dataset)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/BackdoorDefense.py", line 76, in repair
+    self.defense_method.repair( dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 206, in repair
+    self.train(dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 303, in train
+    loss.backward(retain_graph=True)
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/tensor.py", line 245, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/autograd/__init__.py", line 145, in backward
+    Variable._execution_engine.run_backward(
+RuntimeError: Unable to find a valid cuDNN algorithm to run convolution
+[2023-11-29_09:49:20]Epoch:2/100, iteration:4\195,lr:0.1, ls_dist:0.005, loss:2.160530033601165, supervise_loss:1.9911959171295166, info_xz:-0.013212800025939941, whiten_loss:170.6554322370293, time:0.00020647048950195312
+
+batch_size:256,correct_num:65
+
+Traceback (most recent call last):
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/test/defense/test_MIMRL.py", line 219, in <module>
+    defense.repair(dataset = poisoned_train_dataset)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/BackdoorDefense.py", line 76, in repair
+    self.defense_method.repair( dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 206, in repair
+    self.train(dataset=dataset, schedule=schedule)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 300, in train
+    loss, supervise_loss, info_xz, whiten_loss = self.loss(predict_digits, batch_label, batch_img, latents.to(device))
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 133, in forward
+    whiten_loss = self.whiten_loss(z, labels)
+  File "/home/zzq/miniconda3/envs/BackdoorBox/lib/python3.9/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 78, in forward
+    loss = loss + self.KL_Divergence(latents_z)
+  File "/home/zzq/CreatingSpace/BackdoorToolbox/core/defenses/MIMRL.py", line 66, in KL_Divergence
+    sign, log_det = torch.slogdet(matrix)
+RuntimeError: CUDA error: out of memory
+[2023-11-29_09:47:12]Epoch:2/100, iteration:4\195,lr:0.1, ls_dist:0.005, loss:2.2558877099420305, supervise_loss:2.1077024936676025, info_xz:-0.012489795684814453, whiten_loss:149.43429121034117, time:0.00022554397583007812
+
+batch_size:256,correct_num:55
+
+[2023-11-29_09:49:11]Epoch:2/100, iteration:104\195,lr:0.1, ls_dist:0.005, loss:2.099845567343969, supervise_loss:1.943199634552002, info_xz:-0.04010647535324097, whiten_loss:160.6566101296133, time:0.00019073486328125
+
+batch_size:256,correct_num:66
+
+[2023-11-29_09:50:48]Epoch:3/100, iteration:8\195,lr:0.1, ls_dist:0.005, loss:2.0233012342584873, supervise_loss:1.8632723093032837, info_xz:-0.1349334716796875, whiten_loss:173.52222443945635, time:0.0001800060272216797
+
+batch_size:256,correct_num:65
+
+[2023-11-29_09:52:24]Epoch:3/100, iteration:108\195,lr:0.1, ls_dist:0.005, loss:1.8236066863586984, supervise_loss:1.6609199047088623, info_xz:-0.18211472034454346, whiten_loss:180.89826560521942, time:0.0003085136413574219
+
+batch_size:256,correct_num:103
+
+[2023-11-29_09:53:58]Epoch:4/100, iteration:12\195,lr:0.1, ls_dist:0.005, loss:1.7447245702485854, supervise_loss:1.5905276536941528, info_xz:-0.19862335920333862, whiten_loss:174.05921075151508, time:0.00020742416381835938
+
+batch_size:256,correct_num:109
+
+[2023-11-29_09:55:30]Epoch:4/100, iteration:112\195,lr:0.1, ls_dist:0.005, loss:1.50494196482001, supervise_loss:1.3310606479644775, info_xz:-0.2404806911945343, whiten_loss:197.92940683661158, time:0.00024580955505371094
+
+batch_size:256,correct_num:136
+
+[2023-11-29_09:57:01]Epoch:5/100, iteration:16\195,lr:0.1, ls_dist:0.005, loss:1.6062063537888194, supervise_loss:1.4489344358444214, info_xz:-0.15760302543640137, whiten_loss:173.03222048803812, time:0.00017309188842773438
+
+batch_size:256,correct_num:113
+
+[2023-11-29_09:58:44]Epoch:5/100, iteration:116\195,lr:0.1, ls_dist:0.005, loss:1.5358554170691137, supervise_loss:1.3748308420181274, info_xz:-0.18413203954696655, whiten_loss:179.43776112428952, time:0.0047893524169921875
+
+batch_size:256,correct_num:127
+
+[2023-11-29_10:00:36]Epoch:6/100, iteration:20\195,lr:0.1, ls_dist:0.005, loss:1.4636829146196095, supervise_loss:1.306700587272644, info_xz:-0.16574782133102417, whiten_loss:173.55706775681654, time:0.00022864341735839844
+
+batch_size:256,correct_num:139
+
+[2023-11-29_10:02:28]Epoch:6/100, iteration:120\195,lr:0.1, ls_dist:0.005, loss:1.2713816381842933, supervise_loss:1.0853354930877686, info_xz:-0.18011891841888428, whiten_loss:204.05807270119996, time:0.0001895427703857422
+
+batch_size:256,correct_num:155
+
+[2023-11-29_10:04:20]Epoch:7/100, iteration:24\195,lr:0.1, ls_dist:0.005, loss:1.2025620392267948, supervise_loss:1.0325754880905151, info_xz:-0.18254098296165466, whiten_loss:188.24059280803257, time:0.0002372264862060547
+
+batch_size:256,correct_num:171
+
+[2023-11-29_10:06:17]Epoch:7/100, iteration:124\195,lr:0.1, ls_dist:0.005, loss:1.1778300159792494, supervise_loss:1.0115247964859009, info_xz:-0.16563716530799866, whiten_loss:182.8689330439161, time:0.00023126602172851562
+
+batch_size:256,correct_num:165
+
+[2023-11-29_10:08:06]Epoch:8/100, iteration:28\195,lr:0.1, ls_dist:0.005, loss:1.0918305201164327, supervise_loss:0.9174151420593262, info_xz:-0.17577102780342102, whiten_loss:191.9924897781454, time:0.00018548965454101562
+
+batch_size:256,correct_num:170
+
+[2023-11-29_10:09:58]Epoch:8/100, iteration:128\195,lr:0.1, ls_dist:0.005, loss:1.0284590505995272, supervise_loss:0.8616142272949219, info_xz:-0.18615472316741943, whiten_loss:185.46030754227618, time:0.00017070770263671875
+
+batch_size:256,correct_num:179
+
+[2023-11-29_10:11:51]Epoch:9/100, iteration:32\195,lr:0.1, ls_dist:0.005, loss:0.9346331701028107, supervise_loss:0.7571628093719482, info_xz:-0.1582651138305664, whiten_loss:193.296884034848, time:0.00020122528076171875
+
+batch_size:256,correct_num:186
+
+[2023-11-29_10:13:48]Epoch:9/100, iteration:132\195,lr:0.1, ls_dist:0.005, loss:0.9872070577712225, supervise_loss:0.8131495118141174, info_xz:-0.20520377159118652, whiten_loss:194.57793503715274, time:0.0001785755157470703
+
+batch_size:256,correct_num:190
+
+[2023-11-29_10:15:48]Epoch:10/100, iteration:36\195,lr:0.1, ls_dist:0.005, loss:0.9648560053717798, supervise_loss:0.7947390675544739, info_xz:-0.13626205921173096, whiten_loss:183.743155659408, time:0.00022149085998535156
+
+batch_size:256,correct_num:181
+
+[2023-11-29_10:17:41]Epoch:10/100, iteration:136\195,lr:0.1, ls_dist:0.005, loss:0.8116730631081394, supervise_loss:0.6362373232841492, info_xz:-0.16066992282867432, whiten_loss:191.50270826499974, time:0.00018668174743652344
+
+batch_size:256,correct_num:201
+
+[2023-11-29_10:19:38]Epoch:11/100, iteration:40\195,lr:0.1, ls_dist:0.005, loss:0.8243031912332242, supervise_loss:0.6628485321998596, info_xz:-0.1439172625541687, whiten_loss:175.84637932831694, time:0.0002841949462890625
+
+batch_size:256,correct_num:195
+
+[2023-11-29_10:21:26]Epoch:11/100, iteration:140\195,lr:0.1, ls_dist:0.005, loss:0.9404140799830972, supervise_loss:0.7742649912834167, info_xz:-0.11485821008682251, whiten_loss:177.63490374789825, time:0.000186920166015625
+
+batch_size:256,correct_num:191
+
+[2023-11-29_10:22:58]Epoch:12/100, iteration:44\195,lr:0.1, ls_dist:0.005, loss:0.8121161017631537, supervise_loss:0.6393995881080627, info_xz:-0.12405800819396973, whiten_loss:185.12232639541688, time:0.0002002716064453125
+
+batch_size:256,correct_num:204
+
+[2023-11-29_10:24:29]Epoch:12/100, iteration:144\195,lr:0.1, ls_dist:0.005, loss:0.9253935478399611, supervise_loss:0.773762583732605, info_xz:-0.10483470559120178, whiten_loss:162.11440784438616, time:0.00020766258239746094
+
+batch_size:256,correct_num:190
+
+[2023-11-29_10:25:58]Epoch:13/100, iteration:48\195,lr:0.1, ls_dist:0.005, loss:0.772798668184675, supervise_loss:0.598595917224884, info_xz:-0.14390385150909424, whiten_loss:188.59315995255827, time:0.00020575523376464844
+
+batch_size:256,correct_num:204
+
+[2023-11-29_10:27:27]Epoch:13/100, iteration:148\195,lr:0.1, ls_dist:0.005, loss:0.8272652684153817, supervise_loss:0.6621920466423035, info_xz:-0.15865862369537354, whiten_loss:180.93908414261557, time:0.00020885467529296875
+
+batch_size:256,correct_num:199
+
+[2023-11-29_10:28:57]Epoch:14/100, iteration:52\195,lr:0.1, ls_dist:0.005, loss:0.6773209336519564, supervise_loss:0.5012679696083069, info_xz:-0.14221608638763428, whiten_loss:190.274572682413, time:0.0002079010009765625
+
+batch_size:256,correct_num:215
+
+[2023-11-29_10:30:29]Epoch:14/100, iteration:152\195,lr:0.1, ls_dist:0.005, loss:0.6780070274910517, supervise_loss:0.5133474469184875, info_xz:-0.13799190521240234, whiten_loss:178.4587710938043, time:0.00019598007202148438
+
+batch_size:256,correct_num:209
+
+[2023-11-29_10:32:01]Epoch:15/100, iteration:56\195,lr:0.1, ls_dist:0.005, loss:0.6721759531124699, supervise_loss:0.510801374912262, info_xz:-0.14466604590415955, whiten_loss:175.84119173132063, time:0.0002105236053466797
+
+batch_size:256,correct_num:216
+
+[2023-11-29_10:33:29]Epoch:15/100, iteration:156\195,lr:0.1, ls_dist:0.005, loss:0.7234007659324533, supervise_loss:0.5477035045623779, info_xz:-0.12811875343322754, whiten_loss:188.50916055525607, time:0.00016164779663085938
+
+batch_size:256,correct_num:209
+
+[2023-11-29_10:35:00]Epoch:16/100, iteration:60\195,lr:0.1, ls_dist:0.005, loss:0.642630915058082, supervise_loss:0.4747132360935211, info_xz:-0.1340905725955963, whiten_loss:181.3267272834238, time:0.00018215179443359375
+
+batch_size:256,correct_num:209
+
+[2023-11-29_10:36:27]Epoch:16/100, iteration:160\195,lr:0.1, ls_dist:0.005, loss:0.6337475898748377, supervise_loss:0.46478399634361267, info_xz:-0.17545419931411743, whiten_loss:186.50902538356567, time:0.00016641616821289062
+
+batch_size:256,correct_num:212
+
+[2023-11-29_10:38:01]Epoch:17/100, iteration:64\195,lr:0.1, ls_dist:0.005, loss:0.580033916703381, supervise_loss:0.41333019733428955, info_xz:-0.12660303711891174, whiten_loss:179.36401414028595, time:0.00019621849060058594
+
+batch_size:256,correct_num:223
+
+[2023-11-29_10:39:31]Epoch:17/100, iteration:164\195,lr:0.1, ls_dist:0.005, loss:0.5212305591445507, supervise_loss:0.35350415110588074, info_xz:-0.17148101329803467, whiten_loss:184.8745153289379, time:0.00016689300537109375
+
+batch_size:256,correct_num:228
+
+[2023-11-29_10:41:01]Epoch:18/100, iteration:68\195,lr:0.1, ls_dist:0.005, loss:0.5707608228016863, supervise_loss:0.4168184995651245, info_xz:-0.10834389925003052, whiten_loss:164.77671912202922, time:0.00019598007202148438
+
+batch_size:256,correct_num:228
+
+[2023-11-29_10:42:35]Epoch:18/100, iteration:168\195,lr:0.1, ls_dist:0.005, loss:0.6438891440671636, supervise_loss:0.47791749238967896, info_xz:-0.13310766220092773, whiten_loss:179.28241193711293, time:0.00018787384033203125
+
+batch_size:256,correct_num:214
+
+[2023-11-29_10:44:09]Epoch:19/100, iteration:72\195,lr:0.1, ls_dist:0.005, loss:0.4748850946679193, supervise_loss:0.3047228157520294, info_xz:-0.11669045686721802, whiten_loss:181.83131864214715, time:0.00015020370483398438
+
+batch_size:256,correct_num:229
+
+[2023-11-29_10:45:40]Epoch:19/100, iteration:172\195,lr:0.1, ls_dist:0.005, loss:0.6526503489940335, supervise_loss:0.490693062543869, info_xz:-0.13111114501953125, whiten_loss:175.0684009521176, time:0.00026535987854003906
+
+batch_size:256,correct_num:214
+
+[2023-11-29_10:47:13]Epoch:20/100, iteration:76\195,lr:0.1, ls_dist:0.005, loss:0.6157142865315742, supervise_loss:0.4488513469696045, info_xz:-0.09156787395477295, whiten_loss:176.01973291791154, time:0.0002117156982421875
+
+batch_size:256,correct_num:215
+
+[2023-11-29_10:48:49]Epoch:20/100, iteration:176\195,lr:0.1, ls_dist:0.005, loss:0.5767811890413203, supervise_loss:0.4131993055343628, info_xz:-0.12209486961364746, whiten_loss:175.79135854739326, time:0.0001995563507080078
+
+batch_size:256,correct_num:217
+
+[2023-11-29_10:50:20]Epoch:21/100, iteration:80\195,lr:0.1, ls_dist:0.005, loss:0.48774534201800746, supervise_loss:0.32688334584236145, info_xz:-0.12056589126586914, whiten_loss:172.9185853022329, time:0.0002570152282714844
+
+batch_size:256,correct_num:229
+
+[2023-11-29_10:51:51]Epoch:21/100, iteration:180\195,lr:0.1, ls_dist:0.005, loss:0.5570471055762932, supervise_loss:0.39202356338500977, info_xz:-0.12761449813842773, whiten_loss:177.78498604466174, time:0.0001621246337890625
+
+batch_size:256,correct_num:217
+
+[2023-11-29_10:53:21]Epoch:22/100, iteration:84\195,lr:0.1, ls_dist:0.005, loss:0.5439007866644798, supervise_loss:0.37726566195487976, info_xz:-0.09076666831970215, whiten_loss:175.71177962064127, time:0.00018668174743652344
+
+batch_size:256,correct_num:225
+
+[2023-11-29_10:54:46]Epoch:22/100, iteration:184\195,lr:0.1, ls_dist:0.005, loss:0.46133844797397916, supervise_loss:0.30255475640296936, info_xz:-0.11504554748535156, whiten_loss:170.2882522800094, time:0.00021982192993164062
+
+batch_size:256,correct_num:230
+
+[2023-11-29_10:56:14]Epoch:23/100, iteration:88\195,lr:0.1, ls_dist:0.005, loss:0.538631821508553, supervise_loss:0.37482041120529175, info_xz:-0.10070836544036865, whiten_loss:173.88224088683364, time:0.00021982192993164062
+
+batch_size:256,correct_num:230
+
+[2023-11-29_10:57:40]Epoch:23/100, iteration:188\195,lr:0.1, ls_dist:0.005, loss:0.49099404099778565, supervise_loss:0.3338557779788971, info_xz:-0.1146857738494873, whiten_loss:168.60685232476627, time:0.00018143653869628906
+
+batch_size:256,correct_num:229
+
+[2023-11-29_10:59:06]Epoch:24/100, iteration:92\195,lr:0.1, ls_dist:0.005, loss:0.41255418066376653, supervise_loss:0.25280970335006714, info_xz:-0.10764288902282715, whiten_loss:170.50876323574988, time:0.0001990795135498047
+
+batch_size:256,correct_num:231
+
+[2023-11-29_11:00:38]Epoch:24/100, iteration:192\195,lr:0.1, ls_dist:0.005, loss:0.4744586488842143, supervise_loss:0.3157353401184082, info_xz:-0.13016366958618164, whiten_loss:171.7396816848887, time:0.00017070770263671875
+
+batch_size:256,correct_num:234
+
+[2023-11-29_11:02:06]Epoch:25/100, iteration:96\195,lr:0.1, ls_dist:0.005, loss:0.4552236602766586, supervise_loss:0.2996481657028198, info_xz:-0.09351921081542969, whiten_loss:164.92740373445278, time:0.00021076202392578125
+
+batch_size:256,correct_num:235
+
+[2023-11-29_11:03:36]Epoch:25/100, iteration:196\195,lr:0.1, ls_dist:0.005, loss:0.39382205954565064, supervise_loss:0.28029149770736694, info_xz:-0.13870596885681152, whiten_loss:127.40115872396487, time:0.00019073486328125
+
+batch_size:256,correct_num:72
+
+[2023-11-29_11:05:03]Epoch:26/100, iteration:100\195,lr:0.1, ls_dist:0.005, loss:0.47956502945697643, supervise_loss:0.3187521696090698, info_xz:-0.10750031471252441, whiten_loss:171.56288535869453, time:0.00021696090698242188
+
+batch_size:256,correct_num:224
+
+[2023-11-29_11:06:29]Epoch:27/100, iteration:4\195,lr:0.1, ls_dist:0.005, loss:0.4632977919387894, supervise_loss:0.29614365100860596, info_xz:-0.08385038375854492, whiten_loss:175.53917334557343, time:0.00024247169494628906
+
+batch_size:256,correct_num:234
+
+[2023-11-29_11:07:59]Epoch:27/100, iteration:104\195,lr:0.1, ls_dist:0.005, loss:0.38465639932533396, supervise_loss:0.22286243736743927, info_xz:-0.1286916732788086, whiten_loss:174.6631263055433, time:0.0001513957977294922
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:09:29]Epoch:28/100, iteration:8\195,lr:0.1, ls_dist:0.005, loss:0.4125096785990293, supervise_loss:0.24939091503620148, info_xz:-0.1145942211151123, whiten_loss:174.57818865457133, time:0.00018358230590820312
+
+batch_size:256,correct_num:234
+
+[2023-11-29_11:10:56]Epoch:28/100, iteration:108\195,lr:0.1, ls_dist:0.005, loss:0.4999708310619303, supervise_loss:0.3437384366989136, info_xz:-0.1188211441040039, whiten_loss:168.11452069434608, time:0.00015997886657714844
+
+batch_size:256,correct_num:228
+
+[2023-11-29_11:12:25]Epoch:29/100, iteration:12\195,lr:0.1, ls_dist:0.005, loss:0.357873545537153, supervise_loss:0.1994006633758545, info_xz:-0.1357438564300537, whiten_loss:172.04727376476833, time:0.0004343986511230469
+
+batch_size:256,correct_num:238
+
+[2023-11-29_11:13:54]Epoch:29/100, iteration:112\195,lr:0.1, ls_dist:0.005, loss:0.34699321490481183, supervise_loss:0.18599867820739746, info_xz:-0.12151002883911133, whiten_loss:173.14553958132547, time:0.00019097328186035156
+
+batch_size:256,correct_num:241
+
+[2023-11-29_11:15:26]Epoch:30/100, iteration:16\195,lr:0.1, ls_dist:0.005, loss:0.37033899324025993, supervise_loss:0.2147771716117859, info_xz:-0.12215709686279297, whiten_loss:167.77752535428885, time:0.00017714500427246094
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:16:56]Epoch:30/100, iteration:116\195,lr:0.1, ls_dist:0.005, loss:0.3950534105531385, supervise_loss:0.23807676136493683, info_xz:-0.09597969055175781, whiten_loss:166.57462122360965, time:0.00018072128295898438
+
+batch_size:256,correct_num:235
+
+[2023-11-29_11:18:28]Epoch:31/100, iteration:20\195,lr:0.1, ls_dist:0.005, loss:0.37446450665146624, supervise_loss:0.21272292733192444, info_xz:-0.12286043167114258, whiten_loss:174.02761652619162, time:0.00019598007202148438
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:19:52]Epoch:31/100, iteration:120\195,lr:0.1, ls_dist:0.005, loss:0.44052146767781053, supervise_loss:0.2797184884548187, info_xz:-0.1386563777923584, whiten_loss:174.66862892315658, time:0.00017714500427246094
+
+batch_size:256,correct_num:228
+
+[2023-11-29_11:21:24]Epoch:32/100, iteration:24\195,lr:0.1, ls_dist:0.005, loss:0.3914570841052357, supervise_loss:0.2311115860939026, info_xz:-0.128525972366333, whiten_loss:173.1980922677342, time:0.0002512931823730469
+
+batch_size:256,correct_num:234
+
+[2023-11-29_11:22:55]Epoch:32/100, iteration:124\195,lr:0.1, ls_dist:0.005, loss:0.34331999258930745, supervise_loss:0.17267800867557526, info_xz:-0.10623645782470703, whiten_loss:181.2656326764351, time:0.00027441978454589844
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:24:28]Epoch:33/100, iteration:28\195,lr:0.1, ls_dist:0.005, loss:0.34320409985325756, supervise_loss:0.17677870392799377, info_xz:-0.11655664443969727, whiten_loss:178.08105440876903, time:0.00023365020751953125
+
+batch_size:256,correct_num:242
+
+[2023-11-29_11:25:59]Epoch:33/100, iteration:128\195,lr:0.1, ls_dist:0.005, loss:0.3714164021185579, supervise_loss:0.2150360345840454, info_xz:-0.09477400779724121, whiten_loss:165.85777427470111, time:0.00014138221740722656
+
+batch_size:256,correct_num:238
+
+[2023-11-29_11:27:25]Epoch:34/100, iteration:32\195,lr:0.1, ls_dist:0.005, loss:0.35946397788137624, supervise_loss:0.2049103081226349, info_xz:-0.13616466522216797, whiten_loss:168.1701422414226, time:0.00020623207092285156
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:28:56]Epoch:34/100, iteration:132\195,lr:0.1, ls_dist:0.005, loss:0.4017258534031877, supervise_loss:0.24395664036273956, info_xz:-0.12367820739746094, whiten_loss:170.13702781972978, time:0.00016760826110839844
+
+batch_size:256,correct_num:238
+
+[2023-11-29_11:30:25]Epoch:35/100, iteration:36\195,lr:0.1, ls_dist:0.005, loss:0.3237770562569725, supervise_loss:0.1735130101442337, info_xz:-0.14415216445922852, whiten_loss:164.67926553889393, time:0.0001926422119140625
+
+batch_size:256,correct_num:240
+
+[2023-11-29_11:31:55]Epoch:35/100, iteration:136\195,lr:0.1, ls_dist:0.005, loss:0.4053409151669493, supervise_loss:0.25803548097610474, info_xz:-0.1388847827911377, whiten_loss:161.19391246995835, time:0.000186920166015625
+
+batch_size:256,correct_num:234
+
+[2023-11-29_11:33:23]Epoch:36/100, iteration:40\195,lr:0.1, ls_dist:0.005, loss:0.38901602335200813, supervise_loss:0.24069194495677948, info_xz:-0.14417314529418945, whiten_loss:162.74139888511206, time:0.0001804828643798828
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:34:54]Epoch:36/100, iteration:140\195,lr:0.1, ls_dist:0.005, loss:0.37215475458570535, supervise_loss:0.20968097448349, info_xz:-0.15171408653259277, whiten_loss:177.64518875547466, time:0.0003917217254638672
+
+batch_size:256,correct_num:236
+
+[2023-11-29_11:36:23]Epoch:37/100, iteration:44\195,lr:0.1, ls_dist:0.005, loss:0.3099075680343832, supervise_loss:0.15221373736858368, info_xz:-0.1453256607055664, whiten_loss:172.22639673635615, time:0.00021529197692871094
+
+batch_size:256,correct_num:248
+
+[2023-11-29_11:37:50]Epoch:37/100, iteration:144\195,lr:0.1, ls_dist:0.005, loss:0.35736447806182964, supervise_loss:0.20578230917453766, info_xz:-0.14389657974243164, whiten_loss:165.9718328219996, time:0.00017213821411132812
+
+batch_size:256,correct_num:241
+
+[2023-11-29_11:39:22]Epoch:38/100, iteration:48\195,lr:0.1, ls_dist:0.005, loss:0.32288656322218967, supervise_loss:0.16635443270206451, info_xz:-0.17073702812194824, whiten_loss:173.60583631255219, time:0.0001990795135498047
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:40:51]Epoch:38/100, iteration:148\195,lr:0.1, ls_dist:0.005, loss:0.34032386430608896, supervise_loss:0.18755263090133667, info_xz:-0.21114897727966309, whiten_loss:173.8861341129508, time:0.00013947486877441406
+
+batch_size:256,correct_num:243
+
+[2023-11-29_11:42:23]Epoch:39/100, iteration:52\195,lr:0.1, ls_dist:0.005, loss:0.3139341797778501, supervise_loss:0.161280557513237, info_xz:-0.20985913276672363, whiten_loss:173.63953852151772, time:0.0001544952392578125
+
+batch_size:256,correct_num:248
+
+[2023-11-29_11:43:51]Epoch:39/100, iteration:152\195,lr:0.1, ls_dist:0.005, loss:0.3310169554922121, supervise_loss:0.17786845564842224, info_xz:-0.20219933986663818, whiten_loss:173.36843681068592, time:0.00019049644470214844
+
+batch_size:256,correct_num:245
+
+[2023-11-29_11:45:18]Epoch:40/100, iteration:56\195,lr:0.1, ls_dist:0.005, loss:0.2933226527720032, supervise_loss:0.13635262846946716, info_xz:-0.23224353790283203, whiten_loss:180.19437809281928, time:0.00015616416931152344
+
+batch_size:256,correct_num:243
+
+[2023-11-29_11:46:28]Epoch:40/100, iteration:156\195,lr:0.1, ls_dist:0.005, loss:0.3322403440018846, supervise_loss:0.18593907356262207, info_xz:-0.23964571952819824, whiten_loss:170.26583941185012, time:0.0001556873321533203
+
+batch_size:256,correct_num:241
+
+[2023-11-29_11:47:31]Epoch:41/100, iteration:60\195,lr:0.1, ls_dist:0.005, loss:0.27745945736821404, supervise_loss:0.12227073311805725, info_xz:-0.2487788200378418, whiten_loss:180.06660774405708, time:0.00016689300537109375
+
+batch_size:256,correct_num:246
+
+[2023-11-29_11:48:33]Epoch:41/100, iteration:160\195,lr:0.1, ls_dist:0.005, loss:0.2918677810004251, supervise_loss:0.13827553391456604, info_xz:-0.25325703620910645, whiten_loss:178.91794772653748, time:0.00017952919006347656
+
+batch_size:256,correct_num:243
+
+[2023-11-29_11:49:38]Epoch:42/100, iteration:64\195,lr:0.1, ls_dist:0.005, loss:0.2673394808103199, supervise_loss:0.11800172179937363, info_xz:-0.2734818458557129, whiten_loss:176.6859421064014, time:0.00016307830810546875
+
+batch_size:256,correct_num:246
+
+[2023-11-29_11:50:45]Epoch:42/100, iteration:164\195,lr:0.1, ls_dist:0.005, loss:0.3392866629410417, supervise_loss:0.18734228610992432, info_xz:-0.27765488624572754, whiten_loss:179.7098594952257, time:0.00015854835510253906
+
+batch_size:256,correct_num:239
+
+[2023-11-29_11:51:48]Epoch:43/100, iteration:68\195,lr:0.1, ls_dist:0.005, loss:0.31704775470649527, supervise_loss:0.16472630202770233, info_xz:-0.24580168724060059, whiten_loss:176.90161842262071, time:0.00016188621520996094
+
+batch_size:256,correct_num:240
+
+[2023-11-29_11:52:54]Epoch:43/100, iteration:168\195,lr:0.1, ls_dist:0.005, loss:0.2875117111260057, supervise_loss:0.1379430890083313, info_xz:-0.25741732120513916, whiten_loss:175.31035572830444, time:0.0001342296600341797
+
+batch_size:256,correct_num:243
+
+[2023-11-29_11:54:03]Epoch:44/100, iteration:72\195,lr:0.1, ls_dist:0.005, loss:0.26789244392968886, supervise_loss:0.11034083366394043, info_xz:-0.24607586860656738, whiten_loss:182.15919414617292, time:0.00018453598022460938
+
+batch_size:256,correct_num:249
+
+[2023-11-29_11:55:18]Epoch:44/100, iteration:172\195,lr:0.1, ls_dist:0.005, loss:0.2402262136452288, supervise_loss:0.0835699588060379, info_xz:-0.2890172004699707, whiten_loss:185.55797339607184, time:0.0001819133758544922
+
+batch_size:256,correct_num:250
+
+[2023-11-29_11:56:31]Epoch:45/100, iteration:76\195,lr:0.1, ls_dist:0.005, loss:0.27258447124236435, supervise_loss:0.12391608953475952, info_xz:-0.3095102310180664, whiten_loss:179.61940480941146, time:0.00017690658569335938
+
+batch_size:256,correct_num:247
+
+[2023-11-29_11:57:35]Epoch:45/100, iteration:176\195,lr:0.1, ls_dist:0.005, loss:0.2916429850900879, supervise_loss:0.13999858498573303, info_xz:-0.3456308841705322, whiten_loss:186.2074944818726, time:0.00016760826110839844
+
+batch_size:256,correct_num:246
+
+[2023-11-29_11:58:38]Epoch:46/100, iteration:80\195,lr:0.1, ls_dist:0.005, loss:0.2737808739000066, supervise_loss:0.12542690336704254, info_xz:-0.3786085844039917, whiten_loss:186.214825993131, time:0.00017070770263671875
+
+batch_size:256,correct_num:248
+
+[2023-11-29_11:59:41]Epoch:46/100, iteration:180\195,lr:0.1, ls_dist:0.005, loss:0.2763964261012323, supervise_loss:0.13442295789718628, info_xz:-0.37131619453430176, whiten_loss:179.1050906377084, time:0.000179290771484375
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:00:50]Epoch:47/100, iteration:84\195,lr:0.1, ls_dist:0.005, loss:0.2723980102987086, supervise_loss:0.11738483607769012, info_xz:-0.25610995292663574, whiten_loss:180.6241724939143, time:0.00015664100646972656
+
+batch_size:256,correct_num:248
+
+[2023-11-29_12:01:51]Epoch:47/100, iteration:184\195,lr:0.1, ls_dist:0.005, loss:0.26977995234816604, supervise_loss:0.12366174161434174, info_xz:-0.3073103427886963, whiten_loss:176.84924799292617, time:0.00013399124145507812
+
+batch_size:256,correct_num:246
+
+[2023-11-29_12:02:53]Epoch:48/100, iteration:88\195,lr:0.1, ls_dist:0.005, loss:0.2591484079054826, supervise_loss:0.11322274804115295, info_xz:-0.3046278953552246, whiten_loss:176.38844641961987, time:0.00015306472778320312
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:03:54]Epoch:48/100, iteration:188\195,lr:0.1, ls_dist:0.005, loss:0.3044266606910658, supervise_loss:0.15717720985412598, info_xz:-0.36985862255096436, whiten_loss:184.23531011180398, time:0.0001354217529296875
+
+batch_size:256,correct_num:246
+
+[2023-11-29_12:04:57]Epoch:49/100, iteration:92\195,lr:0.1, ls_dist:0.005, loss:0.28147991487502344, supervise_loss:0.1334112286567688, info_xz:-0.30464744567871094, whiten_loss:178.53343227624188, time:0.0001671314239501953
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:06:02]Epoch:49/100, iteration:192\195,lr:0.1, ls_dist:0.005, loss:0.2690835507385032, supervise_loss:0.11896884441375732, info_xz:-0.341888427734375, whiten_loss:184.30355058829952, time:0.00014066696166992188
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:07:05]Epoch:50/100, iteration:96\195,lr:0.1, ls_dist:0.005, loss:0.2831137339615164, supervise_loss:0.1494341790676117, info_xz:-0.38493871688842773, whiten_loss:172.17342658274748, time:0.0001583099365234375
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:08:25]Epoch:50/100, iteration:196\195,lr:0.1, ls_dist:0.005, loss:0.23615606921008708, supervise_loss:0.14530602097511292, info_xz:-0.3680000305175781, whiten_loss:127.65005277684809, time:0.0001704692840576172
+
+batch_size:256,correct_num:77
+
+[2023-11-29_12:09:50]Epoch:51/100, iteration:100\195,lr:0.1, ls_dist:0.005, loss:0.2817949203178771, supervise_loss:0.1364055573940277, info_xz:-0.3969547748565674, whiten_loss:185.08484189962226, time:0.00019931793212890625
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:11:15]Epoch:52/100, iteration:4\195,lr:0.1, ls_dist:0.005, loss:0.2852102461080286, supervise_loss:0.13659724593162537, info_xz:-0.3222646713256836, whiten_loss:180.83947326943604, time:0.00020313262939453125
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:13:40]Epoch:52/100, iteration:104\195,lr:0.1, ls_dist:0.005, loss:0.30117060236607907, supervise_loss:0.15434512495994568, info_xz:-0.33130013942718506, whiten_loss:179.95549730931637, time:0.00017523765563964844
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:15:05]Epoch:53/100, iteration:8\195,lr:0.1, ls_dist:0.005, loss:0.28085859058679385, supervise_loss:0.1301277130842209, info_xz:-0.3325235843658447, whiten_loss:183.98323593915745, time:0.0001976490020751953
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:17:30]Epoch:53/100, iteration:108\195,lr:0.1, ls_dist:0.005, loss:0.273199964852432, supervise_loss:0.12342753261327744, info_xz:-0.37612104415893555, whiten_loss:187.38453516493198, time:0.00015926361083984375
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:20:32]Epoch:54/100, iteration:12\195,lr:0.1, ls_dist:0.005, loss:0.2632281655817515, supervise_loss:0.10693460702896118, info_xz:-0.3445887565612793, whiten_loss:190.75243420891823, time:0.00020122528076171875
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:21:56]Epoch:54/100, iteration:112\195,lr:0.1, ls_dist:0.005, loss:0.26398143745585967, supervise_loss:0.12054431438446045, info_xz:-0.3549022674560547, whiten_loss:178.92735279723692, time:0.0001838207244873047
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:23:24]Epoch:55/100, iteration:16\195,lr:0.1, ls_dist:0.005, loss:0.26892782976687024, supervise_loss:0.1331671178340912, info_xz:-0.42684316635131836, whiten_loss:178.44502856791092, time:0.00020051002502441406
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:25:30]Epoch:55/100, iteration:116\195,lr:0.1, ls_dist:0.005, loss:0.22754513291492226, supervise_loss:0.08297144621610641, info_xz:-0.39642393589019775, whiten_loss:184.2160802878356, time:0.00018286705017089844
+
+batch_size:256,correct_num:251
+
+[2023-11-29_12:27:31]Epoch:56/100, iteration:20\195,lr:0.1, ls_dist:0.005, loss:0.24262184848147464, supervise_loss:0.09590350091457367, info_xz:-0.3387356996536255, whiten_loss:180.59191678720546, time:0.00022220611572265625
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:29:07]Epoch:56/100, iteration:120\195,lr:0.1, ls_dist:0.005, loss:0.25949443750312123, supervise_loss:0.12309221923351288, info_xz:-0.384365439414978, whiten_loss:174.83876519133838, time:0.0001628398895263672
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:30:38]Epoch:57/100, iteration:24\195,lr:0.1, ls_dist:0.005, loss:0.22378133829814964, supervise_loss:0.07832063734531403, info_xz:-0.3543233871459961, whiten_loss:180.89303966743523, time:0.0002243518829345703
+
+batch_size:256,correct_num:251
+
+[2023-11-29_12:32:05]Epoch:57/100, iteration:124\195,lr:0.1, ls_dist:0.005, loss:0.32702911683034075, supervise_loss:0.18765492737293243, info_xz:-0.3553624153137207, whiten_loss:174.91043396901262, time:0.000244140625
+
+batch_size:256,correct_num:241
+
+[2023-11-29_12:33:34]Epoch:58/100, iteration:28\195,lr:0.1, ls_dist:0.005, loss:0.23629957726172784, supervise_loss:0.09107282012701035, info_xz:-0.392350435256958, whiten_loss:184.46180140547136, time:0.00023293495178222656
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:35:07]Epoch:58/100, iteration:128\195,lr:0.1, ls_dist:0.005, loss:0.225179704144741, supervise_loss:0.08302700519561768, info_xz:-0.3332347869873047, whiten_loss:175.47617690279574, time:0.0001971721649169922
+
+batch_size:256,correct_num:249
+
+[2023-11-29_12:36:35]Epoch:59/100, iteration:32\195,lr:0.1, ls_dist:0.005, loss:0.268484896083123, supervise_loss:0.13140513002872467, info_xz:-0.34519195556640625, whiten_loss:171.59896161103893, time:0.00024008750915527344
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:38:02]Epoch:59/100, iteration:132\195,lr:0.1, ls_dist:0.005, loss:0.2561847892372914, supervise_loss:0.11329516768455505, info_xz:-0.3164329528808594, whiten_loss:174.53292280128673, time:0.0001964569091796875
+
+batch_size:256,correct_num:248
+
+[2023-11-29_12:39:33]Epoch:60/100, iteration:36\195,lr:0.1, ls_dist:0.005, loss:0.26228444608933993, supervise_loss:0.12356610596179962, info_xz:-0.4110245704650879, whiten_loss:179.82079419381685, time:0.0002219676971435547
+
+batch_size:256,correct_num:249
+
+[2023-11-29_12:41:42]Epoch:60/100, iteration:136\195,lr:0.1, ls_dist:0.005, loss:0.26004932731270824, supervise_loss:0.1220029890537262, info_xz:-0.39087605476379395, whiten_loss:177.1339467155937, time:0.000293731689453125
+
+batch_size:256,correct_num:245
+
+[2023-11-29_12:43:12]Epoch:61/100, iteration:40\195,lr:0.1, ls_dist:0.005, loss:0.25480404511103133, supervise_loss:0.1018548458814621, info_xz:-0.3188495635986328, whiten_loss:184.83415260920026, time:0.00021076202392578125
+
+batch_size:256,correct_num:247
+
+[2023-11-29_12:44:35]Epoch:61/100, iteration:140\195,lr:0.1, ls_dist:0.005, loss:0.22829196605355118, supervise_loss:0.08424027264118195, info_xz:-0.3561820983886719, whiten_loss:179.66990548641058, time:0.00018930435180664062
+
+batch_size:256,correct_num:251
+
+[2023-11-29_12:45:56]Epoch:62/100, iteration:44\195,lr:0.1, ls_dist:0.005, loss:0.21419973411723658, supervise_loss:0.06847264617681503, info_xz:-0.38480162620544434, whiten_loss:184.20725056096597, time:0.00023865699768066406
+
+batch_size:256,correct_num:253
+
+[2023-11-29_12:47:16]Epoch:62/100, iteration:144\195,lr:0.1, ls_dist:0.005, loss:0.24932404146306433, supervise_loss:0.1030370220541954, info_xz:-0.3183763027191162, whiten_loss:178.1246541511289, time:0.00020122528076171875
+
+batch_size:256,correct_num:248
+
+[2023-11-29_12:48:37]Epoch:63/100, iteration:48\195,lr:0.1, ls_dist:0.005, loss:0.30604454113229135, supervise_loss:0.16140642762184143, info_xz:-0.3511652946472168, whiten_loss:179.75463701470713, time:0.0002219676971435547
+
+batch_size:256,correct_num:244
+
+[2023-11-29_12:49:58]Epoch:63/100, iteration:148\195,lr:0.1, ls_dist:0.005, loss:0.25804477935490844, supervise_loss:0.11661865562200546, info_xz:-0.38288307189941406, whiten_loss:179.71442645249599, time:0.0002675056457519531
+
+batch_size:256,correct_num:248
+
+[2023-11-29_12:51:18]Epoch:64/100, iteration:52\195,lr:0.1, ls_dist:0.005, loss:0.2081575196785549, supervise_loss:0.064202219247818, info_xz:-0.3233520984649658, whiten_loss:176.29051102229153, time:0.00017499923706054688
+
+batch_size:256,correct_num:251
+
+[2023-11-29_12:53:03]Epoch:64/100, iteration:152\195,lr:0.1, ls_dist:0.005, loss:0.22432882400660398, supervise_loss:0.07828735560178757, info_xz:-0.33718717098236084, whiten_loss:179.76018475799444, time:0.00018095970153808594
+
+batch_size:256,correct_num:250
+
+[2023-11-29_12:54:37]Epoch:65/100, iteration:56\195,lr:0.1, ls_dist:0.005, loss:0.22355286914079264, supervise_loss:0.08739005029201508, info_xz:-0.3880951404571533, whiten_loss:174.972334384609, time:0.0002529621124267578
+
+batch_size:256,correct_num:250
+
+[2023-11-29_12:57:22]Epoch:65/100, iteration:156\195,lr:0.1, ls_dist:0.005, loss:0.30330316320237244, supervise_loss:0.1552383154630661, info_xz:-0.349556565284729, whiten_loss:183.02050575789536, time:0.0001900196075439453
+
+batch_size:256,correct_num:243
+
+[2023-11-29_13:00:18]Epoch:66/100, iteration:60\195,lr:0.1, ls_dist:0.005, loss:0.19150252110313318, supervise_loss:0.04644741117954254, info_xz:-0.3492414951324463, whiten_loss:179.97925943683526, time:0.00022220611572265625
+
+batch_size:256,correct_num:253
+
+[2023-11-29_13:03:52]Epoch:66/100, iteration:160\195,lr:0.1, ls_dist:0.005, loss:0.2685204426848701, supervise_loss:0.13184519112110138, info_xz:-0.3810844421386719, whiten_loss:174.783697267752, time:0.00017404556274414062
+
+batch_size:256,correct_num:246
+
+[2023-11-29_13:06:27]Epoch:67/100, iteration:64\195,lr:0.1, ls_dist:0.005, loss:0.2545473204329337, supervise_loss:0.10478004068136215, info_xz:-0.2840752601623535, whiten_loss:178.17480874803914, time:0.0002391338348388672
+
+batch_size:256,correct_num:248
+
+[2023-11-29_13:09:05]Epoch:67/100, iteration:164\195,lr:0.1, ls_dist:0.005, loss:0.3146218816564598, supervise_loss:0.17448684573173523, info_xz:-0.3491697311401367, whiten_loss:175.05200307827377, time:0.00020933151245117188
+
+batch_size:256,correct_num:240
+
+[2023-11-29_13:11:21]Epoch:68/100, iteration:68\195,lr:0.1, ls_dist:0.005, loss:0.2511734425538206, supervise_loss:0.10267926752567291, info_xz:-0.32705092430114746, whiten_loss:181.19927341872693, time:0.00019168853759765625
+
+batch_size:256,correct_num:246
+
+[2023-11-29_13:13:33]Epoch:68/100, iteration:168\195,lr:0.1, ls_dist:0.005, loss:0.2191308478255357, supervise_loss:0.07302486151456833, info_xz:-0.35853052139282227, whiten_loss:181.9590406854238, time:0.0001723766326904297
+
+batch_size:256,correct_num:250
+
+[2023-11-29_13:15:41]Epoch:69/100, iteration:72\195,lr:0.1, ls_dist:0.005, loss:0.27136263258130106, supervise_loss:0.11987699568271637, info_xz:-0.3204078674316406, whiten_loss:183.526426621981, time:0.00020933151245117188
+
+batch_size:256,correct_num:246
+
+[2023-11-29_13:17:55]Epoch:69/100, iteration:172\195,lr:0.1, ls_dist:0.005, loss:0.2098349130780942, supervise_loss:0.06074075400829315, info_xz:-0.3494706153869629, whiten_loss:184.04122284367153, time:0.00017213821411132812
+
+batch_size:256,correct_num:251
+
+[2023-11-29_13:20:15]Epoch:70/100, iteration:76\195,lr:0.1, ls_dist:0.005, loss:0.26452816519300815, supervise_loss:0.11925645172595978, info_xz:-0.3569495677947998, whiten_loss:180.96667024652837, time:0.0002200603485107422
+
+batch_size:256,correct_num:244
+
+[2023-11-29_13:22:28]Epoch:70/100, iteration:176\195,lr:0.1, ls_dist:0.005, loss:0.21897513396422755, supervise_loss:0.07644734531641006, info_xz:-0.37283897399902344, whiten_loss:179.81168604771983, time:0.00017547607421875
+
+batch_size:256,correct_num:252
+
+[2023-11-29_13:24:39]Epoch:71/100, iteration:80\195,lr:0.1, ls_dist:0.005, loss:0.24618192208687428, supervise_loss:0.09683020412921906, info_xz:-0.30533719062805176, whiten_loss:179.88543404022815, time:0.0002377033233642578
+
+batch_size:256,correct_num:245
+
+[2023-11-29_13:26:51]Epoch:71/100, iteration:180\195,lr:0.1, ls_dist:0.005, loss:0.30811314086037656, supervise_loss:0.16673964262008667, info_xz:-0.3204759359359741, whiten_loss:173.4210977943518, time:0.00016927719116210938
+
+batch_size:256,correct_num:244
+
+[2023-11-29_13:29:01]Epoch:72/100, iteration:84\195,lr:0.1, ls_dist:0.005, loss:0.2141360768966671, supervise_loss:0.07009856402873993, info_xz:-0.34353160858154297, whiten_loss:178.39067596125565, time:0.0003120899200439453
+
+batch_size:256,correct_num:252
+
+[2023-11-29_13:31:13]Epoch:72/100, iteration:184\195,lr:0.1, ls_dist:0.005, loss:0.2428315025521481, supervise_loss:0.0962788388133049, info_xz:-0.35137462615966797, whiten_loss:181.69012709986805, time:0.00024199485778808594
+
+batch_size:256,correct_num:246
+
+[2023-11-29_13:33:21]Epoch:73/100, iteration:88\195,lr:0.1, ls_dist:0.005, loss:0.24974568328579744, supervise_loss:0.10385403782129288, info_xz:-0.34435200691223145, whiten_loss:180.32685062607607, time:0.00022149085998535156
+
+batch_size:256,correct_num:250
+
+[2023-11-29_13:35:37]Epoch:73/100, iteration:188\195,lr:0.1, ls_dist:0.005, loss:0.2738467744767491, supervise_loss:0.13155204057693481, info_xz:-0.41190671920776367, whiten_loss:183.48540284035843, time:0.00018453598022460938
+
+batch_size:256,correct_num:248
+
+[2023-11-29_13:37:55]Epoch:74/100, iteration:92\195,lr:0.1, ls_dist:0.005, loss:0.21076398532447485, supervise_loss:0.06806088238954544, info_xz:-0.42308616638183594, whiten_loss:185.01172031817106, time:0.00018858909606933594
+
+batch_size:256,correct_num:249
+
+[2023-11-29_13:40:08]Epoch:74/100, iteration:192\195,lr:0.1, ls_dist:0.005, loss:0.2542501665463387, supervise_loss:0.11029882729053497, info_xz:-0.40737247467041016, whiten_loss:184.6885882129609, time:0.00017213821411132812
+
+batch_size:256,correct_num:247
+
+[2023-11-29_13:42:24]Epoch:75/100, iteration:96\195,lr:0.1, ls_dist:0.005, loss:0.21688415961275062, supervise_loss:0.0730777457356453, info_xz:-0.3577427864074707, whiten_loss:179.58069326291044, time:0.00019669532775878906
+
+batch_size:256,correct_num:250
+
+[2023-11-29_13:44:38]Epoch:75/100, iteration:196\195,lr:0.1, ls_dist:0.005, loss:0.2258823169120034, supervise_loss:0.1336071640253067, info_xz:-0.3725464344024658, whiten_loss:129.5297993071755, time:0.000179290771484375
+
+batch_size:256,correct_num:77
+
+[2023-11-29_13:46:51]Epoch:76/100, iteration:100\195,lr:0.1, ls_dist:0.005, loss:0.23261198943073622, supervise_loss:0.0907888188958168, info_xz:-0.3656899929046631, whiten_loss:178.3921698253857, time:0.0002353191375732422
+
+batch_size:256,correct_num:248
+
+[2023-11-29_13:49:01]Epoch:77/100, iteration:4\195,lr:0.1, ls_dist:0.005, loss:0.24730202965241735, supervise_loss:0.09843000024557114, info_xz:-0.3139944076538086, whiten_loss:180.2714657018787, time:0.0002014636993408203
+
+batch_size:256,correct_num:251
+
+[2023-11-29_13:51:18]Epoch:77/100, iteration:104\195,lr:0.1, ls_dist:0.005, loss:0.18484861367349006, supervise_loss:0.0393524244427681, info_xz:-0.404050350189209, whiten_loss:185.90122424964287, time:0.00017714500427246094
+
+batch_size:256,correct_num:254
+
+[2023-11-29_13:53:24]Epoch:78/100, iteration:8\195,lr:0.1, ls_dist:0.005, loss:0.2083742240441934, supervise_loss:0.053548697382211685, info_xz:-0.3037378787994385, whiten_loss:185.19931416939653, time:0.0003705024719238281
+
+batch_size:256,correct_num:254
+
+[2023-11-29_13:55:44]Epoch:78/100, iteration:108\195,lr:0.1, ls_dist:0.005, loss:0.2762932308475698, supervise_loss:0.13060615956783295, info_xz:-0.3292367458343506, whiten_loss:178.61074735328802, time:0.000247955322265625
+
+batch_size:256,correct_num:244
+
+[2023-11-29_13:58:09]Epoch:79/100, iteration:12\195,lr:0.1, ls_dist:0.005, loss:0.26366632271159973, supervise_loss:0.11157238483428955, info_xz:-0.3412806987762451, whiten_loss:186.22200775493468, time:0.00023698806762695312
+
+batch_size:256,correct_num:249
+
+[2023-11-29_14:00:39]Epoch:79/100, iteration:112\195,lr:0.1, ls_dist:0.005, loss:0.21306837585584446, supervise_loss:0.07839229702949524, info_xz:-0.3918660879135132, whiten_loss:173.86268687264248, time:0.00017023086547851562
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:03:11]Epoch:80/100, iteration:16\195,lr:0.1, ls_dist:0.005, loss:0.2180969304703831, supervise_loss:0.07644157111644745, info_xz:-0.4251677989959717, whiten_loss:184.17213850847475, time:0.00021076202392578125
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:05:34]Epoch:80/100, iteration:116\195,lr:0.1, ls_dist:0.005, loss:0.1974515977441155, supervise_loss:0.060873840004205704, info_xz:-0.3844282627105713, whiten_loss:175.02058550108305, time:0.006522178649902344
+
+batch_size:256,correct_num:252
+
+[2023-11-29_14:07:55]Epoch:81/100, iteration:20\195,lr:0.1, ls_dist:0.005, loss:0.23366939945917706, supervise_loss:0.08726952970027924, info_xz:-0.3137035369873047, whiten_loss:177.77022271257022, time:0.00019025802612304688
+
+batch_size:256,correct_num:249
+
+[2023-11-29_14:10:12]Epoch:81/100, iteration:120\195,lr:0.1, ls_dist:0.005, loss:0.2244495796158574, supervise_loss:0.08886656910181046, info_xz:-0.4205665588378906, whiten_loss:177.63966788795213, time:0.00017309188842773438
+
+batch_size:256,correct_num:248
+
+[2023-11-29_14:12:29]Epoch:82/100, iteration:24\195,lr:0.1, ls_dist:0.005, loss:0.22036059952471446, supervise_loss:0.07979001849889755, info_xz:-0.3572903871536255, whiten_loss:176.2996204862375, time:0.0002090930938720703
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:14:44]Epoch:82/100, iteration:124\195,lr:0.1, ls_dist:0.005, loss:0.25239714011045683, supervise_loss:0.10929922759532928, info_xz:-0.3703775405883789, whiten_loss:180.13567253442992, time:0.0002429485321044922
+
+batch_size:256,correct_num:248
+
+[2023-11-29_14:17:00]Epoch:83/100, iteration:28\195,lr:0.1, ls_dist:0.005, loss:0.21698657011716294, supervise_loss:0.06771259754896164, info_xz:-0.33936941623687744, whiten_loss:183.2109164270632, time:0.0002262592315673828
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:19:21]Epoch:83/100, iteration:128\195,lr:0.1, ls_dist:0.005, loss:0.20912296412264714, supervise_loss:0.06603358685970306, info_xz:-0.3135814666748047, whiten_loss:174.44752616559873, time:0.00016808509826660156
+
+batch_size:256,correct_num:252
+
+[2023-11-29_14:21:41]Epoch:84/100, iteration:32\195,lr:0.1, ls_dist:0.005, loss:0.18874455473013635, supervise_loss:0.046571310609579086, info_xz:-0.31401729583740234, whiten_loss:173.5749751944136, time:0.00019669532775878906
+
+batch_size:256,correct_num:255
+
+[2023-11-29_14:23:59]Epoch:84/100, iteration:132\195,lr:0.1, ls_dist:0.005, loss:0.23107262240861798, supervise_loss:0.08566262573003769, info_xz:-0.37474536895751953, whiten_loss:182.88453580950642, time:0.0001780986785888672
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:26:19]Epoch:85/100, iteration:36\195,lr:0.1, ls_dist:0.005, loss:0.2154849989266767, supervise_loss:0.07388793677091599, info_xz:-0.3628121614456177, whiten_loss:177.87827904538054, time:0.00020170211791992188
+
+batch_size:256,correct_num:252
+
+[2023-11-29_14:28:32]Epoch:85/100, iteration:136\195,lr:0.1, ls_dist:0.005, loss:0.22244627612881784, supervise_loss:0.07817821204662323, info_xz:-0.36638081073760986, whiten_loss:180.90614515595558, time:0.00013208389282226562
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:30:49]Epoch:86/100, iteration:40\195,lr:0.1, ls_dist:0.005, loss:0.20813277376458827, supervise_loss:0.06131131201982498, info_xz:-0.3139078617095947, whiten_loss:178.21224791572277, time:0.004618406295776367
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:33:10]Epoch:86/100, iteration:140\195,lr:0.1, ls_dist:0.005, loss:0.20838715327275428, supervise_loss:0.07417609542608261, info_xz:-0.38959527015686035, whiten_loss:173.1705870975319, time:0.00017642974853515625
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:35:31]Epoch:87/100, iteration:44\195,lr:0.1, ls_dist:0.005, loss:0.24224960311044055, supervise_loss:0.10203565657138824, info_xz:-0.40726280212402344, whiten_loss:180.94022824157076, time:0.0002315044403076172
+
+batch_size:256,correct_num:249
+
+[2023-11-29_14:37:49]Epoch:87/100, iteration:144\195,lr:0.1, ls_dist:0.005, loss:0.2259060088990846, supervise_loss:0.08707734197378159, info_xz:-0.3663361072540283, whiten_loss:175.46227765070586, time:0.00018787384033203125
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:40:14]Epoch:88/100, iteration:48\195,lr:0.1, ls_dist:0.005, loss:0.24377900900944507, supervise_loss:0.09297236800193787, info_xz:-0.3289914131164551, whiten_loss:183.70578231915272, time:0.00020503997802734375
+
+batch_size:256,correct_num:248
+
+[2023-11-29_14:42:28]Epoch:88/100, iteration:148\195,lr:0.1, ls_dist:0.005, loss:0.21794662600899684, supervise_loss:0.07887459546327591, info_xz:-0.35532569885253906, whiten_loss:174.60460192109096, time:0.00016736984252929688
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:44:45]Epoch:89/100, iteration:52\195,lr:0.1, ls_dist:0.005, loss:0.22222390599055655, supervise_loss:0.07309432327747345, info_xz:-0.3470330238342285, whiten_loss:183.832885841564, time:0.00034308433532714844
+
+batch_size:256,correct_num:251
+
+[2023-11-29_14:47:04]Epoch:89/100, iteration:152\195,lr:0.1, ls_dist:0.005, loss:0.2415127257054085, supervise_loss:0.09494854509830475, info_xz:-0.32326292991638184, whiten_loss:178.89047657897416, time:0.00021076202392578125
+
+batch_size:256,correct_num:248
+
+[2023-11-29_14:49:22]Epoch:90/100, iteration:56\195,lr:0.1, ls_dist:0.005, loss:0.20168954619519622, supervise_loss:0.058185726404190063, info_xz:-0.40943896770477295, whiten_loss:184.44771805159957, time:0.0002529621124267578
+
+batch_size:256,correct_num:252
+
+[2023-11-29_14:51:43]Epoch:90/100, iteration:156\195,lr:0.1, ls_dist:0.005, loss:0.23073747350549384, supervise_loss:0.09706176817417145, info_xz:-0.4311237335205078, whiten_loss:176.78808017348928, time:0.0001780986785888672
+
+batch_size:256,correct_num:249
+
+[2023-11-29_14:54:08]Epoch:91/100, iteration:60\195,lr:0.1, ls_dist:0.005, loss:0.18493469255994913, supervise_loss:0.04576839506626129, info_xz:-0.42062902450561523, whiten_loss:181.22920217942354, time:0.00020051002502441406
+
+batch_size:256,correct_num:255
+
+[2023-11-29_14:56:21]Epoch:91/100, iteration:160\195,lr:0.1, ls_dist:0.005, loss:0.22099527257209806, supervise_loss:0.08232985436916351, info_xz:-0.4132874011993408, whiten_loss:179.99415757781057, time:0.00015497207641601562
+
+batch_size:256,correct_num:250
+
+[2023-11-29_14:58:35]Epoch:92/100, iteration:64\195,lr:0.1, ls_dist:0.005, loss:0.23392164076451763, supervise_loss:0.08894100040197372, info_xz:-0.34038758277893066, whiten_loss:179.0194001305531, time:0.0001590251922607422
+
+batch_size:256,correct_num:250
+
+[2023-11-29_15:00:54]Epoch:92/100, iteration:164\195,lr:0.1, ls_dist:0.005, loss:0.17629916180693275, supervise_loss:0.03522270545363426, info_xz:-0.4106699228286743, whiten_loss:182.14344938122397, time:0.00017142295837402344
+
+batch_size:256,correct_num:254
+
+[2023-11-29_15:03:01]Epoch:93/100, iteration:68\195,lr:0.1, ls_dist:0.005, loss:0.22278248936038889, supervise_loss:0.08272679895162582, info_xz:-0.3604893684387207, whiten_loss:176.1046279976932, time:0.0001990795135498047
+
+batch_size:256,correct_num:249
+
+[2023-11-29_15:05:28]Epoch:93/100, iteration:168\195,lr:0.1, ls_dist:0.005, loss:0.2313675831744477, supervise_loss:0.09088907390832901, info_xz:-0.36833786964416504, whiten_loss:177.31229846570938, time:0.00017881393432617188
+
+batch_size:256,correct_num:247
+
+[2023-11-29_15:07:54]Epoch:94/100, iteration:72\195,lr:0.1, ls_dist:0.005, loss:0.23349096661758942, supervise_loss:0.09696086496114731, info_xz:-0.4236485958099365, whiten_loss:178.89496347260993, time:0.0002028942108154297
+
+batch_size:256,correct_num:248
+
+[2023-11-29_15:10:28]Epoch:94/100, iteration:172\195,lr:0.1, ls_dist:0.005, loss:0.22660827871361952, supervise_loss:0.07918085157871246, info_xz:-0.3456918001174927, whiten_loss:181.99660863677244, time:0.00019741058349609375
+
+batch_size:256,correct_num:249
+
+[2023-11-29_15:12:57]Epoch:95/100, iteration:76\195,lr:0.1, ls_dist:0.005, loss:0.20867609737260964, supervise_loss:0.05874473229050636, info_xz:-0.38014233112335205, whiten_loss:187.94559819443847, time:0.00019598007202148438
+
+batch_size:256,correct_num:250
+
+[2023-11-29_15:15:11]Epoch:95/100, iteration:176\195,lr:0.1, ls_dist:0.005, loss:0.19517786410640847, supervise_loss:0.058080364018678665, info_xz:-0.38779592514038086, whiten_loss:175.877094091884, time:0.0001723766326904297
+
+batch_size:256,correct_num:253
+
+[2023-11-29_15:17:24]Epoch:96/100, iteration:80\195,lr:0.1, ls_dist:0.005, loss:0.22229886323096815, supervise_loss:0.07536979019641876, info_xz:-0.342018723487854, whiten_loss:181.13094463827673, time:0.00024771690368652344
+
+batch_size:256,correct_num:251
+
+[2023-11-29_15:19:41]Epoch:96/100, iteration:180\195,lr:0.1, ls_dist:0.005, loss:0.21702926242182224, supervise_loss:0.07741282135248184, info_xz:-0.3890829086303711, whiten_loss:178.52473267743557, time:0.00016880035400390625
+
+batch_size:256,correct_num:248
+
+[2023-11-29_15:22:07]Epoch:97/100, iteration:84\195,lr:0.1, ls_dist:0.005, loss:0.2203038407566492, supervise_loss:0.07770223915576935, info_xz:-0.3463764190673828, whiten_loss:177.23924276256005, time:0.00017118453979492188
+
+batch_size:256,correct_num:251
+
+[2023-11-29_15:24:27]Epoch:97/100, iteration:184\195,lr:0.1, ls_dist:0.005, loss:0.22718754293260007, supervise_loss:0.0801619365811348, info_xz:-0.33637571334838867, whiten_loss:180.6631784313622, time:0.0001590251922607422
+
+batch_size:256,correct_num:246
+
+[2023-11-29_15:26:52]Epoch:98/100, iteration:88\195,lr:0.1, ls_dist:0.005, loss:0.18174728480466337, supervise_loss:0.04258451610803604, info_xz:-0.39199864864349365, whiten_loss:178.3626350510928, time:0.00031876564025878906
+
+batch_size:256,correct_num:254
+
+[2023-11-29_15:29:23]Epoch:98/100, iteration:188\195,lr:0.1, ls_dist:0.005, loss:0.20272468459706572, supervise_loss:0.062438782304525375, info_xz:-0.37979722023010254, whiten_loss:178.26562431555058, time:0.00017499923706054688
+
+batch_size:256,correct_num:250
+
+[2023-11-29_15:31:15]Epoch:99/100, iteration:92\195,lr:0.1, ls_dist:0.005, loss:0.21583506347248543, supervise_loss:0.07639385759830475, info_xz:-0.4170095920562744, whiten_loss:181.1421650798081, time:0.000213623046875
+
+batch_size:256,correct_num:249
+
+[2023-11-29_15:32:59]Epoch:99/100, iteration:192\195,lr:0.1, ls_dist:0.005, loss:0.21704270981233842, supervise_loss:0.07777925580739975, info_xz:-0.4273819923400879, whiten_loss:182.00165323894745, time:0.00020051002502441406
+
+batch_size:256,correct_num:251
+
+[2023-11-29_15:34:53]Epoch:100/100, iteration:96\195,lr:0.1, ls_dist:0.005, loss:0.20654726288068037, supervise_loss:0.05792326107621193, info_xz:-0.33986735343933105, whiten_loss:182.6107378934596, time:0.00020837783813476562
+
+batch_size:256,correct_num:253
+
+[2023-11-29_15:36:36]Epoch:100/100, iteration:196\195,lr:0.1, ls_dist:0.005, loss:0.24323975012919688, supervise_loss:0.15474307537078857, info_xz:-0.39121437072753906, whiten_loss:127.61810885092996, time:0.00013303756713867188
+
+batch_size:256,correct_num:77
+
+Save repaired model to/home/zzq/CreatingSpace/BackdoorToolbox/experiments/ResNet-18_CIFAR-10/MIMRL_for_Adaptive-Patch/model/poison_0.003_cover_0.003/repaired_model.pth
+Save defense object to /home/zzq/CreatingSpace/BackdoorToolbox/experiments/ResNet-18_CIFAR-10/MIMRL_for_Adaptive-Patch/defense_object/poison_0.003_cover_0.003/MIMRL_object.pth
+

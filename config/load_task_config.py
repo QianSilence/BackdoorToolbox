@@ -148,7 +148,7 @@ def get_task_schedule(task = None):
         'momentum': None,
         'weight_decay': None,
         'gamma': None,
-
+        'clip_grad_norm': 20,
         # Settings aving model,data and logs
         'log_iteration_interval': None,
     }
@@ -175,6 +175,7 @@ def get_task_schedule(task = None):
     schedule['momentum'] = config[task]['schedule']['momentum']
     schedule['weight_decay'] = float(config[task]['schedule']['weight_decay'])
     schedule['gamma'] = config[task]['schedule']['gamma']
+    schedule['clip_grad_norm'] = config[task]['schedule']['clip_grad_norm']
     #log:
     schedule['work_dir'] = config[task]['schedule']['work_dir']
     schedule['log_iteration_interval'] = config[task]['schedule']['log_iteration_interval']

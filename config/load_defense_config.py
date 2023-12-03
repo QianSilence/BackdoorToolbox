@@ -10,32 +10,86 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(BASE_DIR)
 from models import BaselineMNISTNetwork,ResNet
+from core.defenses import Spectral
 import torch
 from utils import parser
 from .load_config import load_config
 
 config, inner_dir, config_name = load_config(os.path.join(os.path.dirname(os.path.abspath(__file__)),"defense_config.yaml"))
 
-support_defense_strategies = ["Spectral", "Mine", "MIMRL"]
+support_defense_strategies = ["Spectral", "Spectre", "Mine", "MIMRL"]
 
-def get_Spectral_config():
+def get_filter_object(filter_strategy="Spectral",schedule=None):
+    if filter_strategy == "Spectral":
+        filter_object = Spectral(task=None, defense_schedule=schedule)
+    return filter_object
+
+def get_Spectral_config(default=False):
     defense_config = {
         'defense_strategy': 'Spectral',
-        'train':None,
-        'trained_model':None,
-        'backdoor_model_path': None,
-        'y_target':None,
-        'poisoned_trainset': None,
-        'poisoned_testset': None,
-        'percentile': None,
+        # The saving path of the backdoor model. When train = True, it is the path to save 
+        # the trained model. When train = False, it is the path to load the model.
+        'filter':{
+            'train':False,
+            'layer':None,
+            'y_target':None,
+            'percentile':None,
+            'latents_path': None,
+            'device': 'cuda:0'
+        },
+        'repair':{'filter': True},
+        'schedule':None
     }
-    defense_config['train'] = config['Spectral']['train']
-    defense_config['trained_model'] = config['Spectral']['trained_model']
-    defense_config['backdoor_model_path'] = config['Spectral']['backdoor_model_path']
-    defense_config['y_target'] = config['Spectral']['y_target']
-    defense_config['poisoned_trainset'] = config['Spectral']['poisoned_trainset']
-    defense_config['poisoned_testset'] = config['Spectral']['poisoned_testset']
-    defense_config['percentile'] = config['Spectral']['percentile']
+    if default is False:
+        defense_config['defense_strategy'] = config['Spectral']['defense_strategy']
+
+        defense_config['filter']['train'] = config['Spectral']['filter']['train']
+        defense_config['filter']['layer'] = config['Spectral']['filter']['layer']
+        defense_config['filter']['y_target'] = config['Spectral']['filter']['y_target']
+        defense_config['filter']['percentile'] = config['Spectral']['filter']['percentile']
+        defense_config['filter']['latents_path'] = config['Spectral']['filter']['latents_path']
+        defense_config['filter']['device'] = config['Spectral']['filter']['device']
+
+        defense_config['repair']['filter'] = config['Spectral']['repair']['filter']
+        defense_config['device'] = config['Spectral']['device']
+        defense_config['schedule'] = config['Spectral']['schedule']
+
+    return defense_config
+
+def get_Spectre_config(default=False):
+    defense_config = {
+        'defense_strategy': 'Spectre',
+        # The saving path of the backdoor model. When train = True, it is the path to save 
+        # the trained model. When train = False, it is the path to load the model.
+        'filter':{
+            'train':False,
+            'layer':None,
+            'y_target':None,
+            'n_dim':None,
+            'alpha':None,
+            'varepsilon':None,
+            'latents_path': None,
+            'device': 'cuda:0'
+        },
+        'repair':{'filter': True},
+        'schedule':None
+    }
+    if default is False:
+        defense_config['defense_strategy'] = config['Spectre']['defense_strategy']
+
+        defense_config['filter']['train'] = config['Spectre']['filter']['train']
+        defense_config['filter']['layer'] = config['Spectre']['filter']['layer']
+        defense_config['filter']['y_target'] = config['Spectre']['filter']['y_target']
+        defense_config['filter']['n_dim'] = config['Spectre']['filter']['n_dim']
+        defense_config['filter']['alpha'] = config['Spectre']['filter']['alpha']
+        defense_config['filter']['varepsilon'] = config['Spectre']['filter']['varepsilon']
+        defense_config['filter']['latents_path'] = config['Spectre']['filter']['latents_path']
+        defense_config['filter']['device'] = config['Spectre']['filter']['device']
+
+        defense_config['repair']['filter'] = config['Spectre']['repair']['filter']
+        defense_config['device'] = config['Spectre']['device']
+        defense_config['schedule'] = config['Spectre']['schedule']
+
     return defense_config
 
 def get_Mine_config():
@@ -79,25 +133,39 @@ def get_MIMRL_config():
         # defense config:
         'defense_strategy':"MIMRL",
         'loss':'MIMRLLoss',
-        'beta': 20.0,
+        'alpha':0.01,
+        'beta': 0.2,
         'x_dim': 784,
-        'dim': 10,
+        'z_dim': 10,
+        'n_classes':10,
         # related Infor-max   
         'lr_dis': 0.00001,
         'layer': None,
+        'schedule':None,
         #related filtering config
-        'poison_rate':None,
-        'threshold': 1.4172
+        'filter_object':None,
+        'filter_config':None
+        
     }
+   
     defense_config['defense_strategy'] = config['MIMRL']['defense_strategy']
     defense_config['loss'] = config['MIMRL']['loss']
+    defense_config['alpha'] = config['MIMRL']['alpha']
     defense_config['beta'] = config['MIMRL']['beta']
     defense_config['x_dim'] = config['MIMRL']['x_dim']
-    defense_config["dim"] = config['MIMRL']["dim"]
+    defense_config["z_dim"] = config['MIMRL']["z_dim"]
+    defense_config["n_classes"] = config['MIMRL']["n_classes"]
     defense_config['lr_dis'] = config['MIMRL']['lr_dis']
     defense_config['layer'] = config['MIMRL']['layer']
-    defense_config['poison_rate'] = config['MIMRL']['poison_rate']
-    defense_config['threshold'] = config['MIMRL']['threshold']
+    
+    filter_config = get_Spectral_config(default=True)
+    filter_config["filter"]["y_target"] = config['MIMRL']["filter"]["y_target"]
+    filter_config["filter"]["percentile"] = config['MIMRL']["filter"]["percentile"]
+    filter_config["filter"]["device"] = config['MIMRL']["filter"]["device"]
+
+    defense_config['filter_strategy'] = config['MIMRL']['filter_strategy']
+    defense_config['filter_object'] = get_filter_object(filter_strategy=config['MIMRL']['filter_strategy'])
+    defense_config['filter_config'] = filter_config
 
     return defense_config
     
@@ -106,9 +174,11 @@ def get_defense_config(defense_strategy = None):
     assert defense_strategy in support_defense_strategies, f"{defense_strategy} is not in support_datasets:{support_defense_strategies}"
     if defense_strategy == "Spectral":
         defense_config = get_Spectral_config()
-    if defense_strategy == "Mine":
+    elif defense_strategy == "Spectre":
+        defense_config = get_Spectre_config()
+    elif defense_strategy == "Mine":
         defense_config = get_Mine_config()
-    if defense_strategy == "MIMRL":
+    elif defense_strategy == "MIMRL":
         defense_config = get_MIMRL_config()
 
     return defense_config

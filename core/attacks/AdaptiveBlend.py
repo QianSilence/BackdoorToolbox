@@ -293,10 +293,15 @@ class AdaptiveBlend(Base, Attack):
         benign_dataset = dataset
         dataset_type = type(benign_dataset)
         assert dataset_type in support_list, 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
-        assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
-        y_target = self.attack_schedule['y_target']
-        assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
-        poisoning_rate = self.attack_schedule['poisoning_rate']
+        
+        if y_target is None:
+            assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
+            y_target = self.attack_schedule['y_target']
+        if poisoning_rate is None:
+            assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
+            poisoning_rate = self.attack_schedule['poisoning_rate']
+       
+            
         assert 'cover_rate' in self.attack_schedule, "Attack_config must contain 'cover_rate' configuration! "
         cover_rate = self.attack_schedule['cover_rate']
 

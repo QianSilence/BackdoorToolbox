@@ -38,7 +38,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn import manifold
 from utils import show_img,save_img,accuracy,compute_accuracy,get_latent_rep, plot_2d,count_model_predict_digits
-from utils import Log,parser
+from utils import Log, log, parser
+from utils.compute import cluster_metrics
 # ========== Set global settings ==========
 args = parser.parse_args()
 dataset = args.dataset
@@ -75,28 +76,43 @@ elif dataset == "ImageNet":
     pass
 
 work_dir = os.path.join(BASE_DIR,'experiments/' + task + '/'+ dir)
+
+task_config = get_task_config(task = task)
+schedule = get_task_schedule(task = task)
+attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
 # work_dir = os.path.join(BASE_DIR,'experiments/Mine/BaselineCIFAR10Network_CIFAR10_BadNets_Mine')
 datasets_dir = os.path.join(work_dir,'datasets')
+schedule['experiment'] = experiment
+schedule['work_dir'] = work_dir
+
+attack_schedule['train_schedule'] = schedule
+attack_schedule['trigger_dir'] = os.path.join(datasets_dir, 'triggers/')
+attack_schedule['work_dir'] = work_dir
+
+poisoning_rate = attack_schedule["poisoning_rate"]
+cover_rate = attack_schedule["cover_rate"]
+
 poison_datasets_dir = os.path.join(datasets_dir, 'poisoned_data')
+poison_datasets_dir = os.path.join(poison_datasets_dir, f"poison_{poisoning_rate}_cover_{cover_rate}/")
+
 predict_dir = os.path.join(datasets_dir,'predict')
+predict_dir= os.path.join(predict_dir, f"poison_{poisoning_rate}_cover_{cover_rate}/")
+
 latents_dir = os.path.join(datasets_dir,'latents')
+latents_dir = os.path.join(latents_dir, f"poison_{poisoning_rate}_cover_{cover_rate}/")
+
 model_dir = os.path.join(work_dir,'model')
+model_dir = os.path.join(model_dir, f"poison_{poisoning_rate}_cover_{cover_rate}/")
+
 show_dir = os.path.join(work_dir,'show')
+show_dir = os.path.join(show_dir, f"poison_{poisoning_rate}_cover_{cover_rate}/")
 
 dirs = [work_dir, datasets_dir, poison_datasets_dir, predict_dir, latents_dir, model_dir, show_dir]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-task_config = get_task_config(task = task)
-schedule = get_task_schedule(task = task)
-schedule['experiment'] = experiment
-schedule['work_dir'] = work_dir
-
-attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
-attack_schedule['train_schedule'] = schedule
-attack_schedule['trigger_dir'] = os.path.join(datasets_dir, 'triggers/')
-attack_schedule['work_dir'] = work_dir
+log.set_log_path(osp.join(work_dir, 'log.txt'))
 
 if __name__ == "__main__":
     """
@@ -121,12 +137,15 @@ if __name__ == "__main__":
         
     6.The task of visualizing latents by t-sne
         python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "visualize latents by t-sne"
-
-        python test_AdaptivePatch.py --subtask "visualize latents for target class by t-sne"
-
-    7.The task of comparing predict_digits
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "visualize latents for target class by t-sne"
+    
+    7.The task of computing condition number
+        python test_AdaptivePatch.py --dataset "CIFAR10" --subtask "compute condition number"
+        
+    8.The task of comparing predict_digits
         python test_AdaptivePatch.py --subtask "generate predict_digits"
         python test_AdaptivePatch.py --subtask "compare predict_digits"
+   
 
     """
 
@@ -159,7 +178,7 @@ if __name__ == "__main__":
         log("Save generated train_datasets to" + os.path.join(poison_datasets_dir,'train.pt'))
     
     elif args.subtask == "generate test backdoor samples":   
-        poisoned_test_dataset = backdoor.create_poisoned_test_dataset()
+        poisoned_test_dataset = backdoor.create_poisoned_test_dataset(poisoning_rate = 0.1)
         poison_test_indices =  poisoned_test_dataset.get_poison_indices()
         
         benign_test_indexs = list(set(range(len(poisoned_test_dataset))) - set(poison_test_indices))
@@ -259,22 +278,21 @@ if __name__ == "__main__":
     elif args.subtask == "generate latents":
         log("\n==========Get the latent representation in the middle layer of the model.==========\n")
         #Alreadly exsiting trained model and poisoned datasets
-        # device = torch.device("cuda:1")
+        device = torch.device("cuda:1")
         # model = nn.DataParallel(BaselineCIFAR10Network(), output_device=device)
-
-        device = torch.device("cpu")
         model = task_config['model']
         model.to(device)
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
         poison_indices = poisoned_train_dataset.get_poison_indices()
         #'backdoor_model.pth'
-        file = "backdoor_model_poison_0.05_cover_0.05.pth"
+        file = "backdoor_model.pth"
         model.load_state_dict(torch.load(os.path.join(model_dir,file)),strict=False)
         # Get the latent representation in the middle layer of the model.
-        latents,y_labels = get_latent_rep(model, layer, poisoned_train_dataset, device=device)
+        latents, y_labels = get_latent_rep(model, layer, poisoned_train_dataset, device=device)
         latents_path = os.path.join(latents_dir,"latents.npz")
 
         np.savez(latents_path, latents=latents, y_labels=y_labels)
+        log(f"Save latents to {latents_path}\n")
 
     elif args.subtask == "visualize latents by t-sne":
         log("\n========== Clusters of latent representations for all classes.==========\n")  
@@ -287,24 +305,23 @@ if __name__ == "__main__":
    
         # get low-dimensional data points by t-SNE
         n_components = 2 # number of coordinates for the manifold
-        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        
+        #perplexity=50
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=150, early_exaggeration=120, init="pca", n_iter=1000, random_state=0)
         points = t_sne.fit_transform(latents)
 
-        # points = points*1000
-        # print(t_sne.kl_divergence_)
-        
         #Display data clusters for all category by scatter plots
         num = len(poisoned_train_dataset.classes)
         # Custom color mapping
         colors = [plt.cm.tab10(i) for i in range(num)]
-        colors.append("red") 
+        colors.append("black") 
         y_labels[poison_indices] = num
         # Create a ListedColormap objectall_
         cmap = mcolors.ListedColormap(colors)
         title = "t-SNE diagram of latent representation"
         path = os.path.join(show_dir,"latent_2d_all_clusters.png")
         plot_2d(points, y_labels, title=title, cmap=cmap, path=path)
-           
+
     elif args.subtask == "visualize latents for target class by t-sne":
         #Clusters of latent representations for target class
         log("\n==========Verify the assumption of latent separability.==========\n")  
@@ -317,17 +334,54 @@ if __name__ == "__main__":
         latents,y_labels = data["latents"],data["y_labels"]
 
         indexs = np.where(y_labels == attack_schedule['y_target'])[0]
+        # print(f"latents:{len(latents)},len(poison_indices):{len(poison_indices)},len(indexs):{len(indexs)}\n")
+
+        
+        poison_latents = torchvision.transforms.ToTensor()(latents[poison_indices]).squeeze()
+        clean_latents = torchvision.transforms.ToTensor()(latents[np.setdiff1d(indexs,poison_indices)]).squeeze()
+       
+        silhouette_score, intra_clust_dists, inter_clust_dists = cluster_metrics(clean_latents, poison_latents)
+        print(f"clean_latents:{clean_latents.shape},poison_latents:{poison_latents.shape},silhouette_score:{silhouette_score},intra_clust_dists:{intra_clust_dists},inter_clust_dists:{inter_clust_dists}\n")
+
         color_numebers = [0 if index in poison_indices else 1 for index in indexs]
         color_numebers = np.array(color_numebers)
 
         # get low-dimensional data points by t-SNE
         n_components = 2 # number of coordinates for the manifold
-        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=500, early_exaggeration=120, init="pca", n_iter=1000, random_state=0 )
         points = t_sne.fit_transform(latents[indexs])
-        points = points*100
 
-        colors = ["blue","red"]
+        colors = ["black","blue"]
         cmap = mcolors.ListedColormap(colors)
-        title = "t-SNE diagram of latent representation"
+        title = f"silhouette_score:{silhouette_score}"
         path = os.path.join(show_dir,"latent_2d_clusters.png")
         plot_2d(points, color_numebers, title=title, cmap=cmap, path=path)
+
+    elif args.subtask == "compute condition number":
+
+        latents_path = os.path.join(latents_dir,"latents.npz")
+        data = np.load(latents_path)
+        latents, y_labels = data["latents"], data["y_labels"]
+        log(f"The shape of the 'latents' matrix is {latents.shape}\n")
+        cur_indices = np.where(y_labels == attack_schedule["y_target"])[0]
+        
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        clean_indices = np.setdiff1d(cur_indices, poison_indices)
+
+        mix_latents = latents[cur_indices]
+        mix_mean = np.mean(mix_latents, axis=0, keepdims=True) 
+        mix_centered_cov = mix_latents - mix_mean
+        # Use Frobenius norm
+        mix_cond_number = np.linalg.cond(np.dot(mix_centered_cov.T,mix_centered_cov), p='fro')
+        mix_u, mix_s, mix_v = np.linalg.svd(mix_centered_cov, full_matrices=False)
+
+        clean_latents = latents[clean_indices]
+        clean_mean = np.mean(clean_latents, axis=0, keepdims=True) 
+        centered_cov = clean_latents - clean_mean
+        # Use Frobenius norm
+        cond_number = np.linalg.cond(np.dot(centered_cov.T,centered_cov), p='fro')
+        u, s, v = np.linalg.svd(centered_cov, full_matrices=False)
+
+        log(f'mix_cov_cond_number:{mix_cond_number},Top 10 Singular Values:{mix_s[0:20]},cond_number:{cond_number},Top 10 Singular Values:{s[0:20]}\n')
+        log(f'Mix Singular Values:{mix_s}, Singular Values:{s}\n')

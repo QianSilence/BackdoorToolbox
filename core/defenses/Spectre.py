@@ -20,8 +20,10 @@ from utils.interact.log import Log, log
 from .Defense import Defense
 from tqdm import trange    
 from utils import get_latent_rep
-
-class Spectral(Base,Defense):
+from utils import BeingRobust
+from utils import robust_estimation
+import torchvision
+class Spectre(Base,Defense):
     """Filtering the training samples spectral signatures (Spectral).
     Args:
         task(dict):The defense strategy is used for the task, refrence core.Base.Base.
@@ -102,27 +104,143 @@ class Spectral(Base,Defense):
         latents, _ = get_latent_rep(model, schedule["filter"]['layer'], sub_dataset, device=device)
         return cur_indices, latents
     
-    def detect_via_SVD(self, latents=None, percentile=None):
-        log(f"The shape of the 'latents' matrix is {latents.shape}\n")
-        full_mean = np.mean(latents, axis=0, keepdims=True) 
-        centered_cov = latents - full_mean
+    def target_label_identifier(self, latent_feats, class_indices, max_k, alpha, varepsilon):
+        """
+        The idea is that the mean QUE scores obtained for the target label are clearly larger (for appropriate values of effective dimension k)
+        than those obtained for untargeted labels       
+        """
+        num_classes = len(class_indices) 
+        target_label  = None
+        best_k = None
+        max_q = 0.0
+        best_to_be_removed = None
+        for i in range(num_classes):
+            if len(class_indices[i]) > 1:
+                latents = latent_feats[class_indices[i]]
+                k, q, removed = self.k_identifier(latents, max_k, alpha, varepsilon)
+                if q > max_q:
+                    max_q = q
+                    target_label = i
+                    best_k = k
+                    best_to_be_removed = removed
+        return target_label, best_k, best_to_be_removed
+              
+    def k_identifier(self, latents, max_k, alpha, varepsilon):
+        """
+        The idea is that if poisons were correctly identified,  then the mean QUE score will be large as poisons have strong spectral signature. 
+        """
+        # n * m
+        feat_deviation = latents - latents.mean(dim=0) # centered data
+        # m * m
+        U, _, _ = torch.svd(feat_deviation.T)
+        # m * max_k
+        U = U[:, :max_k]
+        max_q = 0.0
+        best_n_dim = None
+        best_to_be_removed = None
+        for n_dim in range(2, max_k):
+            S_removed, S_left,_ = self.SPECTRE(latents, n_dim, alpha, varepsilon)
+            # len(S_left) * m
+            left_feats = latents[S_left]
+            # max_k*max_k
+            # covariance = torch.cov(torch.matmul(left_feats, U))
+            # L, V = torch.linalg.eig(covariance)
+            # L, V = L.real, V.real
+            # L = (torch.diag(L) ** (1 / 2) + 0.001).inverse()
+            # # max_k*max_k
+            # normalizer = torch.matmul(V, torch.matmul(L, V.T))
 
-        # Use Frobenius norm
-        cond_number = np.linalg.cond(np.dot(centered_cov.T,centered_cov), p='fro')
+            # # n*m *  m*max_k --> n*max_k
+            # projected_feats = torch.matmul(latents, U)
+            # # n*max_k *  max_k*max_k --> n*max_k
+            # whitened_feats = torch.matmul(projected_feats, normalizer)
+            
+            whitened_feats = self.whiten(torch.matmul(latents, U), oracle_clean_feats=torch.matmul(left_feats, U))
+            q = self.QUEscore(whitened_feats, alpha=alpha).mean()
+            if q > max_q:
+                max_q = q
+                best_n_dim = n_dim
+                best_to_be_removed = S_removed
 
-        u,s,v = np.linalg.svd(centered_cov, full_matrices=False)
-        log('Top 10 Singular Values:{0}\n'.format(s[0:10]))
-        log('Singular Values:{0}\n'.format(s))
+            return  best_n_dim, max_q, best_to_be_removed
+               
+    def SPECTRE(self, latents, n_dim, alpha, varepsilon):
+        # n * m
+        feat_deviation = latents - latents.mean(dim=0) # centered data
+        # m * m
+        U, _, _ = torch.svd(feat_deviation.T)
+        # m * n_dim
+        U = U[:, :n_dim]
+        # print(f"latents:{latents.size()}, U:{U.size()}\n")
+        # n*m *  m*n_dim --> n*n_dim
+        projected_feats = torch.matmul(latents, U)
+        # n*n_dim
+        whitened_feats = self.whiten(projected_feats, oracle_clean_feats=None)
+        taus = self.QUEscore(whitened_feats, alpha = alpha)
 
-        eigs = v[0:1] 
-        corrs = np.matmul(eigs, np.transpose(centered_cov)) 
-        scores = np.linalg.norm(corrs, axis=0) 
-        p_score = np.percentile(scores, percentile)
+        p_score = np.percentile(taus, 1.5 * varepsilon)
        
-        top_scores = np.where(scores>p_score)[0]
-        removed_inds = np.copy(top_scores)
-        
-        return removed_inds, p_score, cond_number
+        top_scores = np.where(taus > p_score)[0]
+        S_removed = np.copy(top_scores)
+        S_left = np.delete(range(len(latents)),S_removed)
+
+        return S_removed, S_left, p_score 
+
+    # filter criteria
+    def QUEscore(sefl, temp_feats, alpha = 4.0):
+        n_samples = temp_feats.shape[0]
+        n_dim = temp_feats.shape[1]
+        temp_feats = temp_feats - temp_feats.mean(dim=0)
+        Sigma = torch.matmul(temp_feats, temp_feats.T) / (n_samples - 1) 
+        I = torch.eye(n_dim).cuda()
+        Q = torch.exp((alpha * (Sigma - I)) / (torch.linalg.norm(Sigma, ord=2) - 1))
+        trace_Q = torch.trace(Q)
+
+        taus = []
+        for i in range(n_samples):
+            h_i = temp_feats[i]
+            tau_i = torch.matmul(h_i.T, torch.matmul(Q, h_i)) / trace_Q
+            tau_i = tau_i.item()
+            taus.append(tau_i)
+        taus = np.array(taus)
+        return taus
+
+    def whiten(self, temp_feats, oracle_clean_feats=None):
+        # whiten the data
+        if oracle_clean_feats is None:
+            estimator = robust_estimation.BeingRobust(random_state=0, keep_filtered=True).fit((temp_feats.T).cpu().numpy())
+            clean_mean = torch.FloatTensor(estimator.location_).cuda()
+            filtered_feats = (torch.FloatTensor(estimator.filtered_).cuda() - clean_mean).T
+            # clean_covariance = torch.cov(filtered_feats)
+            clean_covariance = torch.mm(filtered_feats, filtered_feats.t()) / (filtered_feats.size(0) - 1)
+        else:
+            clean_feats = oracle_clean_feats
+            clean_mean = torch.FloatTensor(clean_feats.mean(dim = 1)).cuda()
+            filtered_feats = (torch.FloatTensor(clean_feats).cuda() - clean_mean).T
+            # clean_covariance = torch.cov(clean_feats)
+            clean_covariance = torch.mm(filtered_feats, filtered_feats.t()) / (filtered_feats.size(0) - 1)
+        temp_feats = temp_feats.cuda()
+        temp_feats = (temp_feats.T - clean_mean).T
+        #clean_covariance ^ (-1/2)
+        L, V = torch.eig(clean_covariance,eigenvectors = True)
+        # L, V = torch.linalg.eig(clean_covariance)
+        L, V = L.real, V.real
+        # L = L[:, 0]
+        # print(f"L:{L},V:{V}\n")
+        # print(torch.diag(L)**(1/2)+0.001)
+        L = (torch.diag(L)**(1/2)+0.001).inverse()
+        normalizer = torch.matmul(V, torch.matmul( L, V.T ) )
+        temp_feats = torch.matmul(normalizer, temp_feats)
+        return temp_feats
+
+    def filter_via_spectre(self, latents=None, n_dim=512, alpha=4.0, varepsilon=0.01):
+        log(f"The shape of the 'latents' matrix is {latents.shape}\n")
+        if isinstance(latents, np.ndarray):
+            latents = torchvision.transforms.ToTensor()(latents)
+        if latents.dim() > 2:
+            latents = latents.squeeze()
+        S_removed, S_left, p_score = self.SPECTRE(latents, n_dim, alpha, varepsilon)
+        return S_removed, S_left, p_score
 
     def filter(self, model=None, dataset=None, schedule=None):
         """
@@ -149,13 +267,14 @@ class Spectral(Base,Defense):
             assert model is not None, "model is None"
 
         cur_indices, latents = self._get_latents(model=model, dataset=dataset, schedule=current_schedule)
-        removed_inds, p_score, cond_number= self.detect_via_SVD(latents=latents, percentile=current_schedule["filter"]["percentile"])
+        
+        removed_inds, _, p_score = self.filter_via_spectre(latents=latents, n_dim=current_schedule["filter"]["n_dim"], alpha=current_schedule["filter"]["alpha"], varepsilon=current_schedule["filter"]["varepsilon"])
         ### c. detect the backdoor data by the SVD decomposition
         re = [cur_indices[v] for i,v in enumerate(removed_inds)]
         # print(f"cur_indices:{cur_indices}, latents:{len(latents)}")
         left_inds = np.delete(range(len(dataset)), re)
                    
-        log(f'The value at {current_schedule["filter"]["percentile"]} of the Scores list is {p_score}, the condition number of the covariance matrix is:{cond_number}\n')
+        log(f'The value at {current_schedule["filter"]["percentile"]} of the Scores list is {p_score}\n')
         log(f'The number of Samples with label:{current_schedule["filter"]["y_target"]} is {len(cur_indices)}, removed:{len(re)}, left:{len(left_inds)}\n') 
 
         return re, left_inds
@@ -174,14 +293,13 @@ class Spectral(Base,Defense):
         latents, y_labels = data["latents"], data["y_labels"]
         cur_indices = np.where(y_labels == current_schedule["filter"]["y_target"])[0]
         latents = latents[cur_indices]
-
-        removed_inds, p_score, cond_number = self.detect_via_SVD(latents=latents, percentile=current_schedule["filter"]["percentile"])
+        removed_inds, _, p_score = self.filter_via_spectre(latents=latents, n_dim=current_schedule["filter"]["n_dim"], alpha=current_schedule["filter"]["alpha"], varepsilon=current_schedule["filter"]["varepsilon"])
         print(f"removed_inds:{len(removed_inds)}")
         ### c. detect the backdoor data by the SVD decomposition
         re = [cur_indices[v] for i,v in enumerate(removed_inds)]
         left_inds = np.delete(range(len(data["latents"])), re)
                    
-        log(f'The value at {0} of the Scores list is {p_score}, the condition number of the covariance matrix is:{cond_number}\n')
+        log(f'The value at {0} of the Scores list is {p_score}\n')
         log(f'The number of Samples with label:{current_schedule["filter"]["y_target"]} is {len(cur_indices)}, removed:{len(re)}, left:{len(left_inds)}\n') 
 
         return re, left_inds

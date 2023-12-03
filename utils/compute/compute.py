@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from sklearn.metrics import silhouette_score
 #prec1, prec5 = accuracy(predict_digits, labels, topk=(1, 5))
 def compute_accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
@@ -272,7 +273,34 @@ def is_singular_matrix(matrices):
             if not is_positive_definite:
                 print(f"index:{index},deter:{determinantes[index]},eigenvalues:{matrix},\n")
             exit(-1)
-            
+
+def cluster_metrics(cluster_1, cluster_0):
+
+    num = len(cluster_1) + len(cluster_0)
+    features = torch.cat([cluster_1, cluster_0], dim=0)
+
+    labels = torch.zeros(num)
+    labels[:len(cluster_1)] = 1
+    labels[len(cluster_1):] = 0
+
+    ## Raw Silhouette Score
+    raw_silhouette_score, intra_clust_dists, inter_clust_dists = silhouette_score(features, labels)
+    return raw_silhouette_score, intra_clust_dists, inter_clust_dists
+
+def cal_cos_sim(vector1,vector2):
+    dot_product = np.dot(vector1, vector2)
+    norm_vector1 = np.linalg.norm(vector1)
+    norm_vector2 = np.linalg.norm(vector2)
+    cos_sim = dot_product / (norm_vector1 * norm_vector2)
+    return cos_sim
+
+
+
+
+        
+
+           
+
 
 
          

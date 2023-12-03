@@ -1,7 +1,7 @@
 ---
 BadNets:
   y_target: 1
-  poisoning_rate: 0.10
+  poisoning_rate: 0.01
   # pattern = torch.zeros((28, 28), dtype=torch.uint8)
   # pattern[-3:, -3:] = 255
   # weight = torch.zeros((28, 28), dtype=torch.float32)
@@ -30,9 +30,9 @@ RegularBadNets:
 Adaptive-Patch:
   # attack config
   y_target: 0
-  poisoning_rate: 0.05
+  poisoning_rate: 0.003
   # conservatism ratio
-  cover_rate : 0.03
+  cover_rate : 0.003
   # trigger and opacitys
   #['phoenix_corner_32.png', 'firefox_corner_32.png', 'badnet_patch4_32.png', 'trojan_square_32.png']
   trigger_dir: null
@@ -46,19 +46,19 @@ Adaptive-Patch:
     - mask_firefox_corner_32.png
     - mask_badnet_patch4_32.png
     - mask_trojan_square_32.png
-  #[  0.5, 0.2, 0.5, 0.3]
+  #[0.5, 0.2, 0.5, 0.3]
   train_alphas: 
-    - 0.5
     - 0.2
-    - 0.5
-    - 0.3
+    - 0.2
+    - 0.2
+    - 0.2
   #[0.5, 0.2, 0.5, 0.3]
   test_alphas: 
     - 0.5
     - 0.2
     - 0.5
     - 0.3
-  test_sample_trigger_num: 2
+  test_sample_trigger_num: 4
   poisoned_transform_index: 0
   train_schedule: null
   work_dir: null
@@ -66,18 +66,19 @@ Adaptive-Patch:
 Adaptive-Blend:
   # attack config
   y_target: 0
-  poisoning_rate: 0.05
+  poisoning_rate: 0.003
   # conservatism ratio
-  cover_rate : 0.05
+  cover_rate : 0.006
   # trigger
   pattern: 'triggers/hellokitty_32.png'
   pieces: 16
   # diverse asymmetry
-  train_mask_rate: 0.5
+  # 0.5
+  train_mask_rate: 0.2
   test_mask_rate: 1.0
   # asymmetric design:The trigger uses different transparency during the training phase and testing phase.
   train_alpha: 0.15
-  test_alpha: 0.2
+  test_alpha: 0.8
   train_schedule: null
   work_dir: null
 

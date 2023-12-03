@@ -3,15 +3,40 @@ Spectral:
   #Defense config 
   defense_strategy: Spectral
   # Is training required to get poisoned models when performing data filtering defense?
-  train: null
-  # The saving path of the backdoor model. When train = True, it is the path to save 
-  # the trained model. When train = False, it is the path to load the model.
-  trained_model: null
-  backdoor_model_path: null 
-  y_target: null
-  poisoned_trainset: null
-  poisoned_testset: null
-  percentile: 85
+  filter:
+    train: False
+    layer: linear
+    y_target: 0
+    percentile: 90
+    latents_path: null
+    device: cuda:0
+  repair:
+    filter: True 
+  device: cuda:1
+  work_dir: null
+
+  schedule: null
+
+Spectre:
+  #Defense config 
+  defense_strategy: Spectre
+  # Is training required to get poisoned models when performing data filtering defense?
+  filter:
+    train: False
+    layer: linear
+    y_target: 0
+    n_dim: 1
+    alpha: 4.0
+    varepsilon: 0.01
+    latents_path: null
+    device: cuda:0
+
+  repair:
+    filter: True 
+  device: cuda:1
+  work_dir: null
+
+  schedule: null
 
 Mine:
   # defense config:
@@ -33,21 +58,42 @@ Mine:
   #unlearning config
   unlearning_threshold: 1.0e-7
   #"times":2,
+  work_dir: null
+
+  schedule: null
   
 MIMRL:
   # defense config:
   defense_strategy: MIMRL
   loss: MIMRLLoss
-  beta: 0.3
-  x_dim: 784
-  dim: 10
-  # related Infor-max   
+  # RCELoss:1.0
+  # CELoss:0.0001 (临界点：12xx.xx)
+  # condition number:0.01, 0.001 (1.2xx)
+  alpha: 0.2
+  # 0.01, 0.1, 0.2
+  # 0.001(临界点:基本不破坏原有模型效果的)
+  beta: 0.01
+  # 784, 3072
+  x_dim: 3072
+  # 10, 512
+  z_dim: 512
+  n_classes: 1
+  # related Infor-max  
+  # 0.001, 0.005, 0.01
   lr_dis: 0.005
   layer: null
+
   #related filtering config
-  poison_rate: 0.05
-  #1.4172, 1.8931
-  threshold: 1.4172
+  #[Spectral-Signature,Spectre,AC(Activation-Clusterin)g,Scan]
+  filter_strategy: Spectral
+  filter:
+    y_target: 0
+    percentile: 90
+    layer: null
+    device: cuda:0
+
+  work_dir: null
+  schedule: null
   
     
 

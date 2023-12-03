@@ -28,8 +28,8 @@ def plot_line(x, y1,y2,labels = [],colors=[],title="",xlabel="",ylabel="",path="
         plt.savefig(path,dpi=600,format='png')
     plt.close()
 
-def plot_2d(points, points_color, title=" ", cmap=None,path=None):
-    """
+def plot_2d(points, points_color, title=" ", cmap=None, path=None):
+    """ 
     这里事先不指定坐标，
     
     """

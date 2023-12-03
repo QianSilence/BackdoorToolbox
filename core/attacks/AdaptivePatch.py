@@ -245,10 +245,16 @@ class AdaptivePatch(Base, Attack):
   
     def create_poisoned_dataset(self, dataset, y_target=None, poisoning_rate=None):
         benign_dataset = dataset
-        assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
-        y_target = self.attack_schedule['y_target']
-        assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
-        poisoning_rate = self.attack_schedule['poisoning_rate']
+        if y_target is not None:
+            y_target = y_target
+        else:
+            assert 'y_target' in self.attack_schedule, "Attack_config must contain 'y_target' configuration! "
+            y_target = self.attack_schedule['y_target']
+        if poisoning_rate is not None:
+            poisoning_rate = poisoning_rate
+        else:
+            assert 'poisoning_rate' in self.attack_schedule, "Attack_config must contain 'poisoning_rate' configuration! "
+            poisoning_rate = self.attack_schedule['poisoning_rate']
         assert 'cover_rate' in self.attack_schedule, "Attack_config must contain 'cover_rate' configuration! "
         cover_rate = self.attack_schedule['cover_rate']
         assert 'trigger_dir' in self.attack_schedule, "Attack_config must contain 'trigger_dir' configuration! "

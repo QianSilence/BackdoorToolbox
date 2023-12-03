@@ -3,8 +3,8 @@
 # @Time        : 2023/09/06 13:59:58
 # @Author      : Zhenqian Zhu
 # @Affiliation : Harbin Institute of Technology, Shenzhen
-# @File        : test_Spectral.py
-# @Description  : This is the test code of Spectral defense.
+# @File        : test_Spectre.py
+# @Description  : This is the test code of Spectre defense.
 import os
 import sys
 from copy import deepcopy
@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.append(BASE_DIR)
 from core.attacks.BackdoorAttack import BackdoorAttack
 from core.defenses.BackdoorDefense import BackdoorDefense
-from core.defenses.Spectral import Spectral
+from core.defenses.Spectre import Spectre
 from utils import compute_confusion_matrix, compute_indexes, compute_accuracy,save_img
 from utils import parser,Log
 from config import get_task_config, get_task_schedule, get_attack_config, get_defense_config
@@ -26,24 +26,24 @@ import random
 # ========== Set global settings ==========
 datasets_root_dir = BASE_DIR + '/datasets/'
 args = parser.parse_args()
-defense = 'Spectral'
+defense = 'Spectre'
 #["BadNets","Adaptive-Blend","Adaptive-Patch"]
 attack = 'Adaptive-Patch'
 dir = f'{defense}_for_{attack}'
 if args.dataset == "MNIST": 
-    # ========== BaselineCIFAR-10Network_CIFAR-10_Spectral_for_BadNets ==========
+    # ========== BaselineCIFAR-10Network_CIFAR-10_Spectre_for_BadNets ==========
     experiment = f'BaselineMNISTNetwork_MNIST_{defense}_for_{attack}' # {task}_{defense}_for_{attack} 
     task = 'BaselineMNISTNetwork_MNIST' # {model}_{dataset}
     layer = "fc2"
 
 elif args.dataset == "CIFAR-10":
-    # ========== ResNet-18_CIFAR-10_Spectral_for_BadNets ==========
+    # ========== ResNet-18_CIFAR-10_Spectre_for_BadNets ==========
     experiment = f'ResNet-18_CIFAR-10_{defense}_for_{attack}'
     task = 'ResNet-18_CIFAR-10'
     layer = "linear"
     
 elif args.dataset == "CIFAR-100":
-    # ========== ResNet-18_CIFAR-100_Spectral_for_BadNets ==========
+    # ========== ResNet-18_CIFAR-100_Spectre_for_BadNets ==========
     experiment = f'ResNet-18_CIFAR-100_{defense}_for_{attack}'
     task = 'ResNet-18_CIFAR-100'
     layer = "linear"
@@ -106,25 +106,30 @@ if __name__ == "__main__":
     # Users can select the task to execute by passing parameters.
 
     # 1. The task of showing backdoor samples
-    #   python test_Spectral.py --subtask "show train backdoor samples" --dataset "CIFAR-10"
-    #   python test_Spectral.py --subtask "show test backdoor samples" --dataset "CIFAR-10"
+    #   python test_Spectre.py --subtask "show train backdoor samples" --dataset "CIFAR-10"
+    #   python test_Spectre.py --subtask "show test backdoor samples" --dataset "CIFAR-10"
 
     # 2. The task of filtering backdoor samples
-    #   python test_Spectral.py --subtask "filter" --dataset "CIFAR-10"
+    #   python test_Spectre.py --subtask "filter" --dataset "CIFAR-10"
 
-    # 3. The task of defense backdoor attack
-    #   python test_Spectral.py --subtask "repair" --dataset "CIFAR-10"
+    # 3. The task of filtering with latents
+    #   python test_Spectre.py --subtask "filter with latents" --dataset "CIFAR-10"
 
-    # 4.The task of testing defense effect
-    #   python test_Spectral.py --subtask "test" --dataset "CIFAR-10"
+    # 4. The task of defense backdoor attack
+    #   python test_Spectre.py --subtask "repair" --dataset "CIFAR-10"
 
+    # 5.The task of testing defense effect
+    #   python test_Spectre.py --subtask "test" --dataset "CIFAR-10"
+
+    # 6.The task of identifying target label 
+    #   python test_Spectre.py --subtask "identify target label " --dataset "CIFAR-10"
 
     log = Log(osp.join(work_dir, 'log.txt'))
     t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
     msg = "\n\n\n==========Start {0} at {1}==========\n".format(experiment,t)
     log(msg)
-    spectral = Spectral(task_config, defense_schedule)
-    defense = BackdoorDefense(spectral)
+    Spectre = Spectre(task_config, defense_schedule)
+    defense = BackdoorDefense(Spectre)
 
     if args.subtask == "show train backdoor samples":
         log("\n==========Show posioning train sample==========\n")
@@ -158,11 +163,12 @@ if __name__ == "__main__":
         title = f"label:{label},class:{poisoned_dataset.classes[label]}"
         save_img(image, title=title, path=backdoor_sample_path)
         log("Save backdoor_test_sample to" + backdoor_sample_path)
+    
+    elif args.subtask == "identify target label ":
+        pass
 
-    elif args.subtask == "filter":
-       
+    elif args.subtask == "filter": 
         model = task_config['model']
-        
         model.load_state_dict(torch.load(os.path.join(model_dir, 'backdoor_model.pth')),strict=False)
         # model.load_state_dict(torch.load(os.path.join(model_dir, 'repaired_model.pth')),strict=False)
 
@@ -190,6 +196,37 @@ if __name__ == "__main__":
          "poison_indices":poison_indices,"benign_indices":benign_indices}
         np.savez(filter_path, **filter_res)
         log(f"Save filter results to {filter_path}\n")
+    #filter_with_latents(self, latents_path=None, schedule=None):
+    elif args.subtask == "filter with latents": 
+        model = task_config['model']
+        model.load_state_dict(torch.load(os.path.join(model_dir, 'backdoor_model.pth')),strict=False)
+       
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        benign_indices = list(set(range(len(poisoned_train_dataset))) - set(poison_indices))
+        log(f"y_target:{poisoned_train_dataset.get_y_target()}, poison_indices:{len(poison_indices)},benign_indices:{len(benign_indices)}\n")
+        
+        latents_path = os.path.join(latents_dir,"latents.npz")
+        # 1.filter out poisoned samples
+        predict_poisoned_indices, predict_clean_indices = defense.filter_with_latents(latents_path = latents_path)
+     
+        precited = np.zeros(len(poisoned_train_dataset))
+        precited[predict_poisoned_indices] = 1
+        expected = np.zeros(len(poisoned_train_dataset))
+        expected[poison_indices] = 1
+
+        tp, fp, tn, fn = compute_confusion_matrix(precited,expected)
+        log(f"tp:{tp}, fp:{fp}, tn:{tn}, fn:{fn}\n")
+        accuracy, precision, recall, F1 = compute_indexes(tp, fp, tn, fn)
+        log(f"accuracy:{accuracy}, precision:{precision}, recall:{recall}, F1:{F1}\n")
+
+        filter_path = os.path.join(filter_dir,"filter.npz")
+        filter_res = {"predict_poisoned_indices":predict_poisoned_indices, "predict_clean_indices":predict_clean_indices,\
+         "poison_indices":poison_indices,"benign_indices":benign_indices}
+        np.savez(filter_path, **filter_res)
+        log(f"Save filter results to {filter_path}\n")
+
+     
 
     elif args.subtask == "repair":
         # get backdoor sample

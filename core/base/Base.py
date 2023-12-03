@@ -25,6 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.append(BASE_DIR)
 # print(sys.path)
 from utils import Log, get_latent_rep_without_detach
+from utils.interact import log
 # ignore warnings
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -62,30 +63,29 @@ class Base(TrainingObservable):
             and if only nondeterministic algorithms are available they will throw a RuntimeError when called. Default: False.
         observers(list[observer]): Contains observer object that interfere with the model training process
     """
-    def __init__(self, task, schedule=None):
-        assert 'train_dataset' in task, "task must contain 'train_dataset' configuration! "
-        assert isinstance(task['train_dataset'], support_list), 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
-        self.train_dataset = task['train_dataset']
-        assert 'test_dataset' in task, "task must contain 'test_dataset' configuration! "
-        assert isinstance(task['test_dataset'], support_list), 'test_dataset is an unsupported dataset type, test_dataset should be a subclass of our support list.'
-        self.test_dataset = task['test_dataset']
-        assert 'model' in task, "task must contain 'model' configuration! "
-        self.model =  task['model'] 
-        self.init_state_dict = self.model.state_dict()
-        assert 'loss' in task, "task must contain 'loss' configuration! "
-        self.loss = task['loss']
+    def __init__(self, task = None, schedule=None):
+        if task is not None:
+            assert 'train_dataset' in task, "task must contain 'train_dataset' configuration! "
+            assert isinstance(task['train_dataset'], support_list), 'train_dataset is an unsupported dataset type, train_dataset should be a subclass of our support list.'
+            self.train_dataset = task['train_dataset']
+            assert 'test_dataset' in task, "task must contain 'test_dataset' configuration! "
+            assert isinstance(task['test_dataset'], support_list), 'test_dataset is an unsupported dataset type, test_dataset should be a subclass of our support list.'
+            self.test_dataset = task['test_dataset']
+            assert 'model' in task, "task must contain 'model' configuration! "
+            self.model =  task['model'] 
+            self.init_state_dict = self.model.state_dict()
+            assert 'loss' in task, "task must contain 'loss' configuration! "
+            self.loss = task['loss']
+            assert 'optimizer' in task, "task must contain 'optimizer' configuration! "
+            self.optimizer = task['optimizer']
 
-        assert 'optimizer' in task, "task must contain 'optimizer' configuration! "
-        self.optimizer = task['optimizer']
-
-        self.global_schedule = deepcopy(schedule)
-    
-        assert 'seed' in schedule, "task must contain 'seed' configuration! "
-        assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
-        if 'seed' in schedule and schedule['seed'] is not None and 'deterministic' in schedule and schedule['deterministic']: 
-            self._set_seed(schedule['seed'], schedule['deterministic'])
-        self.training_observers = []
-        self.post_training_observers = []
+        self.global_schedule = deepcopy(schedule)   
+        if  schedule is not None:
+            assert 'seed' in schedule, "task must contain 'seed' configuration! "
+            assert 'deterministic' in schedule, "task must contain 'deterministic' configuration! "
+            if 'seed' in schedule and schedule['seed'] is not None and 'deterministic' in schedule and schedule['deterministic']: 
+                self._set_seed(schedule['seed'], schedule['deterministic'])
+     
 
 
     #根据seed设置训练结果的随机性
@@ -124,7 +124,7 @@ class Base(TrainingObservable):
         random.seed(worker_seed)
 
     def init_model(self):
-        self.model.load(self.init_state_dict)
+        self.model.load_state_dict(self.init_state_dict)
 
     #Here ensure that the type of the output model is nn.module 
     def get_model(self):
@@ -195,9 +195,9 @@ class Base(TrainingObservable):
         self.model.train()
         optimizer = self.optimizer(self.model.parameters(), lr=current_schedule['lr'], momentum=current_schedule['momentum'], weight_decay=current_schedule['weight_decay'])
         
-        work_dir = current_schedule['work_dir']  
-        log_path = osp.join(work_dir, 'log.txt')
-        log = Log(log_path)
+        # work_dir = current_schedule['work_dir']  
+        # log_path = osp.join(work_dir, 'log.txt')
+        # log = Log(log_path)
         experiment = current_schedule['experiment']
         t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
         msg = "\n==========Execute model train in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
@@ -256,7 +256,7 @@ class Base(TrainingObservable):
     def interact_in_training():
         pass
 
-    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None, work_dir = None):
+    def _test(self, dataset, device, batch_size=16, num_workers=8, model=None):
         if model is None:
             model = self.model
         else:
@@ -334,8 +334,8 @@ class Base(TrainingObservable):
             device = torch.device("cpu")
             print(f"Use cpu to test.")
 
-        work_dir = current_schedule['work_dir']
-        log = Log(osp.join(work_dir, 'log.txt'))
+        # work_dir = current_schedule['work_dir']
+        # log = Log(osp.join(work_dir, 'log.txt'))
         experiment = current_schedule['experiment']
         t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
         msg = "\n==========Execute model test in {experiment} at {time}==========\n".format(experiment=experiment, time=t)
@@ -343,7 +343,7 @@ class Base(TrainingObservable):
         
         last_time = time.time()
         # test result on test dataset
-        predict_digits, labels = self._test(test_dataset, device, batch_size=current_schedule['batch_size'], num_workers=current_schedule['num_workers'], model=model,work_dir=work_dir)
+        predict_digits, labels = self._test(test_dataset, device, batch_size=current_schedule['batch_size'], num_workers=current_schedule['num_workers'], model=model)
 
         total_num = labels.size(0)
         prec1, prec5 = compute_accuracy(predict_digits, labels, topk=(1, 5))

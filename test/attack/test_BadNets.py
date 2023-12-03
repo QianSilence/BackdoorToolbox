@@ -31,6 +31,7 @@ import matplotlib.colors as mcolors
 from sklearn import manifold
 from utils import show_img,save_img,accuracy,compute_accuracy,get_latent_rep, plot_2d,count_model_predict_digits
 from utils import Log,parser
+from utils.compute import cluster_metrics
 from config import get_task_config,get_task_schedule,get_attack_config
 import pdb
 
@@ -47,7 +48,7 @@ if dataset == "MNIST":
     dir = 'BadNets'
     layer = "fc2"
 
-elif dataset == "CIFAR10":
+elif dataset == "CIFAR-10":
     #{model}_{datasets}_{attack}_{defense}
     experiment = 'ResNet-18_CIFAR-10_BadNets' 
     task = 'ResNet-18_CIFAR-10'
@@ -56,7 +57,7 @@ elif dataset == "CIFAR10":
     dir = 'BadNets'
     layer = "linear"
     
-elif dataset == "CIFAR100":
+elif dataset == "CIFAR-100":
     experiment = 'ResNet-18_CIFAR-100_BadNets'
     task = 'ResNet-18_CIFAR-100'
     attack = 'BadNets'
@@ -66,60 +67,85 @@ elif dataset == "CIFAR100":
 elif dataset == "ImageNet":
     pass
    
+task_config = get_task_config(task = task)
+schedule = get_task_schedule(task = task)
+attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
+
+poisoning_rate = attack_schedule["poisoning_rate"]
+
 work_dir = os.path.join(BASE_DIR,'experiments/' + task + '/'+ dir)
 # work_dir = os.path.join(BASE_DIR,'experiments/Mine/BaselineMNISTNetwork_MNIST_BadNets_Mine')
 datasets_dir = os.path.join(work_dir,'datasets')
+
 poison_datasets_dir = os.path.join(datasets_dir, 'poisoned_data')
+poison_datasets_dir = os.path.join(poison_datasets_dir, f"poison_{poisoning_rate}/")
+
 predict_dir = os.path.join(datasets_dir,'predict')
+predict_dir = os.path.join(predict_dir, f"poison_{poisoning_rate}/")
+
 latents_dir = os.path.join(datasets_dir,'latents')
+latents_dir = os.path.join(latents_dir, f"poison_{poisoning_rate}/")
+
 model_dir = os.path.join(work_dir,'model')
+model_dir = os.path.join(model_dir, f"poison_{poisoning_rate}/")
+
 show_dir = os.path.join(work_dir,'show')
+show_dir = os.path.join(show_dir, f"poison_{poisoning_rate}/")
+
 
 dirs = [work_dir, datasets_dir, poison_datasets_dir, predict_dir, latents_dir, model_dir, show_dir]
 for dir in dirs:
     if not os.path.exists(dir):
         os.makedirs(dir)
-# pdb.set_trace()
 
-task_config = get_task_config(task = task)
-schedule = get_task_schedule(task = task)
 schedule['experiment'] = experiment
 schedule['work_dir'] = work_dir
-attack_schedule = get_attack_config(attack_strategy= attack, dataset = dataset)
+
 attack_schedule['work_dir'] = work_dir
 attack_schedule['train_schedule'] = schedule
-#  0.4, 0.6, 0.8
-cover_rate = 0.8
+
 
 if __name__ == "__main__":
     """
     Users can select the task to execute by passing parameters.
     1. The task of generating and showing backdoor samples
-        python test_BadNets.py --dataset "MNIST"  --subtask "generate backdoor samples" 
-        python test_BadNets.py --dataset "CIFAR10"  --subtask "generate backdoor samples" 
+        python test_BadNets.py --dataset "MNIST"  --subtask "generate train backdoor samples" 
+        python test_BadNets.py --dataset "CIFAR-10"  --subtask "generate train backdoor samples" 
+
+        python test_BadNets.py --dataset "MNIST"  --subtask "generate test backdoor samples" 
+        python test_BadNets.py --dataset "CIFAR-10"  --subtask "generate test backdoor samples" 
 
     2. The task of showing backdoor samples
         python test_BadNets.py --dataset "MNIST" --subtask "show train backdoor samples"
-        python test_BadNets.py --dataset "CIFAR10" --subtask "show train backdoor samples"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "show train backdoor samples"
         python test_BadNets.py --dataset "MNIST" --subtask "show test backdoor samples"
-        python test_BadNets.py --dataset "CIFAR10" --subtask "show test backdoor samples"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "show test backdoor samples"
         
     3. The task of training backdoor model
         3.1 python test_BadNets.py --dataset "MNIST" --subtask "attack"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "attack"
         3.2 python test_BadNets.py --dataset "MNIST" --subtask "adptive attack"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "adptive attack"
 
     4.The task of testing backdoor model
         python test_BadNets.py --dataset "MNIST" --subtask "test"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "test"
 
     5.The task of generating latents
         python test_BadNets.py --dataset "MNIST" --subtask "generate latents"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "generate latents"
         
     6.The task of visualizing latents by t-sne
-        python test_BadNets.py --dataset "MNIST" --subtask "visualize latents by t-sne"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "visualize latents by t-sne"
 
-        python test_BadNets.py --subtask "visualize latents for target class by t-sne"
+        python test_BadNets.py --dataset "CIFAR-10" --subtask "visualize latents for target class by t-sne"
 
-    7.The task of comparing predict_digits
+    7.The task of filtering data 
+      python test_BadNets.py --subtask "compute condition number" --dataset "MNIST"
+      python test_BadNets.py --subtask "compute condition number" --dataset "CIFAR-10"
+
+
+    8.The task of comparing predict_digits
         python test_BadNets.py --subtask "generate predict_digits"
         python test_BadNets.py --subtask "compare predict_digits"
 
@@ -128,8 +154,6 @@ if __name__ == "__main__":
     t = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
     msg = "\n\n\n==========Start {0} at {1}==========\n".format(experiment,t)
     log(msg)
-    # Show the structure of the model
-    log(str(task_config['model']))
 
     badnets = BadNets(
         task_config,
@@ -137,7 +161,7 @@ if __name__ == "__main__":
     )
     backdoor = BackdoorAttack(badnets)
  
-    if args.subtask == "generate backdoor samples":
+    if args.subtask == "generate train backdoor samples":
         # Generate backdoor sample
         log("\n==========Generate backdoor samples==========\n")
         poisoned_train_dataset = backdoor.create_poisoned_train_dataset()
@@ -152,10 +176,13 @@ if __name__ == "__main__":
             print(f"the number of sample with label:{label} in poisoned_train_dataset:{labels.tolist().count(i)}\n")
         
         #Save poisoned dataset
+        
         torch.save(poisoned_train_dataset, os.path.join(poison_datasets_dir,'train.pt'))
         log("Save generated train_datasets to" + os.path.join(poison_datasets_dir,'train.pt'))
 
-        poisoned_test_dataset = backdoor.create_poisoned_test_dataset()
+    if args.subtask == "generate test backdoor samples":
+
+        poisoned_test_dataset = backdoor.create_poisoned_test_dataset(poisoning_rate = 0.1)
         poison_test_indices =  poisoned_test_dataset.get_poison_indices()
         benign_test_indexs = list(set(range(len(poisoned_test_dataset))) - set(poison_test_indices))
         log("Total samples:{0}, poisoning samples:{1}, benign samples:{2}".format(len(poisoned_test_dataset),\
@@ -173,12 +200,14 @@ if __name__ == "__main__":
         log(f"Random index:{index}") 
         # Outside of neural networks, packages including numpy and matplotlib are usually used for data operations, 
         # so the type of data is usually converted to np.ndrray()
-        image, label, _ = poisoned_train_dataset[index]
-
-        image = image.numpy()
+        # image, label, _ = poisoned_train_dataset[index]
+        image, label, _ = poisoned_train_dataset.get_sample_by_index(index)
+        if isinstance(image,torch.Tensor):
+            image = image.numpy()
         backdoor_sample_path = os.path.join(show_dir, "backdoor_train_sample.png")
         title = "label: " + str(label)
         save_img(image, title=title, path=backdoor_sample_path)
+        log("Save train backdoor samples to" + backdoor_sample_path)
 
     elif args.subtask == "show test backdoor samples":
         log("\n==========Show posioning test sample==========\n")
@@ -188,15 +217,19 @@ if __name__ == "__main__":
         index = poison_indices[random.choice(range(len(poison_indices)))]
         log(f"Random index:{index}") 
 
-        image, label, _ = poisoned_test_dataset[index] 
+        # image, label, _ = poisoned_test_dataset[index] 
+        image, label, _ = poisoned_test_dataset.get_sample_by_index(index)
         image = image.numpy()
         backdoor_sample_path = os.path.join(show_dir, "backdoor_test_sample.png")
         title = "label: " + str(label)
         save_img(image, title=title, path=backdoor_sample_path)
+        log("Save test backdoor samples to" + backdoor_sample_path)
 
     elif args.subtask == "attack":
         #Train and get backdoor model
         log("\n==========Train on poisoned_train_dataset and get backdoor model==========\n")
+        # Show the structure of the model
+        log(str(task_config['model']))
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt')) 
         backdoor.attack(train_dataset = poisoned_train_dataset)
         poisoned_model = backdoor.get_backdoor_model()
@@ -204,6 +237,7 @@ if __name__ == "__main__":
         log("Save backdoor model to" + os.path.join(model_dir, 'backdoor_model.pth'))
 
     elif args.subtask == "adptive attack":
+        cover_rate = None
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
         poison_indices = poisoned_train_dataset.get_poison_indices()
         indces = np.random.choice(np.arange(len(poison_indices)),size = int(len(poison_indices) * cover_rate))
@@ -245,7 +279,7 @@ if __name__ == "__main__":
         model.to(device)
         poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
         poison_indices = poisoned_train_dataset.get_poison_indices()
-        model.load_state_dict(torch.load(os.path.join(work_dir, f'model/backdoor_model.pth')),strict=False)
+        model.load_state_dict(torch.load(os.path.join(model_dir, f'backdoor_model.pth')),strict=False)
         # Get the latent representation in the middle layer of the model.
         latents,y_labels = get_latent_rep(model, layer, poisoned_train_dataset, device=device)
         latents_path = os.path.join(latents_dir, f"latents.npz")
@@ -263,7 +297,7 @@ if __name__ == "__main__":
    
         # get low-dimensional data points by t-SNE
         n_components = 2 # number of coordinates for the manifold
-        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=1000, random_state=0 )
         points = t_sne.fit_transform(latents)
 
         # points = points*1000
@@ -273,12 +307,12 @@ if __name__ == "__main__":
         num = len(poisoned_train_dataset.classes)
         # Custom color mapping
         colors = [plt.cm.tab10(i) for i in range(num)]
-        colors.append("red") 
+        colors.append("black") 
         y_labels[poison_indices] = num
         # Create a ListedColormap objectall_
         cmap = mcolors.ListedColormap(colors)
         title = "t-SNE diagram of latent representation"
-        path = os.path.join(show_dir, f"latent_2d_all_clusters_poison_rate_0.1.png")
+        path = os.path.join(show_dir, f"latent_2d_all_clusters.png")
         plot_2d(points, y_labels, title=title, cmap=cmap, path=path)
            
     elif args.subtask == "visualize latents for target class by t-sne":
@@ -293,16 +327,22 @@ if __name__ == "__main__":
         latents,y_labels = data["latents"],data["y_labels"]
 
         indexs = np.where(y_labels == attack_schedule['y_target'])[0]
+
+        poison_latents = torchvision.transforms.ToTensor()(latents[poison_indices]).squeeze()
+        clean_latents = torchvision.transforms.ToTensor()(latents[np.setdiff1d(indexs,poison_indices)]).squeeze()
+
+        silhouette_score , intra_clust_dists, inter_clust_dists= cluster_metrics(clean_latents, poison_latents)
+        print(f"clean_latents:{clean_latents.shape},poison_latents:{poison_latents.shape},silhouette_score:{silhouette_score},intra_clust_dists:{intra_clust_dists},inter_clust_dists:{inter_clust_dists}\n")
+
         color_numebers = [0 if index in poison_indices else 1 for index in indexs]
         color_numebers = np.array(color_numebers)
 
         # get low-dimensional data points by t-SNE
         n_components = 2 # number of coordinates for the manifold
-        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=250, random_state=0 )
+        t_sne = manifold.TSNE(n_components=n_components, perplexity=30, early_exaggeration=120, init="pca", n_iter=1000, random_state=0 )
         points = t_sne.fit_transform(latents[indexs])
-        points = points*100
 
-        colors = ["blue","red"]
+        colors = ["black","blue"]
         cmap = mcolors.ListedColormap(colors)
         title = "t-SNE diagram of latent representation"
         path = os.path.join(show_dir,"latent_2d_clusters.png")
@@ -352,7 +392,36 @@ if __name__ == "__main__":
         
         log("\n==========entropy vs poison_entropy.==========\n") 
         log("entropy:{0},sum:{1}\n".format(entropy_matrix[0],entropy_vector[0]))
-        log("poison entropy:{0},sum:{1}\n".format(poison_entropy_matrix[0],poison_entropy_vector[0])) 
+        log("poison entropy:{0},sum:{1}\n".format(poison_entropy_matrix[0],poison_entropy_vector[0]))
+
+    elif args.subtask == "compute condition number":
+        
+        latents_path = os.path.join(latents_dir,"latents.npz")
+        data = np.load(latents_path)
+        latents, y_labels = data["latents"], data["y_labels"]
+        log(f"The shape of the 'latents' matrix is {latents.shape}\n")
+        cur_indices = np.where(y_labels == attack_schedule["y_target"])[0]
+        
+        poisoned_train_dataset = torch.load(os.path.join(poison_datasets_dir,'train.pt'))
+        poison_indices = poisoned_train_dataset.get_poison_indices()
+        clean_indices = np.setdiff1d(cur_indices, poison_indices)
+
+        mix_latents = latents[cur_indices]
+        mix_mean = np.mean(mix_latents, axis=0, keepdims=True) 
+        mix_centered_cov = mix_latents - mix_mean
+        # Use Frobenius norm
+        mix_cond_number = np.linalg.cond(np.dot(mix_centered_cov.T,mix_centered_cov), p='fro')
+        mix_u, mix_s, mix_v = np.linalg.svd(mix_centered_cov, full_matrices=False)
+
+        clean_latents = latents[clean_indices]
+        clean_mean = np.mean(clean_latents, axis=0, keepdims=True) 
+        centered_cov = clean_latents - clean_mean
+        # Use Frobenius norm
+        cond_number = np.linalg.cond(np.dot(centered_cov.T,centered_cov), p='fro')
+        u, s, v = np.linalg.svd(centered_cov, full_matrices=False)
+
+        log(f'mix_cov_cond_number:{mix_cond_number},Top 10 Singular Values:{mix_s[0:20]},cond_number:{cond_number},Top 10 Singular Values:{s[0:20]}\n')
+        log(f'Mix Singular Values:{mix_s}, Singular Values:{s}\n')
 
 
 

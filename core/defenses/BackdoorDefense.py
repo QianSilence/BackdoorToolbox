@@ -68,17 +68,33 @@ class BackdoorDefense(object):
         self.clean_indices = None
         self.target_label_inds = None
         self.repaired_model =  None
+
     def get_defense_strategy(self):
         return self.defense_strategy
     
-    def get_repaired_model(self, dataset=None, schedule=None):
-        if self.repaired_model is None:
-            self.defense_method.repair(dataset, schedule)
+    def repair(self, dataset=None, schedule=None):
+        self.defense_method.repair( dataset=dataset, schedule=schedule)
+
+    def get_repaired_model(self):
         self.repaired_model = self.defense_method.get_model()
         return self.repaired_model
     
     def get_target_label(self):
         return self.defense_method.get_target_label()
+    
+    def filter(self, model=None, dataset=None, schedule=None):
+        """
+        Return the results of dataset filtering
+        """
+        self.poisoned_indices, self.clean_indices = self.defense_method.filter(model, dataset, schedule) 
+        return self.poisoned_indices, self.clean_indices
+    
+    def filter_with_latents(self, latents_path=None, schedule=None):
+        self.poisoned_indices, self.clean_indices =  self.defense_method.filter_with_latents(latents_path, schedule) 
+        return self.poisoned_indices, self.clean_indices
+   
+    def test(self, model=None, test_dataset=None, schedule=None): 
+        return self.defense_method.test(schedule, model, test_dataset)
 
     def get_pred_poisoned_sample_dist(self):
         return  self.defense_method.get_poison_data_pool()
@@ -93,30 +109,10 @@ class BackdoorDefense(object):
         expected[poison_indices] = 1
         return expected
 
-    def filter(self, dataset=None, schedule=None):
-        """
-        Return the results of dataset filtering
-        """
-        self.poisoned_indices, self.clean_indices =  self.defense_method.filter(dataset, schedule)
-        return self.poisoned_indices, self.clean_indices
-   
-    def test(self, schedule=None, model=None, test_dataset=None): 
-        return self.defense_method.test(schedule, model, test_dataset)
-    
     def invert_random_labels(self):
         return self.defense_method.invert_random_labels()
     
 
-    def add_training_observer(self,observer):
-        self.attack_method.add_training_observer(observer)
-    def delete_training_observer(self,observer):
-        self.attack_method.delete_training_observer(observer)
-
-    def add_post_training_observer(self, observer):
-        print("add_post_training_observer")
-        self.attack_method.add_post_training_observer(observer)
-    def delete_post_training_observer(self,observer):
-        self.attack_method.delete_post_training_observer(observer)
 
 
 

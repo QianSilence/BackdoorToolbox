@@ -62,20 +62,10 @@ class BackdoorAttack(object):
            self.attack_method.train(train_dataset,schedule)
         
     # 这里测试逻辑允许指定调度和测试数据集
-    def test(self, schedule=None, model=None, test_dataset=None): 
+    def test(self, model=None, test_dataset=None, schedule=None): 
         return self.attack_method.test(schedule, model, test_dataset)
 
-    def add_training_observer(self,observer):
-        self.attack_method.add_training_observer(observer)
-    def delete_training_observer(self,observer):
-        self.attack_method.delete_training_observer(observer)
 
-    def add_post_training_observer(self, observer):
-        print("add_post_training_observer")
-        self.attack_method.add_post_training_observer(observer)
-    def delete_post_training_observer(self,observer):
-        self.attack_method.delete_post_training_observer(observer)
-    
 
 
 
